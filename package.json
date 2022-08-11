@@ -1,0 +1,29 @@
+{
+  "name": "anandakevin.github.io",
+  "version": "1.0.0",
+  "description": "My Portfolio",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anandakevin/anandakevin.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anandakevin/anandakevin.github.io/issues"
+  },
+  "homepage": "https://github.com/anandakevin/anandakevin.github.io#readme",
+  "devDependencies": {
+    "sass": "^1.54.4",
+    "vite": "^3.0.5"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "bootstrap": "^5.2.0"
+  }
+}
