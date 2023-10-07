@@ -6,6 +6,7 @@
   "scripts": {
     "build": "vite build",
     "start": "vite",
+    "deploy": "npm run build && gh-pages -d dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/anandakevin/anandakevin.github.io#readme",
   "devDependencies": {
+    "gh-pages": "^6.0.0",
     "sass": "^1.54.4",
     "vite": "^3.0.5"
   },
