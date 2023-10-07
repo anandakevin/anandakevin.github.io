@@ -24,3 +24,7 @@ hs_err_pid*
 
 # npm modules
 node_modules
+
+#Intellij IDEA Settings
+.idea/
+

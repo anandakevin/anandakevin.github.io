@@ -12,6 +12,6 @@ export default {
         hot: true
     },
     build: {
-        outDir: "../",
+        outDir: "../dist",
     },
 }
