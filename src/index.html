@@ -15,51 +15,44 @@
   </head>
   <body>
     <!-- add about, experience, Tools, work, contact -->
-    <nav class="nav justify-content-center">
-      <a href="index.html" class="header-logo">
-        <img src="/asset/logo.png" alt=""/>
-      </a>
-      <div class="container">
-        <ul class="nav justify-content-center">
-          <li class="nav-item">
-
-            <a class="nav-link" href="#about">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#exp">Experience</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#legacy">Legacy</a>
-          </li>
-          <li class="nav-item">
-			<a class="nav-link" href="#tools">Stacks Used</a>
-			  
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#contact">Contact</a>
-			</li>
-			<!-- <li class="nav-item">
-			  <button class="nav-home-btn hexagon">
-				
-			  </button> -->
-			  <!-- <svg id="home-btn" xmlns="http://www.w3.org/2000/svg">
-				<polygon
-				  id="multi-bg"
-				  stroke="currentColor"
-				  stroke-width="5"
-				  stroke-linecap="round"
-				  stroke-linejoin="round"
-				  points="39 0 0 22 0 67 39 90 78 68 78 23"
-				>
-				  <a></a>
-				</polygon>
-			  </svg>
-		
-			  <button class="nav-home-btn"></button> 
-			</li> -->
-        </ul>
-	</div>
-    </nav>
+	<header id="navbar">
+		<nav class="navbar-container container">
+			<!-- <img src="/asset/logo.png" alt=""/> -->
+			<a href="index.html" class="navbar-home exo-2-logo">
+				AKRS
+			</a>
+			<button
+				type="button"
+				id="navbar-toggle"
+				aria-controls="navbar-menu"
+				aria-label="Toggle menu"
+				aria-expanded="false"
+			>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<div id="navbar-menu">
+				<ul class = navbar-links>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#about">About</a>
+					</li>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#exp">Experience</a>
+					</li>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#legacy">Legacy</a>
+					</li>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#tools">Stacks Used</a>
+					</li>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#contact">Contact</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</header>
 
     
     <div id="intro">
@@ -82,7 +75,7 @@
     
     <div id="legacy">
 		<div>
-		Some of My Projecs and Achievements
+			Some of My Projecs and Achievements
 		</div>
 		<div id="project">
 			Projects
@@ -111,18 +104,20 @@
     <div id="contact">		
 		<div class="vertical-line"></div>
 		<div>
-			<div class="par">What's next?</div>
+			<div class="">What's next?</div>
 			<h1>Reach me out!</h1>
-			<div class="par">I’m open for new opportunities and connections. If you have any questions, inquiries,
-				or just want to have a chat and connect, I’d be happy to answer! 
-				I’ll try my best to get back to you</div>
-			
-			<div class="btn-gradient" style="--c:radial-gradient(#26F994, #22879D)">
-				<!-- <a> -->
-					Slide in here
-				<!-- </a> -->
+			<div class="">I’m open for new opportunities and connections. If you have any questions, inquiries,
+				or just want to have a chat and connect
+				<br>
+				I’d be happy to answer! I’ll try my best to get back to you
 			</div>
-			<div class="par">© 2024 Ananda Kevin Refaldo Sariputra. All rights reserved</div>
+			
+			<a href="mailto:anandakevinsariputra@gmail.com">
+			<div class="btn-gradient" style="--c:radial-gradient(#26F994, #22879D)">
+				Slide in
+			</div>
+			</a>
+			<div class="">© 2024 Ananda Kevin Refaldo Sariputra. All rights reserved</div>
 		</div>
     </div>
     <script type="module" src="./js/main.js"></script>
