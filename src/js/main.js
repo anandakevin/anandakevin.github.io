@@ -33,4 +33,10 @@ const navbarMenu = document.querySelector('#navbar-menu');
 const navbarLinksContainer = navbarMenu.querySelector('.navbar-links');
 
 navbarLinksContainer.addEventListener('click', (e) => e.stopPropagation());
-// navbarMenu.addEventListener('click', toggleNavbarVisibility);
+navbarMenu.addEventListener('click', toggleNavbarVisibility);
+
+const navbarLinks = document.querySelectorAll('.navbar-item');
+
+navbarLinks.forEach(item => {
+	item.addEventListener('click', toggleNavbarVisibility);
+})

@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
+  <script type="module" src="./js/main.js"></script>
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
   <body>
     <!-- add about, experience, Tools, work, contact -->
 	<header id="navbar">
@@ -54,54 +56,55 @@
 		</nav>
 	</header>
 
-    
-    <div id="intro">
+    <main>
+		<div id="intro" class="content-container">
 
-    </div>
+		</div>
 
-    <div id="about">
-      <div>
-        About me
-      </div>
-    </div>
-    
-    <div id="exp">
-      <div>Experience</div>
-    </div>
-
-	<div id="edu">
-		<div>Education</div>
-	</div>
-    
-    <div id="legacy">
+		<div id="about" class="content-container">
 		<div>
-			Some of My Projecs and Achievements
+			About me
 		</div>
-		<div id="project">
-			Projects
 		</div>
-		<div id="award">
-			Awards
+		
+		<div id="exp" class="content-container">
+		<div>Experience</div>
 		</div>
-		<div id="scholarship">
-			Scholarships
-		</div>
-    </div>
-    
-    <div id="tools">
-      <div>
-        Tech Stacks & Tools worked with
-      </div>
-	  <div>
-		<box-icon type='logo' name='github'></box-icon>
-	  </div>
-    </div>
-    
-	<div id="sidebar">
-		<box-icon type='logo' name='instagram'></box-icon>
-	</div>
 
-    <div id="contact">		
+		<div id="edu" class="content-container">
+			<div>Education</div>
+		</div>
+		
+		<div id="legacy" class="content-container">
+			<div>
+				Some of My Projecs and Achievements
+			</div>
+			<div id="project">
+				Projects
+			</div>
+			<div id="award">
+				Awards
+			</div>
+			<div id="scholarship">
+				Scholarships
+			</div>
+		</div>
+		
+		<div id="tools" class="content-container">
+		<div>
+			Tech Stacks & Tools worked with
+		</div>
+		<div>
+			<box-icon type='logo' name='github'></box-icon>
+		</div>
+		</div>
+		
+		<div id="sidebar">
+			<box-icon type='logo' name='instagram'></box-icon>
+		</div>
+	</main>
+
+    <footer id="contact">		
 		<div class="vertical-line"></div>
 		<!-- <hr width="1" size="500" style="0 auto" /> -->
 		<div>
@@ -121,8 +124,6 @@
 			</a>
 			<div class="">© 2024 Ananda Kevin Refaldo Sariputra. All rights reserved</div>
 		</div>
-    </div>
-    <script type="module" src="./js/main.js"></script>
-	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    </footer>
   </body>
 </html>
