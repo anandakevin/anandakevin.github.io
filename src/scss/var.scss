@@ -9,10 +9,15 @@ $lime-green: #64ffda;
 :root {
 	--navbar-bg-color: $page-background-color;
 	--navbar-text-color: whitesmoke;
+	--content-text-color: whitesmoke;
+	--sidebar-text-color: whitesmoke;
 	--navbar-text-color-focus: #22879D;
-	--navbar-link-text-color-focus: #0a192f;
+	--navbar-link-text-color-focus: #102b55;
 	// --navbar-bg-contrast: hsl(0, 0%, 25%);
 	--navbar-bg-contrast:  #26F994;
 	--navbar-logo-font-size: 5rem;
 	--navbar-links-font-size: 1.5rem;
+	--line-color: #26F994;
+	--font-size-sidebar: 15px;
+	--font-line-height: 18px;
 }

@@ -1,7 +1,7 @@
 $lime-green: #64ffda;
 
 .vertical-line {
-	border-left: 1.5px solid #26F994;
+	border-left: 1.5px solid var(--line-color);
 	height: 10vh;
 	position: relative;
 	margin: 40px 0px;
