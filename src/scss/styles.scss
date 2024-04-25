@@ -263,6 +263,15 @@ a.navbar-link {
 	letter-spacing: 0.1em;
 }
 
+.sidebar-container-left li, .sidebar-container-right a{
+	transition: 0.2s ease-out;
+}
+
+
+.sidebar-container-left li:hover, .sidebar-container-right a:hover {
+	transform: translateY(-10px);
+}
+
 .sidebar::after {
 	content: "";
 	display: block;
