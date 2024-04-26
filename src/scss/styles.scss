@@ -22,10 +22,6 @@ main {
 	padding: 10% 15%;
 }
 
-p {
-	white-space: pre-wrap;
-}
-
 a, .icon-bar, .navbar-item, .btn-gradient{
 	text-decoration: none;
 	-moz-transition: color .2s ease-in;
@@ -40,6 +36,7 @@ a, .icon-bar, .navbar-item, .btn-gradient{
 
 p {
 	padding: 0em 0em;
+	// white-space: pre-wrap;
 }
 
 .container {
@@ -100,6 +97,10 @@ a.navbar-link {
 .navbar-link:is(:focus, :hover) {
 	color: var(--navbar-link-text-color-focus);
 	background-color: var(--navbar-bg-contrast);
+}
+
+.resume-btn:is(:focus, :hover), .profpic:is(:focus, :hover){
+	transform: translateY(-10px);
 }
 
 #navbar-toggle {
@@ -165,7 +166,6 @@ a.navbar-link {
 	// background-color: var(--navbar-bg-color);
 	background-color: $page-background-color;
 	display: flex;
-	flex-direction: column;
 	align-items: center;
 	box-shadow: 0 0 20px rgba(0, 0, 0, 1);
 	font-size: var(--navbar-links-font-size);
@@ -215,6 +215,11 @@ a.navbar-link {
 		--navbar-links-font-size: 1.5rem;
 	}
 
+	.container-2 {
+		// display: grid;
+		flex-direction: column;
+	}
+
 	.sidebar {
 		visibility: hidden;
 	}
@@ -249,7 +254,7 @@ a.navbar-link {
 
 .profpic{
 	width: 100%;
-	height: 100%;
+	// height: 100%;
 }
 
 .sidebar-container-left {
@@ -332,6 +337,7 @@ footer {
 
 .btn-gradient {
 	--b:5px;  /* border width*/
+	--r:5px;
 	color: whitesmoke;
 	padding: calc(var(--b) + 5px) calc(var(--b) + 15px);
 	display: inline-block;
@@ -355,7 +361,7 @@ footer {
 	right: 0;
 	bottom: 0;
 	padding: var(--b);
-	border-radius: var(--r);
+	border-radius: 5px;
 	background-image: var(--c,radial-gradient(#26F994, #22879D));
 	background-size: auto;
 	--mask: url('data:image/svg+xml;utf8,<svg  xmlns="http://www.w3.org/2000/svg" ><rect x="5" y="5" width="100%" height="100%" style="height:calc(100% - 10px);width:calc(100% - 10px)" rx="10" ry="10" stroke-width="3" fill="transparent" stroke="white"/></svg>');
