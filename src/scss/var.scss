@@ -1,13 +1,14 @@
 $font-family-base: "ABeeZee", sans-serif;
-$primary: #ff9643;
-$text-primary: #0d095c;
 $enable-cssgrid: true;
+$primary: #ff9643;
 $page-background-color: #0a192f;
+$text-primary: #0d095c;
 $dark-grey: #c1cae9;
 $lime-green: #64ffda;
+$highlight-color: #22879D;
 
 :root {
-	--navbar-bg-color: $page-background-color;
+	--navbar-bg-color: #0a192f;
 	--navbar-text-color: whitesmoke;
 	--content-text-color: whitesmoke;
 	--sidebar-text-color: whitesmoke;
@@ -20,4 +21,6 @@ $lime-green: #64ffda;
 	--line-color: #26F994;
 	--font-size-sidebar: 15px;
 	--font-line-height: 18px;
+	--highlight-color: #4ecae9;
+	--heading-color:  #26F994;
 }
