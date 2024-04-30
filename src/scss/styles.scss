@@ -39,6 +39,12 @@ p {
 	// white-space: pre-wrap;
 }
 
+img, svg {
+    width: 100%;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
 .container {
 	max-width: 2000px;
 	padding: 0 1.4rem;
@@ -99,7 +105,7 @@ a.navbar-link {
 	background-color: var(--navbar-bg-contrast);
 }
 
-.resume-btn:is(:focus, :hover), .profpic:is(:focus, :hover){
+.resume-btn:is(:focus, :hover){
 	transform: translateY(-10px);
 }
 
@@ -251,11 +257,67 @@ a.navbar-link {
 .container-2 {
 	width: 100%;
 	display: flex;
+	gap: 50px;
+}
+
+.profpic-wrapper-container {
+	max-width: 300px;
+	position: relative;
+
 }
 
 .profpic{
 	width: 100%;
-	// height: 100%;
+	// padding: 1.4rem;
+}
+
+.profpic-wrapper {
+    box-shadow: 0 10px 30px -15px var(--navy-shadow);
+    transition: var(--transition);
+    display: block;
+    position: relative;
+    width: 100%;
+	height: auto;
+    border-radius: var(--border-radius);
+    background-color: var(--line-color);
+}
+
+.profpic-wrapper img {
+    position: relative;
+    border-radius: var(--border-radius);
+    mix-blend-mode: multiply;
+    filter: grayscale(50%) contrast(1);
+    transition: var(--transition);
+}
+
+.profpic-wrapper:is(:focus, :hover){
+	transform: translateX(-10px) translateY(-10px);
+
+	img {
+		mix-blend-mode: normal;
+		filter: none;
+	}
+}
+
+.profpic-wrapper:is(:focus, :hover)::after {
+	transform: translateX(20px) translateY(20px);
+}
+
+.profpic-wrapper::before, .profpic-wrapper::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.profpic-wrapper::after {
+	border: 2px solid #26F994;
+	top: 14px;
+	left: 14px;
+	z-index: -1;
 }
 
 .sidebar-container-left {
