@@ -1,6 +1,10 @@
 import '../scss/styles.scss';
 import '../scss/font-styles.scss';
 import '../scss/figures.scss';
+import AOS from 'aos';
+import 'aos/dist/aos.css'; // You can also use <link> for styles
+// ..
+AOS.init();
 
 import * as bootstrap from 'bootstrap';
 
