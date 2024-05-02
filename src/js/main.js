@@ -39,19 +39,40 @@ const navbarLinksContainer = navbarMenu.querySelector('.navbar-links');
 navbarLinksContainer.addEventListener('click', (e) => e.stopPropagation());
 navbarMenu.addEventListener('click', toggleNavbarVisibility);
 
-const navbarLinks = document.querySelectorAll('.navbar-item');
+const navbarLinks = document.querySelectorAll('.navbar-link');
+// let navbarLinks2 = select('.navbar-link', true)
 
 navbarLinks.forEach(item => {
-	item.addEventListener('click', toggleNavbarVisibility);
+  item.addEventListener('click', toggleNavbarVisibility);
 })
 
-var prevScrollpos = window.scrollY || window.pageYOffSet;
+var prevScrollPos = window.scrollY || window.pageYOffSet;
 window.onscroll = function() {
   var currentScrollPos = window.scrollY || window.pageYOffSet;
-  if (prevScrollpos > currentScrollPos) {
+  var position = currentScrollPos + 150;
+
+  if (prevScrollPos > currentScrollPos) {
     document.getElementById("navbar").style.top = "0";
   } else {
     document.getElementById("navbar").style.top = "-100px";
   }
-  prevScrollpos = currentScrollPos;
+  prevScrollPos = currentScrollPos;
+
+  navbarLinks.forEach(item => {
+    if (!item.hash) return;
+    let section = document.querySelector(item.hash);
+    if (!section) return;
+    if (position >= section.offsetTop && position <= (section.offsetTop + section.offsetHeight)) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  })
 }
+
+// const navbarLinksActive = () => {
+//   let position = window.scrollY + 200;
+
+// }
+// window.addEventListener('load', navbarLinksActive);
+// onscroll(document, navbarLinksActive);
