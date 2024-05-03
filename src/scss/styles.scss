@@ -312,6 +312,7 @@ img, svg {
 	height: auto;
 	display: flex;
 	list-style: none;
+	flex-wrap: wrap;
 	gap: 20px;
 	align-items: center;
 	justify-content: center;
@@ -511,5 +512,4 @@ footer {
 		height: 100%;
 	}
 
-	
 }
