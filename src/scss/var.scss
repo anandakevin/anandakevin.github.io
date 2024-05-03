@@ -8,10 +8,12 @@ $lime-green: #64ffda;
 $highlight-color: #22879D;
 
 :root {
+	--page-color: #0a192f;
 	--navbar-bg-color: #0a192f;
 	--navbar-text-color: whitesmoke;
 	--content-text-color: whitesmoke;
 	--sidebar-text-color: whitesmoke;
+	--text-color: whitesmoke;
 	--navbar-text-color-focus: #22879D;
 	--navbar-link-text-color-focus: #102b55;
 	// --navbar-bg-contrast: hsl(0, 0%, 25%);
@@ -24,5 +26,5 @@ $highlight-color: #22879D;
 	--highlight-color: #4ecae9;
 	--heading-color:  #26F994;
 	--transition: all 0.25s cubic-bezier(0.645,0.045,0.355,1);
-	--border-radius: 5px;
+	--border-radius: 2px;
 }

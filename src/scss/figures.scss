@@ -1,13 +1,14 @@
 $lime-green: #64ffda;
 
-#contact::before {
-	border-left: 1.5px solid var(--line-color);
-	height: 10vh;
-	position: relative;
-	margin: 40px 0px;
-	left: 50%;
-	width: 50%;
-}
+// footer::before {
+//   content: "";
+// 	border-left: 1.5px solid var(--line-color);
+// 	height: 10rem;
+// 	position: relative;
+// 	margin: 40px 0px;
+// 	left: 50%;
+// 	width: 50%;
+// }
 
 #home-btn {
   color: $lime-green;
