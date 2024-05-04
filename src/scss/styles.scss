@@ -318,6 +318,10 @@ img, svg {
 	justify-content: center;
 }
 
+.stacks-container .lab{
+	font-size: 40px;
+}
+
 .sidebar-container-left {
 	width: 40px;
 	position: fixed;
@@ -348,6 +352,14 @@ img, svg {
 
 .sidebar a {
 	color: white;
+}
+ 
+.sidebar a .fa-brands{
+	font-size: 24px;
+}
+
+.sidebar a .lab{
+	font-size: 32px;
 }
 
 .sidebar a:hover {
