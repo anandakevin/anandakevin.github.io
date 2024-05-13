@@ -30,10 +30,6 @@ a, .icon-bar, .navbar-item, .btn-gradient{
     transition: color .2s ease-in;
 }
 
-.icon-bar {
-	transition: transform .2s ease-in;
-}
-
 p {
 	padding: 0em 0em;
 	// white-space: pre-wrap;
@@ -164,6 +160,7 @@ img, svg {
 	height: 4px;
 	margin: 2px;
 	background-color: var(--navbar-text-color);
+	transition: transform .2s ease-in;
 }
   
 #navbar-toggle:is(:focus, :hover) .icon-bar {
@@ -362,6 +359,11 @@ img, svg {
 	font-size: 32px;
 }
 
+.sidebar img {
+	width: 28px;
+	height: 28px;
+}
+
 .sidebar a:hover {
 	color: var(--highlight-color);
 }
@@ -375,7 +377,7 @@ img, svg {
 .sidebar-container-right a{
 	writing-mode: vertical-rl;
 	padding: 10px;
-	margin: 20px auto;
+	// margin: 20px auto;
 	font-size: var(--font-size-sidebar);
 	color: var(--sidebar-text-color);
 	line-height: var(--font-line-height);
@@ -473,7 +475,7 @@ footer {
 		margin-bottom: 1rem;
 	}
 
-	.sidebar-container-left {
+	.sidebar-container-left, .sidebar-container-right {
 		position: relative;
 		width: auto;
 		bottom: auto;
@@ -481,7 +483,11 @@ footer {
 		right: auto;
 	}
 
-	.sidebar-container-right, .sidebar::after {
+	.sidebar-container-right a{
+		writing-mode: initial;
+	}
+
+	.sidebar::after {
 		display: none;
 	}
 
