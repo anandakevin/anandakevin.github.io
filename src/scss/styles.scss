@@ -36,8 +36,8 @@ p {
 }
 
 img, svg {
-    width: 100%;
-    max-width: 100%;
+    // width: 100%;
+    // max-width: 100%;
     vertical-align: middle;
 }
 
@@ -347,7 +347,7 @@ img, svg {
 	list-style: none;
 }
 
-.sidebar a {
+.sidebar a, .sidebar svg {
 	color: white;
 }
  
@@ -360,11 +360,11 @@ img, svg {
 }
 
 .sidebar img {
-	width: 28px;
-	height: 28px;
+	width: 32px;
+	height: 32px;
 }
 
-.sidebar a:hover {
+.sidebar a:hover, .sidebar svg:hover {
 	color: var(--highlight-color);
 }
 
@@ -411,16 +411,15 @@ img, svg {
 }
 
 footer {
-	display: block;
+	// display: block;
+	max-width: 100%;
+	padding: 2em 15%;
+}
+
+.center-layout {
 	text-align: center;
 	align-items: center;
 	justify-content: center;
-	max-width: 100%;
-	padding: 2em 0;
-}
-
-.footer-content {
-	padding: 0 15%;
 }
 
 .btn-gradient {
@@ -470,6 +469,7 @@ footer {
 	.sidebar {
 		flex-direction: row;
 		flex-wrap: wrap;
+		flex: 1;
 		max-width: 100%;
 		justify-content: center;
 		margin-bottom: 1rem;
