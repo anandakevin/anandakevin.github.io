@@ -85,8 +85,10 @@ window.onscroll = function() {
     if (!section) return;
     if (position >= section.offsetTop && position <= (section.offsetTop + section.offsetHeight)) {
       item.classList.add('active');
+      item.classList.add('shadow');
     } else {
       item.classList.remove('active');
+      item.classList.remove('shadow');
     }
   })
 }
