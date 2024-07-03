@@ -3,6 +3,9 @@ import '../scss/font-styles.scss';
 import '../scss/figures.scss';
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // You can also use <link> for styles
+import * as bootstrap from 'bootstrap';
+import $ from 'jquery';
+
 // ..
 AOS.init({
   // Global settings:
@@ -27,7 +30,6 @@ AOS.init({
 
 });
 
-import * as bootstrap from 'bootstrap';
 
 // const http = require('http')
 
@@ -44,6 +46,7 @@ import * as bootstrap from 'bootstrap';
 //     console.log(`Server running at http://${hostname}:${port}/`)
 // })
 
+// function for navbar
 const navbarToggle = navbar.querySelector('#navbar-toggle');
 let isNavbarExpanded = navbarToggle.getAttribute('aria-expanded') === 'true';
 
@@ -67,6 +70,7 @@ navbarLinks.forEach(item => {
   item.addEventListener('click', toggleNavbarVisibility);
 })
 
+// function for sticky navbar
 var prevScrollPos = window.scrollY || window.pageYOffSet;
 window.onscroll = function() {
   var currentScrollPos = window.scrollY || window.pageYOffSet;
@@ -90,6 +94,82 @@ window.onscroll = function() {
     }
   })
 }
+
+// function for tabs
+// export function toggleExp(e, exp) {
+export const toggleExp = (e, exp) => {
+	// Declare all variables
+	var i, tabcontent, tablinks;
+
+	// Get all elements with class="tabcontent" and hide them
+	tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+		tabcontent[i].style.display = "none";
+	}
+
+	// Get all elements with class="tablinks" and remove the class "active"
+	tablinks = document.getElementsByClassName("tablinks");
+	for (i = 0; i < tablinks.length; i++) {
+		tablinks[i].className = tablinks[i].className.replace(" active", "");
+	}
+
+	// Show the current tab, and add an "active" class to the link that opened the tab
+	document.getElementById(exp).style.display = "block";
+	e.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+navbarLinksContainer.addEventListener('click', (e) => e.stopPropagation());
+
+const tabsExp = document.querySelectorAll('.tab');
+// let navbarLinks2 = select('.navbar-link', true)
+
+tabsExp.forEach(item => {
+	item.addEventListener('click', (e) => toggleExp(e, 'bca'));
+})
+
+document.getElementById("defaultOpen").click();
+
+// Tabs Toggler
+
+// Variables
+const $tabLink = $('#tabs-section .tab-link');
+const $tabBody = $('#tabs-section .tab-body');
+let timerOpacity;
+
+// Toggle Class
+const init = () => {
+	console.log("abc");
+	// Menu Click
+	$tabLink.off('click').on('click', function (e) {
+		// Prevent Default
+		e.preventDefault();
+		e.stopPropagation();
+
+		// Clear Timers
+		window.clearTimeout(timerOpacity);
+
+		console.log("abc");
+		// Toggle Class Logic
+		// Remove Active Classes
+		$tabLink.removeClass('active ');
+		$tabBody.removeClass('active ');
+		$tabBody.removeClass('active-content');
+
+		// Add Active Classes
+		$(this).addClass('active');
+		$($(this).attr('href')).addClass('active');
+
+		// Opacity Transition Class
+		timerOpacity = setTimeout(() => {
+			$($(this).attr('href')).addClass('active-content');
+		}, 50);
+	});
+};
+
+// Document Ready
+init();
+
 
 // const navbarLinksActive = () => {
 //   let position = window.scrollY + 200;

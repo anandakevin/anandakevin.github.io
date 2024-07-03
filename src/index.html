@@ -10,32 +10,29 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap"
       rel="stylesheet"
     />
-	<script src="https://kit.fontawesome.com/c37d04be02.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href= "/asset/line-awesome-1.3.0/css/line-awesome.min.css" >
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
-  <script type="module" src="./js/main.js"></script>
-  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
   <body>
-    <!-- add about, experience, Tools, work, contact -->
-	<header id="navbar">
+	  <!-- add about, experience, Tools, work, contact -->
+	  <header id="navbar">
 		<nav class="navbar-container container">
 			<!-- <img src="/asset/logo.png" alt=""/> -->
 			<a href="index.html" class="navbar-home exo-2-logo">
 				AKRS
 			</a>
 			<button
-				type="button"
-				id="navbar-toggle"
-				aria-controls="navbar-menu"
-				aria-label="Toggle menu"
-				aria-expanded="false"
+			type="button"
+			id="navbar-toggle"
+			aria-controls="navbar-menu"
+			aria-label="Toggle menu"
+			aria-expanded="false"
 			>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
-			</button>
+		</button>
 			<div id="navbar-menu">
 				<ul class = navbar-links>
 					<li class="navbar-item">
@@ -45,7 +42,10 @@
 						<a class="navbar-link" href="#exp">Experience</a>
 					</li>
 					<li class="navbar-item">
-						<a class="navbar-link" href="#legacy">Legacy</a>
+						<a class="navbar-link" href="#projects">Projects</a>
+					</li>
+					<li class="navbar-item">
+						<a class="navbar-link" href="#awards">Awards</a>
 					</li>
 					<li class="navbar-item">
 						<a class="navbar-link" href="#tools">Stacks</a>
@@ -60,7 +60,7 @@
 			</div>
 		</nav>
 	</header>
-
+	
     <main>
 		<section id="intro" class="content-container">
 			<p>Hi! My Name is</p>
@@ -92,30 +92,84 @@
 		</section>
 		
 		<section id="exp" class="content-container">
-			<div>Experience</div>
+			<h1 class="">Experience</h1>
+			
+			<section class="tabs-wrapper">
+				<div class="tabs-container">
+					<div class="tabs-block">
+						<div id="tabs-section" class="tabs">
+							<ul class="tab-head">
+								<li>
+									<a href="#tab-1" class="tab-link active"> <span class="tab-label">Bank Central Asia</span></a>
+								</li>
+								<li>
+									<a href="#tab-2" class="tab-link"> <span class="tab-label">Omega Education Centre</span></a>
+								</li>
+								<li>
+									<a href="#tab-3" class="tab-link"> <span class="material-icons tab-icon">settings_input_hdmi</span> <span class="tab-label">BB Cream</span></a>
+								</li>
+								<li>
+									<a href="#tab-4" class="tab-link"> <span class="material-icons tab-icon">build</span> <span class="tab-label">Concealer</span></a>
+								</li>
+								<li>
+									<a href="#tab-5" class="tab-link"> <span class="material-icons tab-icon">toll</span> <span class="tab-label">Blush</span></a>
+								</li>
+							</ul>
+							
+							<section id="tab-1" class="tab-body entry-content active active-content">
+								<h2>Bank Central Asia</h2>
+								<p>April 2020 - Current</p>
+								<p>Face primers’ exact effects on your skin and makeup can vary, but overall, their main purpose is to keep your skin looking smooth and your makeup looking fresh all day long.</p>
+							</section>
+
+							<section id="tab-2" class="tab-body entry-content">
+								<h2>Omega Education Centre</h2>
+								<p>Foundation is probably the hardest part of your makeup routine to get right, as you not only have to consider the type of coverage you want (i.e. sheer/natural, medium, or full), but also your skin type and undertones.</p>
+								<p>If you are new to wearing foundation or aren’t sure what type/shade is right for you, I’d highly recommend going to your nearest Sephora, MAC, or department store and have a makeup artist help you pick out one that matches your complexion and fits your coverage needs. It’s also a good idea to request a sample if you want to see how a formula feels on your skin before buying.</p>
+							</section>
+
+							<section id="tab-3" class="tab-body entry-content">
+								<h2>BB Cream</h2>
+								<p>Personally, I prefer BB cream to regular foundation, as I find it to be much more natural-looking. It is a great option if you’re looking for something that has skincare benefits such as moisturizing or priming (some BB creams have primer built in).</p>
+								<p>In addition, if you are new to the makeup world, a good BB cream is an even better place to start than foundation, as it feels lighter on the skin, is hard to overdo, and can be applied with your fingers.</p>
+							</section>
+
+							<section id="tab-4" class="tab-body entry-content">
+								<h2>Concealer</h2>
+								<p>If you have acne, dark circles, or any kind of discoloration, concealer is a must-have.</p>
+								<p>Concealers come in full-coverage and sheerer-coverage formulations, and which one you should choose depends on how much you’re trying to cover up.</p>
+								<p>When choosing a concealer for acne and/or discoloration, find a shade that is as close as possible to your foundation/BB cream shade for the most natural look.</p>
+							</section>
+
+							<section id="tab-5" class="tab-body entry-content">
+								<h2>Blush</h2>
+								<p>Putting on blush can have a huge effect on your overall look, and I personally never leave it out of my makeup routine. Blush is especially necessary if you’re wearing a foundation with more opaque coverage, which can sometimes leave your complexion looking a little bit flat.</p>
+								<p>Blush comes in powder, gel, and cream formulations, with powder being the most popular. Recently, though, cream and gel blush have become very popular as well.</p>
+							</section>
+						</div>
+					</div>
+				</div>
+			</section>
 		</section>
 
 		<section id="edu" class="content-container">
-			<div>Education</div>
+			<h1>Education</h1>
 		</section>
 		
 		<section id="legacy" class="content-container">
-			<div>
-				Some of My Projecs and Achievements
-			</div>
-			<div id="project">
+			<h1>
+				Some of My Projects and Achievements
+			</h1>
+			<h2 id="project">
 				Projects
-			</div>
-			<div id="award">
+			</h2>
+			<h2 id="award">
 				Awards
-			</div>
-			<div id="scholarship">
-				Scholarships
-			</div>
+			</h2>
 		</section>
 		
 		<section id="tools" class="content-container">
-			Tech Stacks & Tools worked with
+			<h1>Tech Stacks & Tools worked with</h1>
 			<br>
 			Mobile
 			<ul class="stacks-container">
@@ -173,18 +227,18 @@
 				<li><i class="lab la-trello"></i></li>
 			</ul>
 			
-				
+			
 		</section>
-
+		
 		<!-- <div class="vertical-line"></div> -->
-
+		
 		<section id="contact" class="content-container center-layout" data-aos="fade-up">
 			<div>What's next?</div>
 			<h1>Reach me out!</h1>
 			<div>
 				<div>I’m open for new opportunities and connections.
-				<br>If you have any questions, inquiries, or just want to have a chat and connect.
-				<br>I’d be happy to answer! I’ll try my best to get back to you.</div>
+					<br>If you have any questions, inquiries, or just want to have a chat and connect.
+					<br>I’d be happy to answer! I’ll try my best to get back to you.</div>
 			</div>
 			
 			<div style="margin:1.5em 0">
@@ -196,7 +250,7 @@
 	</main>
 
 	
-		
+	
 	
 	
     <footer class="center-layout">		
@@ -230,9 +284,13 @@
 		</div>
 		
 		<div>
-			<p><a href="https://www.figma.com/file/xx7G7PArehQDICHom1zyqH/Portfolio-Page?type=design&node-id=0%3A1&mode=design&t=t16RnwNJqKfujFjP-1">Designed</a> and <a href="https://github.com/anandakevin/anandakevin.github.io">Coded</a> with ♡ using Node.JS and Vite</p>
+			<p><a href="https://www.figma.com/file/xx7G7PArehQDICHom1zyqH/Portfolio-Page?type=design&node-id=0%3A1&mode=design&t=t16RnwNJqKfujFjP-1">Designed</a> and <a href="https://github.com/anandakevin/anandakevin.github.io">Coded</a> with ♡ using HTML, CSS, JS and Vite</p>
 			<p>© 2024 Ananda Kevin Refaldo Sariputra. All rights reserved</p>
 		</div>
     </footer>
-  </body>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://kit.fontawesome.com/c37d04be02.js" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+	<script type="module" src="./js/main.js"></script>
+</body>
 </html>
