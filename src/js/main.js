@@ -128,8 +128,6 @@ tabsExp.forEach(item => {
 	item.addEventListener('click', (e) => toggleExp(e, 'bca'));
 })
 
-document.getElementById("defaultOpen").click();
-
 // Tabs Toggler
 
 // Variables
@@ -139,7 +137,10 @@ let timerOpacity;
 
 // Toggle Class
 const init = () => {
-	console.log("abc");
+	var slidingComponent = $('.sliding-border');
+	var listHeight = $('.tabs-link').outerHeight();
+	slidingComponent.css('height', listHeight);
+
 	// Menu Click
 	$tabLink.off('click').on('click', function (e) {
 		// Prevent Default
@@ -148,8 +149,6 @@ const init = () => {
 
 		// Clear Timers
 		window.clearTimeout(timerOpacity);
-
-		console.log("abc");
 		// Toggle Class Logic
 		// Remove Active Classes
 		$tabLink.removeClass('active ');
@@ -164,7 +163,19 @@ const init = () => {
 		timerOpacity = setTimeout(() => {
 			$($(this).attr('href')).addClass('active-content');
 		}, 50);
+
+		// slide the tab-slider
+		let activePosition = $(this).position().top;
+		listHeight = $(this).outerHeight();
+		slidingComponent.css('height', listHeight);
+		slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
+		// console.log("activePosition", activePosition);
+		// console.log("listHeight", listHeight);
 	});
+
+	setTimeout(function () {
+		$('#tabs-section .tab-link:first').trigger('click');
+	}, 250);
 };
 
 // Document Ready
