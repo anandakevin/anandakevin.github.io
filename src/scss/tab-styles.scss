@@ -133,7 +133,7 @@ footer .credits {
 	display: inline-block;
 	position: absolute;
 	width: 2px;
-	// left: 0px;
+	left: 0px;
 	top: 0px;
 	background-color: var(--highlight-color);
 	border: none;
@@ -210,6 +210,7 @@ footer .credits {
 	color: #fff;
 	padding: 1rem 1.5rem;
 	flex-wrap: wrap;
+	white-space: nowrap;
 	// word-wrap: break-word;
 	transition: var(--transition);
 }
@@ -219,6 +220,7 @@ footer .credits {
 .tabs>ul li a:active {
 	border-bottom: none;
 	outline: 0;
+	background-color: var(--hover-color);
 	transition: var(--transition);
 }
 
@@ -396,6 +398,7 @@ footer .credits {
 	.tabs>ul {
 		width: 300px;
 		display: flex;
+        overflow-x: auto;
 	}
 
 	.tabs section {
@@ -405,7 +408,6 @@ footer .credits {
 
 	.tabs>ul li a,
 	.tabs>ul li a:visited {
-		white-space: nowrap;
 		border-left: none;
 		border-bottom: 2px solid var(--line-color);
 	}

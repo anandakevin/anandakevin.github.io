@@ -127,10 +127,11 @@ const init = () => {
 		// Clear Timers
 		window.clearTimeout(timerOpacity);
 		// Toggle Class Logic
-		// Remove Active Classes
-		$tabLink.removeClass('active ');
-		$tabBody.removeClass('active ');
-		$tabBody.removeClass('active-content');
+		// Remove Active Classes on the same section
+		// $tabLink.removeClass('active ');
+		$(this).parent().parent().find('.active').removeClass('active ');
+		$($(this).attr('href')).parent().find('.active').removeClass('active active-content');
+
 
 		// Add Active Classes
 		$(this).addClass('active');
