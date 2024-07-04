@@ -48,6 +48,20 @@ img, svg {
 	margin: 0 auto;
 }
 
+.left {
+	align-items: left;
+	justify-content: left;
+}
+
+.center {
+	align-items: center;
+	justify-content: center;
+}
+
+.right {
+	align-items: right;
+	justify-content: right;
+}
 // navbar
 #navbar {
 	--navbar-height: 100px;

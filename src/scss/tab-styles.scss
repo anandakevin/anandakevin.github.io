@@ -188,7 +188,8 @@ footer .credits {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
-	width: 15%;
+	position: relative;
+		width: max-content;
 }
 
 .tabs>ul li {
@@ -208,7 +209,7 @@ footer .credits {
 	color: #fff;
 	padding: 1rem 1.5rem;
 	transition: all 0.2s ease-in-out;
-	word-wrap: break-word;
+	// word-wrap: break-word;
 	transition: var(--transition);
 }
 
@@ -241,6 +242,9 @@ footer .credits {
 }
 
 // tabs section aka tab body
+.tabs div {
+	position: relative;
+}
 .tabs section {
 	width: 85%;
 	// background-color: #fff;

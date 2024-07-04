@@ -1,0 +1,38 @@
+.grid-container {
+	padding-top: 60px;
+}
+
+li {
+	border-left: 2px solid rgb(189, 187, 187);
+}
+
+.tabs {
+	border: none;
+	position: relative;
+}
+
+li.is-active {
+	background-color: transparent;
+}
+
+.tabs-title>a:focus,
+.tabs-title>a[aria-selected=true] {
+	background-color: transparent;
+}
+
+a:active,
+a:focus {
+	outline: none;
+}
+
+/* Important CSS */
+.tabs.vertical .sliding-border {
+	display: inline-block;
+	position: absolute;
+	width: 2px;
+	left: 0px;
+	top: 0px;
+	background-color: rgb(8, 4, 238);
+	border: none;
+	transition: all 0.3s ease-out;
+}
