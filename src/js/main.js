@@ -148,6 +148,7 @@ const init = () => {
 		if (docWidth < 600) {
 			let activePosition = $(this).position().left;
 			listWidth = $(this).outerWidth();
+			slidingComponent.css('height', '2px');
 			slidingComponent.css('width', listWidth);
 			slidingComponent.css('transform', 'translateX(' + activePosition + 'px)');	
 		}
@@ -155,14 +156,28 @@ const init = () => {
 			let activePosition = $(this).position().top;
 			listHeight = $(this).outerHeight();
 			slidingComponent.css('height', listHeight);
+			slidingComponent.css('width', '2px');
 			slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
 		}
 	});
 
-	setTimeout(function () {
-		$('#tabs-section .tab-link:first').trigger('click');
-	}, 250);
+	// setTimeout(function () {
+	// 	$('#tabs-section .tab-link:first').trigger('click');
+	// }, 250);
+
+	$(window).on('resize', function () {
+		var win = $(this); //this = window
+		if (win.width() < 600) {
+			slidingComponent.css('height', '2px');
+			slidingComponent.css('width', listWidth);
+		}
+		if (win.width() >= 600) {
+			slidingComponent.css('height', listHeight);
+			slidingComponent.css('width', '2px');
+		}
+	});
 };
+
 
 // Document Ready
 init();
