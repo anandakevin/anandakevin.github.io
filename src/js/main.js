@@ -96,30 +96,6 @@ window.onscroll = function() {
 }
 
 // function for tabs
-// export function toggleExp(e, exp) {
-export const toggleExp = (e, exp) => {
-	// Declare all variables
-	var i, tabcontent, tablinks;
-
-	// Get all elements with class="tabcontent" and hide them
-	tabcontent = document.getElementsByClassName("tabcontent");
-	for (i = 0; i < tabcontent.length; i++) {
-		tabcontent[i].style.display = "none";
-	}
-
-	// Get all elements with class="tablinks" and remove the class "active"
-	tablinks = document.getElementsByClassName("tablinks");
-	for (i = 0; i < tablinks.length; i++) {
-		tablinks[i].className = tablinks[i].className.replace(" active", "");
-	}
-
-	// Show the current tab, and add an "active" class to the link that opened the tab
-	document.getElementById(exp).style.display = "block";
-	e.currentTarget.className += " active";
-}
-
-// Get the element with id="defaultOpen" and click on it
-navbarLinksContainer.addEventListener('click', (e) => e.stopPropagation());
 
 const tabsExp = document.querySelectorAll('.tab');
 // let navbarLinks2 = select('.navbar-link', true)
@@ -139,6 +115,7 @@ let timerOpacity;
 const init = () => {
 	var slidingComponent = $('.sliding-border');
 	var listHeight = $('.tabs-link').outerHeight();
+	var listWidth = $('.tabs-link').outerWidth();
 	slidingComponent.css('height', listHeight);
 
 	// Menu Click
@@ -165,12 +142,20 @@ const init = () => {
 		}, 50);
 
 		// slide the tab-slider
-		let activePosition = $(this).position().top;
-		listHeight = $(this).outerHeight();
-		slidingComponent.css('height', listHeight);
-		slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
-		// console.log("activePosition", activePosition);
-		// console.log("listHeight", listHeight);
+		var docWidth = $(window).width();
+
+		if (docWidth < 600) {
+			let activePosition = $(this).position().left;
+			listWidth = $(this).outerWidth();
+			slidingComponent.css('width', listWidth);
+			slidingComponent.css('transform', 'translateX(' + activePosition + 'px)');	
+		}
+		else if (docWidth >= 600) {
+			let activePosition = $(this).position().top;
+			listHeight = $(this).outerHeight();
+			slidingComponent.css('height', listHeight);
+			slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
+		}
 	});
 
 	setTimeout(function () {
