@@ -114,8 +114,9 @@ let timerOpacity;
 // Toggle Class
 const init = () => {
 	var slidingComponent = $('.sliding-border');
-	var listHeight = $('.tabs-link').outerHeight();
-	var listWidth = $('.tabs-link').outerWidth();
+	var listHeight = $('.tab-link').outerHeight();
+	var listWidth = $('.tab-link').outerWidth();
+	var docWidth = $(window).width();
 	slidingComponent.css('height', listHeight);
 
 	// Menu Click
@@ -132,6 +133,9 @@ const init = () => {
 		$(this).parent().parent().find('.active').removeClass('active ');
 		$($(this).attr('href')).parent().find('.active').removeClass('active active-content');
 
+		var currTab = $(this).attr('href');
+		const currTabArray = currTab.split("-");
+		var sectionIndex = currTabArray[1] - 1;
 
 		// Add Active Classes
 		$(this).addClass('active');
@@ -143,27 +147,55 @@ const init = () => {
 		}, 50);
 
 		// slide the tab-slider
-		var docWidth = $(window).width();
-
+		docWidth = $(window).width();
 		if (docWidth < 600) {
 			let activePosition = $(this).position().left;
 			listWidth = $(this).outerWidth();
-			slidingComponent.css('height', '2px');
-			slidingComponent.css('width', listWidth);
-			slidingComponent.css('transform', 'translateX(' + activePosition + 'px)');	
+
+			console.log('listHeight', listHeight);
+			console.log('listWidth', listWidth);
+			slidingComponent.eq(sectionIndex).css('height', '2px');
+			slidingComponent.eq(sectionIndex).css('width', listWidth);
+			slidingComponent.eq(sectionIndex).css('transform', 'translateX(' + activePosition + 'px)');
 		}
 		else if (docWidth >= 600) {
 			let activePosition = $(this).position().top;
 			listHeight = $(this).outerHeight();
-			slidingComponent.css('height', listHeight);
-			slidingComponent.css('width', '2px');
-			slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
+
+
+			console.log('listHeight', listHeight);
+			console.log('listWidth', listWidth);
+			// slidingComponent.css('height', listHeight);
+			// slidingComponent.css('width', '2px');
+			// slidingComponent.css('transform', 'translateY(' + activePosition + 'px)');
+			slidingComponent.eq(sectionIndex).css('height', listHeight);
+			slidingComponent.eq(sectionIndex).css('width', '2px');
+			slidingComponent.eq(sectionIndex).css('transform', 'translateY(' + activePosition + 'px)');
 		}
 	});
 
-	// setTimeout(function () {
-	// 	$('#tabs-section .tab-link:first').trigger('click');
-	// }, 250);
+
+	setTimeout(function () {
+
+		listHeight = $('.tab-link').outerHeight();
+		listWidth = $('.tab-link').outerWidth();
+
+		if (docWidth < 600) {
+			slidingComponent.css('height', '2px');
+			slidingComponent.css('width', listWidth);
+		}
+		else if (docWidth >= 600) {
+			slidingComponent.css('height', listHeight);
+			slidingComponent.css('width', '2px');
+		}
+
+		// 	$.each($tabLink, function (index, value) {
+		// 		var currTab = $(this).attr('href');
+		// 		const currTabArray = currTab.split("-");
+		// 		var tabIndex = currTabArray[2] - 1;
+		// 		if (tabIndex == 0) $(this).trigger('click');
+		// 	})
+	}, 100);
 
 	$(window).on('resize', function () {
 		var win = $(this); //this = window
