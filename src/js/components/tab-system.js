@@ -26,11 +26,11 @@ export class TabSystem {
         this.tabLink.off('click').on('click', (e) => {
             e.preventDefault();
             const index = Array.from(this.tabLink).indexOf(e.currentTarget);
-            this.handleTabClick(e);
+            this.handleTabClick(e, index);
         });
     }
 
-    handleTabClick(e) {
+    handleTabClick(e, index) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -60,8 +60,8 @@ export class TabSystem {
     updateSlidingBorder($tab, sectionIndex) {
         const docWidth = $(window).width();
         const position = $tab.position();
-        console.log('sectionIndex ', sectionIndex);
-        console.log('position ', position);
+        // console.log('sectionIndex ', sectionIndex);
+        // console.log('position ', position);
 
         if (docWidth < 600) {
             this.listWidth = $tab.outerWidth();

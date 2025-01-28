@@ -4,11 +4,12 @@
   "description": "My Portfolio",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
     "build": "vite build --emptyOutDir",
-    "start": "vite",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,14 @@
   },
   "homepage": "https://github.com/anandakevin/anandakevin.github.io#readme",
   "devDependencies": {
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "globals": "^13.24.0",
     "gh-pages": "^6.0.0",
     "sass": "^1.54.4",
     "vite": "^3.0.5",
