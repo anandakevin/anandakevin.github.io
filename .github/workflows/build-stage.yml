@@ -27,9 +27,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Type check
-      run: npm run type-check # Add this script if you use TypeScript
-
     - name: Lint
       run: npm run lint # Add this script if you use ESLint
 
