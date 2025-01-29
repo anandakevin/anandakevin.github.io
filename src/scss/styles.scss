@@ -99,6 +99,18 @@ img, svg {
 	color: var(--navbar-text-color-focus);
 }
 
+.navbar-home {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    
+    img {
+        height: 40px;
+        width: auto;
+        object-fit: contain;
+    }
+}
+
 .navbar-link {
 	justify-content: center;
 	width: 100%;
@@ -574,3 +586,4 @@ a.inline-link::after {
 	}
 
 }
+
