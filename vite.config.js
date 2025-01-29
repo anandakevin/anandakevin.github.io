@@ -11,10 +11,12 @@ export default defineConfig({
     },
     server: {
         port: 8080,
-        hot: true
+        hot: true,
+        open: true
     },
     build: {
         outDir: "../dist",
+        emptyOutDir: true
     },
     plugins: [injectHTML()]
 })
