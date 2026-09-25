@@ -3,9 +3,6 @@ name: Build and Deploy (Production)
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
 
 permissions:
   contents: write
@@ -26,7 +23,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '22'
         cache: 'npm'
 
     - name: Install dependencies
@@ -34,6 +31,12 @@ jobs:
 
     - name: Lint
       run: npm run lint
+
+    - name: Validate public-content boundary
+      run: npm run content:check
+
+    - name: Type check
+      run: npm run type-check
 
     - name: Build
       run: npm run build

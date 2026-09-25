@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+export function getStaticPaths() { return []; }
+const { slug } = Astro.params;
+---
+<BaseLayout title="Writing"><section class="page-hero"><div class="shell"><p class="page-crumb">Writing / {slug}</p><h1 class="display">Reviewed local writing is <em>pending.</em></h1></div></section></BaseLayout>

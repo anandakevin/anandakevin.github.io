@@ -1,0 +1,49 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+interface Props { items: PublicContent[]; }
+const { items } = Astro.props;
+---
+<section class="featured-writing" data-featured-writing aria-label="Featured writing implementation fixture">
+  <div class="featured-nav">
+    <div class="featured-tabs" role="tablist" aria-label="Featured fixture writing">
+      {items.length > 1 && items.map((_, index) => <button class:list={['featured-tab', { active: index === 0 }]} role="tab" aria-selected={index === 0 ? 'true' : 'false'} data-feature-index={index}>{String(index + 1).padStart(2, '0')} Fixture</button>)}
+    </div>
+    {items.length > 1 && <div class="featured-progress" aria-hidden="true"><span></span></div>}
+  </div>
+  {items.map((item, index) => <article class:list={['featured-panel', { active: index === 0 }]} data-feature-panel={index} hidden={index !== 0}>
+    <div class="featured-copy"><p>FEATURED WRITING · {item.content_kind.replace('_', ' ')}</p><h3>{item.title}</h3><p>{item.description}</p><div class="reading-depth"><button class="active" data-depth="quick">Quick Read</button><button data-depth="deep">Deep Dive</button></div></div>
+    <aside><div><b>Source</b><span>Implementation fixture</span></div><div><b>Status</b><span>Not production content</span></div><div><b>Tags</b><span>{item.tags.join(' · ')}</span></div></aside>
+    <div class="reasoning-panel"><p>PUBLIC-SAFE REASONING SUMMARY</p><div><strong>Context</strong><span>Validate the visual hierarchy without asserting a real case-study fact.</span></div><div><strong>Decision</strong><span>Use a typed public contract before creating visitor-facing claims.</span></div><div class="deep-extra" hidden><strong>Deep Dive</strong><span>This fixture proves that the control changes reading depth; it does not stand in for a reviewed narrative.</span></div></div>
+  </article>)}
+</section>
+<script>
+  const feature = document.querySelector<HTMLElement>('[data-featured-writing]');
+  if (feature) {
+    const tabs = [...feature.querySelectorAll<HTMLButtonElement>('[data-feature-index]')];
+    const panels = [...feature.querySelectorAll<HTMLElement>('[data-feature-panel]')];
+    const progress = feature.querySelector<HTMLElement>('.featured-progress span');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let index = 0, manual = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const render = (next: number, selected = false) => {
+      index = next; manual ||= selected;
+      tabs.forEach((tab, i) => { tab.classList.toggle('active', i === index); tab.setAttribute('aria-selected', String(i === index)); });
+      panels.forEach((panel, i) => { panel.hidden = i !== index; panel.classList.toggle('active', i === index); });
+      start();
+    };
+    const stop = () => { clearTimeout(timer); clearInterval(interval); };
+    const start = () => { stop(); if (manual || reduced || tabs.length < 2) return; const begun = performance.now(); interval = setInterval(() => { if (progress) progress.style.width = `${Math.min(100, (performance.now() - begun) / 11000 * 100)}%`; }, 80); timer = setTimeout(() => render((index + 1) % panels.length), 11000); };
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => render(i, true)));
+    feature.addEventListener('pointerenter', stop); feature.addEventListener('pointerleave', start);
+    feature.addEventListener('focusin', stop); feature.addEventListener('focusout', start);
+    feature.querySelectorAll<HTMLButtonElement>('[data-depth]').forEach((button) => button.addEventListener('click', () => {
+      const panel = button.closest<HTMLElement>('[data-feature-panel]');
+      if (!panel) return;
+      panel.querySelectorAll<HTMLButtonElement>('[data-depth]').forEach((item) => item.classList.toggle('active', item === button));
+      const deepExtra = panel.querySelector<HTMLElement>('.deep-extra');
+      if (deepExtra) deepExtra.hidden = button.dataset.depth !== 'deep';
+    }));
+    start();
+  }
+</script>

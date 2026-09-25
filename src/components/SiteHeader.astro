@@ -1,0 +1,15 @@
+---
+const nav = [
+  ['Work', '/work'], ['Projects', '/projects'], ['Writing', '/writing'], ['Contributions', '/contributions'],
+  ['About', '/about'], ['Credentials', '/credentials'], ['Contact', '/contact'],
+];
+---
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="Ananda Kevin home"><span class="brand-mark">k<span>.</span></span><span><strong>Ananda Kevin</strong><small>systems · software · explanation</small></span></a>
+    <nav class="primary-nav" aria-label="Primary navigation">
+      {nav.map(([label, href]) => <a href={href}>{label}</a>)}
+    </nav>
+    <button class="theme-toggle" data-theme-toggle aria-label="Toggle colour theme"><span aria-hidden="true">◐</span></button>
+  </div>
+</header>

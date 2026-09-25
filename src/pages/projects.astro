@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { fixtureProjects } from '../data/fixtures';
+---
+<BaseLayout title="Projects" description="Implementation fixture project surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Projects / independent systems + public artifacts</p><h1 class="display">Projects are concrete things built to be <em>inspected.</em></h1><p class="lede">No candidate project is being promoted to launch content by this foundation.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Selected projects" title="Artifact first, then" emphasis="context." /><div class="three-grid">{fixtureProjects.map((item) => <article class="artifact-card"><small>Project / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/writing">Related thinking ↗</a></article>)}</div></div></section></BaseLayout>

@@ -1,0 +1,10 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+interface Props { item: PublicContent; signal: string; }
+const { item, signal } = Astro.props;
+---
+<article class="work-card" id={item.id.replace('/', '-')}>
+  <div class="work-context"><strong>Fixture context</strong><span>Public record pending</span></div>
+  <div><h3>{item.title}</h3><p>{item.description}</p><div class="stack-pills">{item.tags.map((tag) => <span>{tag}</span>)}</div></div>
+  <div class="selected-signal"><span>Selected signal</span><strong>{signal}</strong><a href="/work">Open work detail ↗</a></div>
+</article>

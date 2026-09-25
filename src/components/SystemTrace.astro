@@ -1,0 +1,36 @@
+<section class="system-trace" aria-labelledby="trace-title">
+  <div class="trace-sheet trace-back"></div>
+  <div class="trace-sheet trace-main">
+    <div class="trace-head"><span id="trace-title">WORKING NOTE / SYSTEM TRACE</span><span>fixture model</span></div>
+    <div class="trace-canvas" data-trace>
+      <svg aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"><path data-edge="product" d="M13 18 L50 50" /><path data-edge="platform" d="M87 18 L50 50" /><path data-edge="tests" d="M18 84 L50 50" /><path data-edge="ops" d="M84 84 L50 50" /><path data-edge="all" d="M50 50 L50 88" /></svg>
+      <button class="trace-node node-product" data-node="product"><b>Product</b> constraints</button>
+      <button class="trace-node node-platform" data-node="platform"><b>Platform</b> runtime</button>
+      <button class="trace-node node-tests" data-node="tests"><b>Tests</b> repeatability</button>
+      <button class="trace-node node-ops" data-node="ops"><b>Ops</b> release safety</button>
+      <button class="trace-node node-system" data-node="all"><b>System</b> decision</button>
+      <button class="trace-node node-reusable" data-node="all"><b>Reusable</b> knowledge</button>
+    </div>
+    <p class="trace-foot">Inspectable reasoning <em>→</em> reusable understanding</p>
+  </div>
+</section>
+<script>
+  const trace = document.querySelector<HTMLElement>('[data-trace]');
+  if (trace) {
+    const nodes = [...trace.querySelectorAll<HTMLButtonElement>('[data-node]')];
+    const edges = [...trace.querySelectorAll<SVGPathElement>('[data-edge]')];
+    let pinned = 'product';
+    const render = (key: string) => {
+      nodes.forEach((node) => node.classList.toggle('is-selected', node.dataset.node === key));
+      edges.forEach((edge) => edge.classList.toggle('is-active', key === 'all' || edge.dataset.edge === key));
+    };
+    nodes.forEach((node) => {
+      node.addEventListener('pointerenter', () => render(node.dataset.node ?? ''));
+      node.addEventListener('pointerleave', () => render(pinned));
+      node.addEventListener('focus', () => render(node.dataset.node ?? ''));
+      node.addEventListener('blur', () => render(pinned));
+      node.addEventListener('click', () => { pinned = node.dataset.node ?? pinned; render(pinned); });
+    });
+    render(pinned);
+  }
+</script>

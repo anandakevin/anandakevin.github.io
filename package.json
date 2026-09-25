@@ -4,11 +4,13 @@
   "description": "My Portfolio",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "type-check": "tsc --noEmit",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 PUBLIC_CONTENT_MODE=fixtures astro dev",
+    "build": "node scripts/assert-production-content.mjs && ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "build:fixtures": "ASTRO_TELEMETRY_DISABLED=1 PUBLIC_CONTENT_MODE=fixtures astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "lint": "eslint src/js --ext .js",
+    "type-check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "content:check": "node scripts/check-generated-contract.mjs",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {
@@ -23,22 +25,26 @@
   },
   "homepage": "https://github.com/anandakevin/anandakevin.github.io#readme",
   "devDependencies": {
-    "eslint": "^8.56.0",
+    "@astrojs/check": "^0.9.10",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
-    "eslint-plugin-react": "^7.33.2",
+    "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
-    "globals": "^13.24.0",
+    "eslint-plugin-react": "^7.33.2",
     "gh-pages": "^6.0.0",
+    "globals": "^13.24.0",
     "sass": "^1.54.4",
+    "typescript": "^6.0.3",
     "vite": "^3.0.5",
     "vite-plugin-html-inject": "^1.1.2"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "@popperjs/core": "^2.11.6",
     "aos": "^2.3.4",
+    "astro": "^7.3.5",
     "bootstrap": "^5.2.0",
     "jquery": "^3.7.1",
     "normalize.css": "^8.0.1"
