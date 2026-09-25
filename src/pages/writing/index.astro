@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { fixtureWriting } from '../../data/fixtures';
+---
+<BaseLayout title="Writing" description="Implementation fixture writing surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Writing / extracted understanding</p><h1 class="display">Writing has different <em>levels of commitment.</em></h1><p class="lede">Case Studies, Articles, Notes, External Writing, and Social belong in one knowledge surface while retaining their different ownership rules.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Featured fixtures" title="External content still feels part of the" emphasis="portfolio." /><div class="three-grid">{fixtureWriting.map((item) => <article class="artifact-card"><small>Case study / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href={item.slug}>Open fixture case study ↗</a></article>)}</div></div></section></BaseLayout>

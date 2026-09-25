@@ -1,0 +1,35 @@
+---
+import type { PublicContent, Throughline } from '../lib/public-contract';
+interface Props { throughlines: Throughline[]; records: PublicContent[]; }
+const { throughlines, records } = Astro.props;
+---
+<section class="systems-map" data-systems-map aria-label="Systems map" data-throughlines={JSON.stringify(throughlines)} data-records={JSON.stringify(records)}>
+  <div class="systems-map-bar"><span>Concept ↔ artifact relationships</span><button type="button" data-map-reset>Reset selection</button></div>
+  <div class="systems-map-grid">
+    <div class="systems-map-nodes" role="list">{throughlines.map((line) => <button type="button" role="listitem" data-map-node={line.id}><small>Concept</small><strong>{line.title}</strong><span>{line.description}</span></button>)}</div>
+    <aside data-map-detail><p>Select a concept to inspect its approved evidence relationships.</p></aside>
+  </div>
+</section>
+<script>
+  type MapThroughline = { id: string; title: string; description: string };
+  type MapRecord = { title: string; throughlines: string[] };
+  const root = document.querySelector<HTMLElement>('[data-systems-map]');
+  if (root) {
+    const throughlines = JSON.parse(root.dataset.throughlines ?? '[]') as MapThroughline[];
+    const records = JSON.parse(root.dataset.records ?? '[]') as MapRecord[];
+    const detail = root.querySelector<HTMLElement>('[data-map-detail]');
+    const nodes = [...root.querySelectorAll<HTMLButtonElement>('[data-map-node]')];
+    const show = (id: string) => {
+      const throughline = throughlines.find((item) => item.id === id);
+      if (!throughline || !detail) return;
+      const evidence = records.filter((item) => item.throughlines.includes(id));
+      nodes.forEach((node) => node.classList.toggle('is-selected', node.dataset.mapNode === id));
+      detail.innerHTML = `<small>Selected concept</small><h3>${throughline.title}</h3><p>${throughline.description}</p><p><b>Evidence:</b> ${evidence.map((item) => item.title).join(', ') || 'No approved evidence.'}</p>`;
+    };
+    nodes.forEach((node) => node.addEventListener('click', () => show(node.dataset.mapNode ?? '')));
+    root.querySelector<HTMLButtonElement>('[data-map-reset]')?.addEventListener('click', () => {
+      nodes.forEach((node) => node.classList.remove('is-selected'));
+      if (detail) detail.innerHTML = '<p>Select a concept to inspect its approved evidence relationships.</p>';
+    });
+  }
+</script>

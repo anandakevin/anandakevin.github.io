@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fixtureWriting } from '../../data/fixtures';
+export function getStaticPaths() { return fixtureWriting.map((item) => ({ params: { slug: item.slug.split('/').at(-1) }, props: { item } })); }
+const { item } = Astro.props;
+---
+<BaseLayout title={item.title} description={item.description}><section class="page-hero"><div class="shell"><p class="page-crumb">Writing / case-study fixture</p><h1 class="display">{item.title}</h1><p class="lede">{item.description}</p></div></section><section class="section"><div class="shell"><div class="detail-list"><div class="detail-row"><small>Context</small><div><h3>Fixture content is visibly isolated.</h3><p>No prototype example has been promoted to a factual case study.</p></div><a href="/writing">Writing ↗</a></div><div class="detail-row"><small>Reasoning</small><div><h3>The public contract precedes public claims.</h3><p>The final Case Study must arrive from reviewed `10-Public-Site/` content, with sanitized evidence and explicit source relationships.</p></div><a href="/work">Work ↗</a></div></div></div></section></BaseLayout>

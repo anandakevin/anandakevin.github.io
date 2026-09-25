@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { fixtureContributions } from '../data/fixtures';
+---
+<BaseLayout title="Contributions" description="Implementation fixture contribution surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Contributions / technical knowledge transfer</p><h1 class="display">Technical work becomes more useful when it can be <em>passed on.</em></h1><p class="lede">This supports the engineering story without recreating a separate teaching-first portfolio.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Contributions" title="Capability transferred, not a" emphasis="certificate wall." /><div class="three-grid">{fixtureContributions.map((item) => <article class="artifact-card"><small>Contribution / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/writing">Related thinking ↗</a></article>)}</div></div></section></BaseLayout>

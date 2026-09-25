@@ -1,0 +1,38 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props { title: string; description?: string; }
+const { title, description = 'Systems-oriented software engineering portfolio.' } = Astro.props;
+const fixtureMode = import.meta.env.PUBLIC_CONTENT_MODE === 'fixtures';
+---
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" />
+    <title>{title} · Ananda Kevin</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <SiteHeader />
+    {fixtureMode && <aside class="fixture-notice" aria-label="Fixture mode">Implementation fixture mode — no reviewed public content is present.</aside>}
+    <main id="main-content"><slot /></main>
+    <SiteFooter />
+    <script is:inline>
+      const root = document.documentElement;
+      const stored = localStorage.getItem('portfolio-theme');
+      root.dataset.theme = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        localStorage.setItem('portfolio-theme', next);
+      });
+      const legacy = { '#about': '/about', '#exp': '/work', '#projects': '/projects', '#awards': '/credentials', '#scholarships': '/credentials', '#contact': '/contact', '#edu': '/about', '#tools': '/work' };
+      if (legacy[location.hash]) location.replace(legacy[location.hash]);
+    </script>
+  </body>
+</html>

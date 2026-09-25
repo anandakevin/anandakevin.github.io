@@ -29,6 +29,7 @@ node_modules
 .idea/
 
 dist
+.astro/
 
 # macOS files
 **/.DS_Store
