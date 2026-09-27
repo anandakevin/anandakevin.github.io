@@ -1,0 +1,1 @@
+import{t as e}from"./external-reader.BeVaZuaO.js";function t(e){let t=Uint8Array.from(atob(e),e=>e.charCodeAt(0));return new TextDecoder().decode(t)}document.querySelectorAll(`[data-external-reader-body]`).forEach(n=>{let r=n.dataset.body,i=n.dataset.baseUrl;if(r&&i)try{e(n,t(r),i)}catch{}});
