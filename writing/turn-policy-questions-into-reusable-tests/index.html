@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="description" content="A small scenario playground can make rule changes reviewable without giving every experiment access to production execution."><link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><title>Turn policy questions into reusable tests · Ananda Kevin</title><link rel="stylesheet" href="/_astro/external-writing.9vg-l7PM.css"></head><body><a class="skip-link" href="#main-content">Skip to content</a><header class="site-header" data-site-header><div class="shell header-inner"><a class="brand" href="/" aria-label="Ananda Kevin home"><img class="brand-logo" src="/favicon.svg" width="33" height="33" alt=""><span><strong>Ananda Kevin</strong><small>system · software · explanation</small></span></a><button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav-panel">Menu</button><nav id="primary-nav-panel" class="primary-nav" aria-label="Primary navigation" data-nav-panel><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing" aria-current="page">Writing</a><a href="/contributions">Contributions</a><a href="/about">About</a><a href="/credentials">Credentials</a></nav><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark colour theme">☾</button></div></header><script type="module">var e=document.querySelector(`[data-site-header]`),t=e?.querySelector(`[data-nav-toggle]`),n=e?.querySelector(`[data-nav-panel]`);t?.addEventListener(`click`,()=>{let n=e?.classList.toggle(`is-nav-open`);t.setAttribute(`aria-expanded`,n?`true`:`false`)}),n?.querySelectorAll(`a`).forEach(n=>{n.addEventListener(`click`,()=>{e?.classList.remove(`is-nav-open`),t?.setAttribute(`aria-expanded`,`false`)})});</script><main id="main-content"><section class="field-note-detail-hero"><div class="shell"><p class="page-crumb">Writing / Field Notes / Engineering systems</p><h1 class="display">Turn policy questions into reusable tests</h1><p class="lede">A small scenario playground can make rule changes reviewable without giving every experiment access to production execution.</p><div class="detail-pills field-note-detail-meta"><span>Field note</span><span>Engineering systems</span><span>Reviewed September 28, 2026</span><span>internal-tools</span><span>testing</span><span>boundaries</span></div></div></section><section class="section field-note-detail-section"><div class="shell field-note-detail-layout"><article><div class="content-body"><h2 id="separate-exploration-from-execution">Separate exploration from execution</h2>
+<p>People who understand a policy or rule often need to ask “what would happen if this input changed?” They should not need production access, an engineer-written one-off script, or a vague request for someone else to interpret the result.</p>
+<p>A scenario playground creates a safer boundary: users can explore synthetic inputs and compare expected outcomes, while the authoritative system remains responsible for execution.</p>
+<h2 id="make-the-editable-surface-explicit">Make the editable surface explicit</h2>
+<p>The tool should show which values a user may change, which assumptions remain fixed, and which changes require an engineering release. That distinction prevents a convenient experiment from being mistaken for a production configuration change.</p>
+<p>Named inputs and expected outputs also give reviewers something concrete to discuss. A policy question becomes a scenario that can be rerun after the rule changes.</p>
+<h2 id="keep-useful-scenarios">Keep useful scenarios</h2>
+<p>The most valuable scenarios are not disposable examples. Preserve the ones that capture an important boundary or a previously surprising result, then use them as regression cases when the policy changes again.</p>
+<p>This creates a small, explainable test set without pretending that the playground is a complete staging environment.</p>
+<h2 id="know-the-limit">Know the limit</h2>
+<p>A scenario tool can clarify policy behavior, but it cannot reproduce every integration or operational condition. Its value comes from keeping that limitation visible while making the part it does cover easy to inspect and repeat.</p>
+</div><div class="editorial-callout"><div class="related-group"><b>Related writing</b><ul><li><a href="/case-studies/domain-expert-configuration-playground">Configuration playground for domain experts</a></li></ul></div></div><nav class="field-note-pagination" aria-label="Field Note navigation"><a href="/writing/moving-incrementally-when-the-old-system-still-runs"><span>Previous note</span><b>Move incrementally while the old system still runs</b></a><span></span></nav><div class="actions"><a class="button alt" href="/writing/notes">Back to Field Notes ↗</a></div></article><aside class="field-note-rail" aria-label="Field Note context"><div class="field-note-rail-block"><b>In this note</b><ol><li><a href="#separate-exploration-from-execution">Separate exploration from execution</a></li><li><a href="#make-the-editable-surface-explicit">Make the editable surface explicit</a></li><li><a href="#keep-useful-scenarios">Keep useful scenarios</a></li><li><a href="#know-the-limit">Know the limit</a></li></ol></div><div class="field-note-rail-block"><b>More Field Notes</b><ul><li><a href="/writing/system-assessment-before-commitment">System assessment before commitment</a></li><li><a href="/writing/reading-for-decisions-not-collection">Reading technical material for decisions, not collection</a></li><li><a href="/writing/recognizing-a-patching-spiral">Recognizing a patching spiral</a></li><li><a href="/writing/making-environment-variation-visible">Make environment variation visible before promotion</a></li><li><a href="/writing/moving-incrementally-when-the-old-system-still-runs">Move incrementally while the old system still runs</a></li></ul></div><a class="field-note-rail-all" href="/writing/notes">Browse the Field Notes ↗</a></aside><details class="field-note-rail-mobile"><summary>Open note contents and related notes</summary><div class="field-note-rail-mobile-body"><div class="field-note-rail-block"><b>In this note</b><ol><li><a href="#separate-exploration-from-execution">Separate exploration from execution</a></li><li><a href="#make-the-editable-surface-explicit">Make the editable surface explicit</a></li><li><a href="#keep-useful-scenarios">Keep useful scenarios</a></li><li><a href="#know-the-limit">Know the limit</a></li></ol></div><div class="field-note-rail-block"><b>More Field Notes</b><ul><li><a href="/writing/system-assessment-before-commitment">System assessment before commitment</a></li><li><a href="/writing/reading-for-decisions-not-collection">Reading technical material for decisions, not collection</a></li><li><a href="/writing/recognizing-a-patching-spiral">Recognizing a patching spiral</a></li><li><a href="/writing/making-environment-variation-visible">Make environment variation visible before promotion</a></li><li><a href="/writing/moving-incrementally-when-the-old-system-still-runs">Move incrementally while the old system still runs</a></li></ul></div></div></details></div></section></main><footer class="site-footer"><div class="shell"><p class="footer-motto">Build <em>Systems.</em> Create <em>Leverage.</em> Leave Lasting <em>Impact.</em></p><div class="footer-directory"><p class="footer-blurb">Engineering work, projects, writing, and teaching.</p><div class="footer-group"><span class="footer-group-label">Explore</span><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing">Writing</a><a href="/contributions">Contributions</a><a href="/about">About</a></div><div class="footer-group"><span class="footer-group-label">More</span><a href="/systems-map">Systems Map</a><a href="/credentials">Credentials & Recognition</a></div><div class="footer-group"><span class="footer-group-label">Elsewhere</span><a href="https://github.com/anandakevin" rel="noopener noreferrer" target="_blank">GitHub ↗</a><a href="https://www.linkedin.com/in/ananda-kevin-refaldo-sariputra/" rel="noopener noreferrer" target="_blank">LinkedIn ↗</a><a href="https://scholar.google.com/citations?user=F_OlnVwAAAAJ" rel="noopener noreferrer" target="_blank">Google Scholar ↗</a><a href="https://www.kaggle.com/thechief28" rel="noopener noreferrer" target="_blank">Kaggle ↗</a><a href="mailto:ananda.kevin.rs@gmail.com">Email ↗</a></div></div><div class="footer-bottom"><span>Ananda Kevin</span><span>system · software · explanation</span></div></div></footer><script>
+      const root = document.documentElement;
+      const themeButton = document.querySelector('[data-theme-toggle]');
+      const syncThemeIcon = () => {
+        if (!themeButton) return;
+        const dark = root.dataset.theme === 'dark';
+        themeButton.textContent = dark ? '☀' : '☾';
+        themeButton.setAttribute(
+          'aria-label',
+          dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+        );
+      };
+      const stored = localStorage.getItem('portfolio-theme');
+      root.dataset.theme =
+        stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      syncThemeIcon();
+      const enhanceArrowLinks = () => {
+        document.querySelectorAll('a').forEach((link) => {
+          if (link.querySelector('.link-arrow')) return;
+          const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+          textNodes.forEach((node) => {
+            const value = node.nodeValue ?? '';
+            if (!value.includes('↗')) return;
+            const parts = value.split('↗');
+            const fragment = document.createDocumentFragment();
+            parts.forEach((part, index) => {
+              if (part) fragment.append(document.createTextNode(part));
+              if (index < parts.length - 1) {
+                const arrow = document.createElement('span');
+                arrow.className = 'link-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                arrow.textContent = '↗';
+                fragment.append(arrow);
+              }
+            });
+            node.replaceWith(fragment);
+          });
+        });
+      };
+      enhanceArrowLinks();
+      document.addEventListener('astro:page-load', enhanceArrowLinks);
+      themeButton?.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        localStorage.setItem('portfolio-theme', next);
+        syncThemeIcon();
+      });
+      const legacy = {
+        '#about': '/about',
+        '#exp': '/work',
+        '#projects': '/projects',
+        '#awards': '/credentials',
+        '#scholarships': '/credentials',
+        '#edu': '/about',
+        '#tools': '/work',
+      };
+      if (legacy[location.hash]) location.replace(legacy[location.hash]);
+    </script></body></html>
