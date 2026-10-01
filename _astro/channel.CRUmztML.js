@@ -1,0 +1,1 @@
+import{It as e,Lt as t}from"./dist.BRl_OCLy.js";var n=(n,r)=>t.lang.round(e.parse(n)[r]);export{n as t};
