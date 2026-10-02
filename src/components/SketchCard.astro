@@ -1,0 +1,34 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import SketchViewer from './SketchViewer.astro';
+import { hrefForPublicRecord } from '../lib/content';
+
+interface Props {
+  sketch: PublicContent;
+}
+
+const { sketch } = Astro.props;
+---
+
+<article class="sketch-card" data-sketch-card data-sketch-tags={sketch.tags.join(' ')}>
+  <div class="sketch-card-preview">
+    <SketchViewer sketch={sketch} mode="preview" />
+  </div>
+  <div class="sketch-card-body">
+    <p class="sketch-card-meta">
+      {sketch.sketch_role?.replace('-', ' ')} · {sketch.published_at ?? 'undated'}
+    </p>
+    <h2>
+      <a href={hrefForPublicRecord(sketch)}>{sketch.title}</a>
+    </h2>
+    <p>{sketch.description}</p>
+    <div class="stack-pills">
+      {sketch.tags.map((tag) => (
+        <span>{tag}</span>
+      ))}
+    </div>
+    <a class="sketch-card-open" href={hrefForPublicRecord(sketch)}>
+      Open full sketch ↗
+    </a>
+  </div>
+</article>

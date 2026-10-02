@@ -1,0 +1,72 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+
+interface Props {
+  sketch: PublicContent;
+  mode?: 'detail' | 'embed' | 'preview';
+  showBrowse?: boolean;
+}
+
+const { sketch, mode = 'detail', showBrowse = false } = Astro.props;
+if (!sketch.sketch_source) throw new Error(`Sketch ${sketch.id} has no Excalidraw source.`);
+const sourceLabel = sketch.sketch_source.split('/').at(-1) ?? 'sketch.excalidraw';
+---
+
+<div
+  class:list={['sketch-viewer', `sketch-viewer--${mode}`]}
+  data-sketch-viewer
+  data-sketch-source={sketch.sketch_source}
+  data-sketch-title={sketch.title}
+  data-sketch-mode={mode}
+>
+  <div class="sketch-viewer-toolbar">
+    <span class="sketch-viewer-source">
+      {sourceLabel} <span aria-hidden="true">·</span> read only
+    </span>
+    <div class="sketch-viewer-actions" aria-label="Sketch viewer controls">
+      <button
+        class="sketch-icon-action"
+        type="button"
+        data-sketch-fullscreen
+        aria-label="Enter fullscreen"
+        title="Enter fullscreen"
+        aria-pressed="false"
+      >
+        <svg
+          class="sketch-fullscreen-glyph sketch-fullscreen-glyph-enter"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6" />
+        </svg>
+        <svg
+          class="sketch-fullscreen-glyph sketch-fullscreen-glyph-exit"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M9 3v6H3M21 9h-6V3M15 21v-6h6M3 15h6v6" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div
+    class="sketch-viewer-canvas"
+    data-sketch-canvas
+    aria-label={`Interactive read-only sketch: ${sketch.title}`}
+  >
+    <div class="sketch-viewer-loading" data-sketch-loading>
+      Loading sketch…
+    </div>
+  </div>
+  <p class="sketch-viewer-hint">Drag to pan · pinch or wheel to zoom</p>
+  {mode !== 'preview' && (
+    <div class="sketch-viewer-footer">
+      <span>Interactive Excalidraw canvas · read only</span>
+      {showBrowse && <a href="/sketches">Browse sketches ↗</a>}
+    </div>
+  )}
+</div>
+
+<script>
+  import '../scripts/sketch-viewer';
+</script>
