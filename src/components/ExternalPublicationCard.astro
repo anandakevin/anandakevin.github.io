@@ -1,0 +1,116 @@
+---
+export type ExternalFeedItem = {
+  id: string;
+  title: string;
+  description?: string;
+  provider: string;
+  url: string;
+  canonicalUrl?: string;
+  publishedAt?: string;
+  tags?: string[];
+  sourceId?: string;
+  authorship?: 'self' | 'third-party';
+  featured?: boolean;
+  fixture?: boolean;
+  readerHref?: string;
+};
+
+const providerLabels: Record<string, string> = {
+  medium: 'Medium',
+  devto: 'DEV',
+  linkedin: 'LinkedIn',
+};
+
+interface Props {
+  item: ExternalFeedItem;
+  feedKind?: 'external_publication' | 'social_post';
+  variant?: 'card' | 'index';
+}
+
+const { item, feedKind = 'external_publication', variant = 'card' } = Astro.props;
+const providerKey = item.provider.toLowerCase().replace(/\s+/g, '-');
+const providerLabel = item.fixture
+  ? 'Fixture / external'
+  : (providerLabels[providerKey] ?? item.provider);
+const publishedLabel = item.publishedAt
+  ? new Intl.DateTimeFormat('en', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${item.publishedAt}T00:00:00Z`))
+  : undefined;
+---
+
+{variant === 'index' ? (
+  <article class="writing-index-row" data-feed-kind={feedKind} data-provider={providerKey}>
+    <p class="writing-index-row-type">
+      {providerLabel}
+      {publishedLabel && ` · ${publishedLabel}`}
+    </p>
+    <div class="writing-index-row-main">
+      <h3>
+        <a
+          href={item.readerHref ?? item.url}
+          rel={item.readerHref || item.fixture ? undefined : 'noopener noreferrer'}
+          target={item.readerHref || item.fixture ? undefined : '_blank'}
+        >
+          {item.title}
+        </a>
+      </h3>
+      {item.description && <p>{item.description}</p>}
+    </div>
+    <div class="writing-index-row-meta writing-index-row-meta--actions">
+      {item.readerHref && <a href={item.readerHref}>Read here ↗</a>}
+      <a
+        href={item.url}
+        rel={item.fixture ? undefined : 'noopener noreferrer'}
+        target={item.fixture ? undefined : '_blank'}
+      >
+        {item.fixture ? 'Writing index ↗' : 'Original ↗'}
+      </a>
+    </div>
+  </article>
+) : (
+  <article class="feed-card" data-feed-kind={feedKind} data-provider={providerKey}>
+    <div class="feed-accent" aria-hidden="true"></div>
+    <div class="feed-body">
+      <div class="feed-meta">
+        <span>{providerLabel}</span>
+        {publishedLabel && <span>{publishedLabel}</span>}
+      </div>
+      <h3>{item.title}</h3>
+      {item.description && <p>{item.description}</p>}
+      {item.tags && item.tags.length > 0 && (
+        <div class="stack-pills feed-tags">
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      )}
+      <div class="feed-foot">
+        <span class="feed-ref">{item.fixture ? 'Layout shell only' : 'Canonical on provider'}</span>
+        <div class="feed-actions">
+          {item.readerHref && (
+            <a href={item.readerHref}>
+              Read here{' '}
+              <span class="link-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          )}
+          <a
+            href={item.url}
+            rel={item.fixture ? undefined : 'noopener noreferrer'}
+            target={item.fixture ? undefined : '_blank'}
+          >
+            {item.fixture ? 'Writing index' : 'Original'}{' '}
+            <span class="link-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+)}

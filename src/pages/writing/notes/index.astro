@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FieldNoteList from '../../../components/FieldNoteList.astro';
+import { getFieldNoteItems, isFixtureMode } from '../../../lib/content';
+import { fieldNoteSections } from '../../../data/writing-sections';
+
+const fieldNotes = await getFieldNoteItems();
+---
+
+<BaseLayout
+  title="Field Notes"
+  description={
+    isFixtureMode
+      ? 'Implementation fixture Field Notes surface.'
+      : 'Reviewed technical notes on engineering systems, learning, and practice.'
+  }
+>
+  <section class="page-hero field-notes-hero">
+    <div class="shell">
+      <p class="page-crumb">Writing / Field Notes</p>
+      <h1 class="display">
+        Field <em>Notes.</em>
+      </h1>
+      <p class="lede">Reviewed notes on engineering systems, learning, and practice.</p>
+      <div class="field-note-nav" aria-label="Field Note sections">
+        <a href="#field-notes">Browse all notes</a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell field-note-hub" data-field-note-hub>
+      <div class="field-note-hub-layout">
+        <aside class="field-note-sidebar" aria-label="Field Notes navigation">
+          <div class="field-note-sidebar-block">
+            <b>Field Notes</b>
+            <nav>
+              {fieldNotes.map((note) => (
+                <a href={note.slug}>{note.title}</a>
+              ))}
+            </nav>
+          </div>
+        </aside>
+        <div class="field-note-hub-main">
+          <div class="field-note-search">
+            <span class="field-note-search-label" id="field-note-search-label">
+              Search Field Notes
+            </span>
+            <div class="field-note-search-controls">
+              <input
+                id="field-note-search-input"
+                type="search"
+                placeholder="Search titles, descriptions, or tags"
+                autocomplete="off"
+                aria-labelledby="field-note-search-label"
+                data-field-note-search-input
+              />
+              <button type="button" data-field-note-search-clear hidden>
+                Clear
+              </button>
+            </div>
+            <p data-field-note-search-status aria-live="polite">
+              {fieldNotes.length} {fieldNotes.length === 1 ? 'note' : 'notes'}
+            </p>
+          </div>
+          <FieldNoteList
+            items={fieldNotes}
+            sections={fieldNoteSections}
+            searchable
+            grouped={false}
+          />
+          <p class="field-note-search-empty" data-field-note-search-empty hidden>
+            No Field Notes match that search.
+          </p>
+        </div>
+      </div>
+      {fieldNotes.length === 0 && (
+        <p class="signal-empty-stats">The first Field Notes are still being prepared.</p>
+      )}
+      <div class="actions">
+        <a class="button alt" href="/writing">
+          Back to writing ↗
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+<script>
+  const root = document.querySelector<HTMLElement>('[data-field-note-hub]');
+  const input = root?.querySelector<HTMLInputElement>('[data-field-note-search-input]');
+  const clear = root?.querySelector<HTMLButtonElement>('[data-field-note-search-clear]');
+  const status = root?.querySelector<HTMLElement>('[data-field-note-search-status]');
+  const empty = root?.querySelector<HTMLElement>('[data-field-note-search-empty]');
+
+  if (root && input && clear && status && empty) {
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-field-note-row]')];
+    const sections = [...root.querySelectorAll<HTMLElement>('.field-note-section')];
+
+    const apply = () => {
+      const query = input.value.trim().toLocaleLowerCase();
+      let visible = 0;
+
+      rows.forEach((row) => {
+        const matches = !query || (row.dataset.fieldNoteSearch ?? '').includes(query);
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      sections.forEach((section) => {
+        const hasVisibleRows = section.querySelector('[data-field-note-row]:not([hidden])');
+        section.hidden = !hasVisibleRows;
+      });
+
+      clear.hidden = !query;
+      empty.hidden = visible > 0 || !query;
+      status.textContent = query
+        ? `${visible} ${visible === 1 ? 'note' : 'notes'} matching “${input.value.trim()}”`
+        : `${rows.length} ${rows.length === 1 ? 'note' : 'notes'}`;
+    };
+
+    input.addEventListener('input', apply);
+    clear.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      apply();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === '/' && document.activeElement !== input) {
+        event.preventDefault();
+        input.focus();
+      }
+      if (event.key === 'Escape' && document.activeElement === input && input.value) {
+        input.value = '';
+        apply();
+      }
+    });
+  }
+</script>

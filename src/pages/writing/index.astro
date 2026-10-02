@@ -1,6 +1,296 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SectionHeader from '../../components/SectionHeader.astro';
-import { fixtureWriting } from '../../data/fixtures';
+import WritingHeroVisual from '../../components/WritingHeroVisual.astro';
+import WritingIndexRow from '../../components/WritingIndexRow.astro';
+import ExternalPublicationCard from '../../components/ExternalPublicationCard.astro';
+import type { ExternalFeedItem } from '../../components/ExternalPublicationCard.astro';
+import {
+  getCuratedFieldNotesForPage,
+  getEditorialWritingItems,
+  getMediumWriting,
+  isFixtureMode,
+} from '../../lib/content';
+import { externalWritingConfig, externalWritingOverlay } from '../../data/external-writing';
+import { externalReaderHref, type ExternalWritingItem } from '../../lib/external-writing';
+
+const writingItems = await getEditorialWritingItems();
+const caseStudies = writingItems.filter((item) => item.content_kind === 'case_study');
+const articles = writingItems.filter((item) => item.content_kind !== 'case_study');
+const fieldNotes = await getCuratedFieldNotesForPage('pages/writing', 3);
+const mediumItems = await getMediumWriting();
+
+const fixtureExternal: ExternalFeedItem[] = isFixtureMode
+  ? [
+      {
+        id: 'external/fixture-shell',
+        title: 'External publication row shell',
+        description:
+          'Validates provider ownership and outbound links without mirroring an article body.',
+        provider: 'Fixture',
+        url: '/writing',
+        fixture: true,
+      },
+    ]
+  : [];
+
+const externalItem = (item: ExternalWritingItem): ExternalFeedItem => ({
+  id: item.sourceId,
+  sourceId: item.sourceId,
+  title: item.title,
+  description: item.description,
+  provider: item.source,
+  url: item.url,
+  canonicalUrl: item.canonicalUrl,
+  publishedAt: item.publishedAt,
+  tags: item.tags,
+  authorship: item.authorship,
+  featured: item.featured,
+  readerHref: externalReaderHref(item),
+});
+
+const externalFeed: ExternalFeedItem[] = [...fixtureExternal, ...mediumItems.map(externalItem)];
+const externalEnabled =
+  isFixtureMode ||
+  Boolean(externalWritingConfig.devto.username || externalWritingConfig.medium.feedUrl);
+const writingEmpty =
+  !isFixtureMode &&
+  caseStudies.length === 0 &&
+  articles.length === 0 &&
+  fieldNotes.length === 0 &&
+  externalFeed.length === 0;
 ---
-<BaseLayout title="Writing" description="Implementation fixture writing surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Writing / extracted understanding</p><h1 class="display">Writing has different <em>levels of commitment.</em></h1><p class="lede">Case Studies, Articles, Notes, External Writing, and Social belong in one knowledge surface while retaining their different ownership rules.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Featured fixtures" title="External content still feels part of the" emphasis="portfolio." /><div class="three-grid">{fixtureWriting.map((item) => <article class="artifact-card"><small>Case study / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href={item.slug}>Open fixture case study ↗</a></article>)}</div></div></section></BaseLayout>
+
+<BaseLayout
+  title="Writing"
+  description={
+    isFixtureMode
+      ? 'Implementation fixture writing surface.'
+      : 'Case studies, reusable notes, and external publications.'
+  }
+>
+  <section class="page-hero">
+    <div class="shell writing-hero-grid">
+      <div>
+        <p class="page-crumb">Writing</p>
+        <h1 class="display">
+          Writing from the <em>work.</em>
+        </h1>
+        <p class="lede">Case studies, field notes, and writing published elsewhere.</p>
+      </div>
+      <WritingHeroVisual />
+    </div>
+  </section>
+
+  <section class="section">
+    <div
+      class="shell writing-index"
+      data-writing-feed
+      data-dev-username={isFixtureMode ? undefined : externalWritingConfig.devto.username}
+      data-dev-api-url={isFixtureMode ? undefined : externalWritingConfig.devto.apiUrl}
+      data-external-overlay={
+        isFixtureMode
+          ? undefined
+          : JSON.stringify(
+              Object.fromEntries(
+                Object.entries(externalWritingOverlay).map(([sourceId, curation]) => [
+                  sourceId,
+                  {
+                    note: curation.note,
+                    featured: curation.featured,
+                    hidden: curation.hidden,
+                  },
+                ]),
+              ),
+            )
+      }
+    >
+      <div class="writing-index-intro">
+        <div>
+          <p class="section-index">01 / Library</p>
+          <h2>Browse the library.</h2>
+        </div>
+        <nav class="writing-format-nav" aria-label="Writing sections">
+          {caseStudies.length > 0 && <a href="#case-studies">Case studies</a>}
+          {fieldNotes.length > 0 && <a href="#field-notes">Field Notes</a>}
+          {(externalFeed.length > 0 || externalEnabled) && <a href="#elsewhere">Elsewhere</a>}
+          <a class="writing-atlas-link" href="/explore">
+            Explore these in the atlas →
+          </a>
+        </nav>
+      </div>
+
+      {caseStudies.length > 0 && (
+        <section class="writing-group" id="case-studies">
+          <header class="writing-group-heading">
+            <h2>Case studies</h2>
+          </header>
+          <div class="writing-index-list">
+            {caseStudies.map((item) => (
+              <WritingIndexRow item={item} fixtureMode={isFixtureMode} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {fieldNotes.length > 0 && (
+        <section class="writing-group" id="field-notes">
+          <header class="writing-group-heading">
+            <h2>Field Notes</h2>
+            <a href="/writing/notes">Browse all notes ↗</a>
+          </header>
+          <div class="writing-index-list">
+            {fieldNotes.map((item) => (
+              <WritingIndexRow item={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {articles.length > 0 && (
+        <section class="writing-group" id="articles">
+          <header class="writing-group-heading">
+            <h2>Articles</h2>
+          </header>
+          <div class="writing-index-list">
+            {articles.map((item) => (
+              <WritingIndexRow item={item} fixtureMode={isFixtureMode} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(externalFeed.length > 0 || externalEnabled) && (
+        <section class="writing-group" id="elsewhere">
+          <header class="writing-group-heading">
+            <h2>Elsewhere</h2>
+          </header>
+          {!isFixtureMode && externalWritingConfig.devto.username && (
+            <p class="writing-index-loading" data-dev-loading aria-live="polite">
+              Loading external writing…
+            </p>
+          )}
+          <div class="writing-index-list" data-writing-index-external>
+            {externalFeed.map((item) => (
+              <ExternalPublicationCard item={item} variant="index" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {writingEmpty && (
+        <p class="signal-empty-stats">I'm still preparing the first pieces to publish here.</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { devtoReaderHref } from '../../lib/external-writing';
+
+  function initExternalWriting() {
+    const root = document.querySelector<HTMLElement>('[data-writing-feed]');
+    if (!root || root.dataset.devLoaded === 'true') return;
+
+    const username = root.getAttribute('data-dev-username');
+    const apiUrl = root.getAttribute('data-dev-api-url');
+    if (!username || !apiUrl) return;
+    root.dataset.devLoaded = 'true';
+
+    const overlay = JSON.parse(root.getAttribute('data-external-overlay') ?? '{}') as Record<
+      string,
+      { note?: string; hidden?: boolean }
+    >;
+    const loading = root.querySelector<HTMLElement>('[data-dev-loading]');
+    const list = root.querySelector<HTMLElement>('[data-writing-index-external]');
+    if (!list) return;
+
+    const timeout = new AbortController();
+    const timer = window.setTimeout(() => timeout.abort(), 5000);
+    fetch(`${apiUrl}?username=${encodeURIComponent(username)}&per_page=100`, {
+      signal: timeout.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(`DEV feed failed: ${response.status}`);
+        return response.json();
+      })
+      .then((payload: unknown) => {
+        if (!Array.isArray(payload)) throw new Error('DEV response must be an array.');
+        payload.forEach((raw) => {
+          if (!raw || typeof raw !== 'object') return;
+          const article = raw as Record<string, unknown>;
+          const id = article.id;
+          const title = typeof article.title === 'string' ? article.title.trim() : '';
+          const url = typeof article.url === 'string' ? article.url : '';
+          if (
+            (!Number.isInteger(id) && typeof id !== 'string') ||
+            !title ||
+            !/^https?:\/\//.test(url)
+          )
+            return;
+
+          const sourceId = `devto:${String(id)}`;
+          const curation = overlay[sourceId];
+          if (curation?.hidden) return;
+          const readerHref = devtoReaderHref(sourceId, url);
+
+          const row = document.createElement('article');
+          row.className = 'writing-index-row';
+          row.dataset.feedKind = 'external_publication';
+          row.dataset.provider = 'devto';
+
+          const type = document.createElement('p');
+          type.className = 'writing-index-row-type';
+          type.textContent = 'DEV';
+
+          const main = document.createElement('div');
+          main.className = 'writing-index-row-main';
+          const heading = document.createElement('h3');
+          const headingLink = document.createElement('a');
+          headingLink.href = readerHref || url;
+          if (!readerHref) {
+            headingLink.target = '_blank';
+            headingLink.rel = 'noopener noreferrer';
+          }
+          headingLink.textContent = title;
+          heading.append(headingLink);
+          const description = document.createElement('p');
+          const suppliedDescription =
+            typeof article.description === 'string'
+              ? article.description
+                  .replace(/<[^>]+>/g, ' ')
+                  .replace(/\s+/g, ' ')
+                  .trim()
+              : '';
+          description.textContent =
+            curation?.note || suppliedDescription || `Originally published on DEV — ${title}`;
+          main.append(heading, description);
+
+          const meta = document.createElement('div');
+          meta.className = 'writing-index-row-meta writing-index-row-meta--actions';
+          if (readerHref) {
+            const reader = document.createElement('a');
+            reader.href = readerHref;
+            reader.textContent = 'Read here ↗';
+            meta.append(reader);
+          }
+          const original = document.createElement('a');
+          original.href = url;
+          original.target = '_blank';
+          original.rel = 'noopener noreferrer';
+          original.textContent = 'Original ↗';
+          meta.append(original);
+
+          row.append(type, main, meta);
+          list.append(row);
+        });
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        window.clearTimeout(timer);
+        loading?.remove();
+      });
+  }
+
+  initExternalWriting();
+  document.addEventListener('astro:page-load', initExternalWriting);
+</script>

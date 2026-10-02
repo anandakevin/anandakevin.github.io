@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { externalWritingConfig } from '../../../data/external-writing';
+---
+
+<BaseLayout title="Read on DEV" description="A self-authored DEV article, read on this portfolio.">
+  <section class="page-hero">
+    <div class="shell">
+      <p class="page-crumb">Writing / DEV</p>
+      <h1 class="display" data-dev-reader-title>
+        Loading a DEV article…
+      </h1>
+      <div class="external-reader-source">
+        <span data-dev-reader-source>Fetching the provider-owned article.</span>
+        <a
+          data-dev-reader-original
+          href="https://dev.to/anandakevin"
+          target="_blank"
+          rel="noopener noreferrer"
+          hidden
+        >
+          Open original ↗
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      <div
+        class="content-body external-reader-body"
+        data-dev-reader-body
+        data-dev-api-url={externalWritingConfig.devto.apiUrl}
+        data-dev-username={externalWritingConfig.devto.username}
+      >
+        <p>Loading the article from DEV…</p>
+      </div>
+      <p class="external-reader-fallback" data-dev-reader-fallback hidden>
+        This article could not be displayed here. You can still read it on DEV.
+      </p>
+      <div class="actions">
+        <a class="button alt" href="/writing">
+          Back to writing ↗
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { devtoArticle } from '../../../lib/external-writing';
+  import { renderSanitizedExternalHtml } from '../../../lib/external-reader';
+
+  const body = document.querySelector<HTMLElement>('[data-dev-reader-body]');
+  const title = document.querySelector<HTMLElement>('[data-dev-reader-title]');
+  const source = document.querySelector<HTMLElement>('[data-dev-reader-source]');
+  const original = document.querySelector<HTMLAnchorElement>('[data-dev-reader-original]');
+  const fallback = document.querySelector<HTMLElement>('[data-dev-reader-fallback]');
+  const parameters = new URLSearchParams(window.location.search);
+  const articleId = parameters.get('article') ?? '';
+  const requestedUrl = parameters.get('url') ?? '';
+
+  function safeOriginalUrl(value: string): string | undefined {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && url.hostname === 'dev.to' ? url.toString() : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const originalUrl = safeOriginalUrl(requestedUrl);
+  if (originalUrl && original) {
+    original.href = originalUrl;
+    original.hidden = false;
+  }
+
+  async function loadDevArticle() {
+    if (!body || !/^\d+$/.test(articleId)) throw new Error('Invalid DEV article reference.');
+    const apiUrl = body.dataset.devApiUrl;
+    const username = body.dataset.devUsername;
+    if (!apiUrl || !username) throw new Error('DEV reader is not configured.');
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 5000);
+    try {
+      const response = await fetch(`${apiUrl}/${articleId}`, { signal: controller.signal });
+      if (!response.ok) throw new Error(`DEV article failed: ${response.status}`);
+      const item = devtoArticle(await response.json());
+      if (
+        item.sourceId !== `devto:${articleId}` ||
+        !item.url.startsWith(`https://dev.to/${username}/`)
+      )
+        throw new Error('DEV article did not match the requested author.');
+      if (!item.bodyHtml) throw new Error('DEV article has no HTML body.');
+      if (title) title.textContent = item.title;
+      if (source) {
+        const parsedDate = item.publishedAt
+          ? new Date(`${item.publishedAt.slice(0, 10)}T00:00:00Z`)
+          : undefined;
+        const publishedLabel =
+          parsedDate && !Number.isNaN(parsedDate.valueOf())
+            ? new Intl.DateTimeFormat('en', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'UTC',
+              }).format(parsedDate)
+            : item.publishedAt;
+        source.textContent = `Originally published on DEV${publishedLabel ? ` · ${publishedLabel}` : ''}`;
+      }
+      if (original) {
+        original.href = item.url;
+        original.hidden = false;
+      }
+      document.title = `${item.title} · Ananda Kevin`;
+      const canonical =
+        document.querySelector<HTMLLinkElement>('link[rel="canonical"]') ??
+        document.head.appendChild(document.createElement('link'));
+      canonical.rel = 'canonical';
+      canonical.href = item.url;
+      renderSanitizedExternalHtml(body, item.bodyHtml, item.url);
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  loadDevArticle().catch(() => {
+    if (body) body.hidden = true;
+    if (title) title.textContent = 'Read this article on DEV.';
+    if (source) source.textContent = 'DEV could not provide the article body right now.';
+    fallback?.removeAttribute('hidden');
+  });
+</script>
