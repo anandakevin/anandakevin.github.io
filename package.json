@@ -1,6 +1,7 @@
 {
   "name": "anandakevin.github.io",
   "version": "1.0.0",
+  "packageManager": "npm@11.11.0",
   "description": "My Portfolio",
   "main": "index.js",
   "scripts": {
