@@ -2,16 +2,209 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import SystemTrace from '../components/SystemTrace.astro';
+import ArtifactLeadin from '../components/ArtifactLeadin.astro';
 import WorkCard from '../components/WorkCard.astro';
 import FeaturedWriting from '../components/FeaturedWriting.astro';
-import { fixtureContributions, fixtureNotice, fixtureProjects, fixtureThroughlines, fixtureWork, fixtureWriting } from '../data/fixtures';
+import SystemsMap from '../components/SystemsMap.astro';
+import HomeWritingTeaser from '../components/HomeWritingTeaser.astro';
+import HomeContributionSignal from '../components/HomeContributionSignal.astro';
+import { fixtureNotice } from '../data/fixtures';
+import { externalWritingConfig, externalWritingOverlay } from '../data/external-writing';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { archFromCaseStudyBody } from '../lib/case-study-arch';
+import type { FixtureArch } from '../data/fixture-arch';
+import { pageHeroFromEntry } from '../lib/content/page-presentation';
+import {
+  getCatalogRecords,
+  getCuratedContributionsForHome,
+  getMediumWriting,
+  getCuratedFeaturedWriting,
+  getContributionsHomeSignal,
+  getCuratedProjectsForHome,
+  getCuratedWorkForHome,
+  getEditorialWritingItems,
+  isFixtureMode,
+} from '../lib/content';
+
+const workItems = await getCuratedWorkForHome();
+const featuredWriting = await getCuratedFeaturedWriting();
+const writingItems = await getEditorialWritingItems();
+const externalWriting = await getMediumWriting();
+const devtoHomepageEnabled = !isFixtureMode && Boolean(externalWritingConfig.devto.username);
+const featuredWritingIds = new Set(featuredWriting.map((item) => item.id));
+const moreWriting = writingItems.filter((item) => !featuredWritingIds.has(item.id));
+const hasMoreWriting = moreWriting.length > 0 || externalWriting.length > 0;
+const projects = await getCuratedProjectsForHome();
+const catalogRecords = await getCatalogRecords();
+const curatedContributions = await getCuratedContributionsForHome();
+const contributionsHomeSignal = await getContributionsHomeSignal();
+let homeHero;
+
+const archByWritingId: Record<string, FixtureArch> = {};
+if (!isFixtureMode) {
+  const writingEntries = await getCollection('writing');
+  const pageEntries = await getCollection('pages');
+  homeHero = pageHeroFromEntry(pageEntries.find((entry) => entry.data.id === 'pages/home'));
+  for (const entry of writingEntries) {
+    if (entry.data.content_kind !== 'case_study') continue;
+    const arch = archFromCaseStudyBody(entry.body ?? '');
+    if (arch) archByWritingId[entry.data.id] = arch;
+  }
+}
+
+const pageTitle = isFixtureMode ? 'Portfolio foundation' : 'Ananda Kevin';
+const pageDescription = isFixtureMode
+  ? fixtureNotice
+  : 'Software engineer working on backend services, integrations, and automation.';
 ---
-<BaseLayout title="Portfolio foundation" description={fixtureNotice}>
-  <section class="home-hero"><div class="shell"><p class="eyebrow"><b></b>Portfolio foundation / fixture mode</p><h1 class="display">Building systems that make good work <em>easier to do.</em></h1><p class="lede">This implementation validates the approved experience and public-content boundary. Visitor-facing facts remain deliberately absent until reviewed public records exist.</p><div class="actions"><a class="button" href="/work">Explore fixture work ↗</a><a class="button alt" href="/writing">Inspect fixture writing ↗</a></div><div class="detail-pills"><span>mode · implementation fixture</span><span>content · not yet reviewed</span><span>theme · light / dark</span></div></div></section>
-  <section class="section"><div class="shell"><SystemTrace /><p class="process-coda"><span>observe</span> → <span>clarify</span> → <span>build</span> <b>↻</b> <em>trade-offs stay visible</em></p></div></section>
-  <section class="section"><div class="shell"><SectionHeader index="01 / Selected work" title="Systems work, not a wall of" emphasis="job titles." description="Fixture cards verify hierarchy, signal placement, contextual stacks, and responsive collapse." /><div class="work-list">{fixtureWork.map((item, index) => <WorkCard item={item} signal={index === 0 ? 'complexity → clarity' : 'manual work → leverage'} />)}</div></div></section>
-  <section class="section"><div class="shell"><SectionHeader index="02 / Featured writing" title="Deep reasoning has a" emphasis="real surface." description="The fixture uses two clearly-labelled items to exercise the approved tab, progress, pause, manual-selection, and depth states." /><FeaturedWriting items={fixtureWriting} /></div></section>
-  <section class="section"><div class="shell"><SectionHeader index="03 / Throughlines" title="Recurring engineering instincts, backed by" emphasis="evidence." description="These are implementation fixtures only. Production throughlines require an approved registry and assigned public records." /><div class="throughlines">{fixtureThroughlines.map((item, index) => <article class="throughline-card"><small>{String(index + 1).padStart(2, '0')} / fixture</small><h3>{item.title}</h3><p>{item.description}</p><span>Seen in · reviewed evidence pending</span></article>)}</div></div></section>
-  <section class="section"><div class="shell"><SectionHeader index="04 / Projects" title="Discrete artifacts deserve their own" emphasis="context." /><div class="three-grid">{fixtureProjects.map((item) => <article class="artifact-card"><small>Project / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/projects">Open fixture projects ↗</a></article>)}<article class="artifact-card"><small>Optional media</small><h3>Graceful absence is intentional.</h3><p>Production cards support public assets when evidence calls for them; imagery is not fabricated to fill a layout.</p></article></div></div></section>
-  <section class="section"><div class="shell"><SectionHeader index="05 / Contribution" title="Technical work becomes more useful when it can be" emphasis="passed on." /><div class="three-grid">{fixtureContributions.map((item) => <article class="artifact-card"><small>Contribution / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/contributions">Open fixture contributions ↗</a></article>)}<article class="artifact-card"><small>Evidence rule</small><h3>Metrics arrive with context.</h3><p>No contribution numbers appear until their source, denominator, and public suitability are reviewed.</p></article></div></div></section>
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="home-hero">
+    <div class="shell home-grid">
+      <div class="home-hero-copy">
+        <p class="eyebrow">
+          <b></b>
+          {isFixtureMode
+            ? 'Portfolio foundation / fixture mode'
+            : 'backend · integration · automation'}
+        </p>
+        <h1 class="home-title">
+          {homeHero?.headline_before ?? 'I build software for problems that are difficult to '}
+          <em>{homeHero?.emphasis ?? 'change safely'}</em>
+          {homeHero?.headline_after ?? '.'}
+        </h1>
+        <p class="lede">
+          {isFixtureMode
+            ? 'This implementation validates the approved experience and public-content boundary. Visitor-facing facts remain deliberately absent until reviewed public records exist.'
+            : 'I work on backend systems, integrations, and automation. Much of the job is tracing how services interact, finding where a fix affects another path, and making those changes easier to review.'}
+        </p>
+        <div class="actions">
+          <a class="button" href="/work">
+            Explore work ↗
+          </a>
+          <a class="button alt" href="/writing">
+            Browse the library ↗
+          </a>
+        </div>
+        {isFixtureMode && (
+          <div class="hero-detail-pills">
+            <span>mode · implementation fixture</span>
+            <span>content · not yet reviewed</span>
+          </div>
+        )}
+      </div>
+      <div class="home-hero-artifact">
+        <SystemTrace />
+        <ArtifactLeadin />
+      </div>
+    </div>
+  </section>
+  {(isFixtureMode || workItems.length > 0) && (
+    <section class="section">
+      <div class="shell">
+        <SectionHeader
+          index="01 / Selected work"
+          title="Selected "
+          emphasis="work"
+          description={
+            isFixtureMode
+              ? 'Fixture cards verify hierarchy, signal placement, contextual stacks, and responsive collapse.'
+              : "A few engineering problems I've spent real time understanding, changing, and improving."
+          }
+        />
+        <div class="work-list">
+          {workItems.map((item) => (
+            <WorkCard item={item} fixtureMode={isFixtureMode} records={catalogRecords} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+  {(isFixtureMode || featuredWriting.length > 0 || hasMoreWriting || devtoHomepageEnabled) && (
+    <section class="section">
+      <div class="shell">
+        <SectionHeader
+          index="02 / Writing"
+          title="Writing from the work and"
+          emphasis="its edges."
+          description={
+            isFixtureMode
+              ? 'The fixture uses clearly labelled items to exercise the case-study stage; additional writing appears below when available.'
+              : 'Case studies and shorter notes on the decisions, constraints, and lessons behind the work.'
+          }
+        />
+        {featuredWriting.length > 0 && (
+          <FeaturedWriting
+            items={featuredWriting}
+            fixtureMode={isFixtureMode}
+            archByWritingId={archByWritingId}
+          />
+        )}
+        {hasMoreWriting && (
+          <HomeWritingTeaser
+            items={moreWriting}
+            externalItems={externalWriting}
+            devtoUsername={externalWritingConfig.devto.username}
+            devtoApiUrl={externalWritingConfig.devto.apiUrl}
+            externalOverlay={externalWritingOverlay}
+            fixtureMode={isFixtureMode}
+          />
+        )}
+      </div>
+    </section>
+  )}
+  <section class="section home-atlas">
+    <div class="shell">
+      <SectionHeader
+        index="03 / Explore"
+        title="See the public"
+        emphasis="corpus."
+        description="Start at the overview, then follow territories and relationships into the work, writing, contributions, and Knowledge."
+      />
+      <div class="home-atlas-map">
+        <SystemsMap records={catalogRecords} mode="context" />
+      </div>
+      <div class="actions home-atlas-actions">
+        <a class="button alt" href="/explore">
+          Explore the full atlas →
+        </a>
+      </div>
+    </div>
+  </section>
+  {(isFixtureMode || projects.length > 0) && (
+    <section class="section">
+      <div class="shell">
+        <SectionHeader
+          index="04 / Projects"
+          title="Independent projects and"
+          emphasis="experiments."
+        />
+        <div class="project-grid">
+          {projects.map((item) => (
+            <ProjectCard item={item} fixtureMode={isFixtureMode} surface="home" />
+          ))}
+        </div>
+        <div class="actions">
+          <a class="button alt" href="/projects">
+            Browse projects ↗
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+  <HomeContributionSignal
+    fixtureMode={isFixtureMode}
+    contributions={curatedContributions}
+    signal={contributionsHomeSignal}
+  />
+  <section class="section home-contact">
+    <div class="shell home-contact-inner">
+      <h2>Want to talk?</h2>
+      <p>If something here overlaps with what you're working on, feel free to get in touch.</p>
+      <a class="button alt" href="mailto:ananda.kevin.rs@gmail.com">
+        Email me ↗
+      </a>
+    </div>
+  </section>
 </BaseLayout>
