@@ -107,6 +107,31 @@ export const fixtureContributions: PublicContent[] = [
   },
 ];
 
+/**
+ * Retained while the fixture homepage remains available from the foundation
+ * commit. These are presentation-only placeholders, not public throughlines.
+ */
+export const fixtureThroughlines = [
+  {
+    id: 'model-variation',
+    title: 'Model variation explicitly',
+    description: 'Fixture throughline for a reviewed future registry.',
+    display_order: 1,
+  },
+  {
+    id: 'repeatable-change',
+    title: 'Make change repeatable',
+    description: 'Fixture throughline for a reviewed future registry.',
+    display_order: 2,
+  },
+  {
+    id: 'legible-boundaries',
+    title: 'Keep boundaries legible',
+    description: 'Fixture throughline for a reviewed future registry.',
+    display_order: 3,
+  },
+];
+
 export const fixtureContent = [
   ...fixtureWork,
   ...fixtureWriting,
