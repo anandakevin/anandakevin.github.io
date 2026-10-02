@@ -5,24 +5,31 @@ import KnowledgeAreaTree from './KnowledgeAreaTree.astro';
 interface Props {
   area: KnowledgeArea;
   pages: PublicContent[];
+  domain: string;
   parentPath?: string[];
 }
 
-const { area, pages, parentPath = [] } = Astro.props;
+const { area, pages, domain, parentPath = [] } = Astro.props;
 const path = [...parentPath, area.id];
-const directPages = pages.filter(
-  (page) => JSON.stringify(page.knowledge_area) === JSON.stringify(path),
+const areaPages = pages.filter((page) =>
+  path.every((segment, index) => page.knowledge_area?.[index] === segment),
 );
+const directPages = areaPages.filter(
+  (page) => JSON.stringify(page.knowledge_area ?? []) === JSON.stringify(path),
+);
+const areaHref = `/knowledge/domain/${domain}/${path.join('/')}`;
 ---
 
 <section class="knowledge-area" data-knowledge-area>
   <div class="knowledge-area-heading">
     <div>
-      <h3>{area.title}</h3>
+      <h3>
+        <a href={areaHref}>{area.title}</a>
+      </h3>
       <p>{area.description}</p>
     </div>
     <span class="knowledge-area-count">
-      {directPages.length} {directPages.length === 1 ? 'page' : 'pages'}
+      {areaPages.length} {areaPages.length === 1 ? 'page' : 'pages'}
     </span>
   </div>
   {directPages.length > 0 && (
@@ -39,7 +46,7 @@ const directPages = pages.filter(
   {area.children.length > 0 && (
     <div class="knowledge-area-children">
       {area.children.map((child) => (
-        <KnowledgeAreaTree area={child} pages={pages} parentPath={path} />
+        <KnowledgeAreaTree area={child} pages={pages} domain={domain} parentPath={path} />
       ))}
     </div>
   )}

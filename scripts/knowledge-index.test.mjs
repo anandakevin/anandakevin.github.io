@@ -63,8 +63,8 @@ test('sorts updated pages newest first with a title tie-breaker', () => {
   );
 });
 
-test('windows a large result set without changing its order', () => {
-  const largeIndex = Array.from({ length: 1_200 }, (_, index) => ({
+test('windows a 10,000-page result set without changing its order', () => {
+  const largeIndex = Array.from({ length: 10_000 }, (_, index) => ({
     title: `Page ${String(index + 1).padStart(4, '0')}`,
     search: `page ${index + 1}`,
   }));

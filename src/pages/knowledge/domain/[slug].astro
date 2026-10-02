@@ -3,6 +3,8 @@ import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import AtlasNeighborhood from '../../../components/AtlasNeighborhood.astro';
 import KnowledgeAreaTree from '../../../components/KnowledgeAreaTree.astro';
+import KnowledgePathStep from '../../../components/KnowledgePathStep.astro';
+import KnowledgeSearch from '../../../components/KnowledgeSearch.astro';
 import { knowledgeKindLabel, knowledgePathLabel } from '../../../data/knowledge';
 import {
   entryToPublicContent,
@@ -37,6 +39,7 @@ const featured = (record.knowledge_featured_pages ?? [])
 ---
 
 <BaseLayout title={record.title} description={record.description}>
+  <KnowledgeSearch />
   <section class="page-hero knowledge-domain-hero">
     <div class="shell">
       <p class="page-crumb">
@@ -63,10 +66,13 @@ const featured = (record.knowledge_featured_pages ?? [])
         <p class="knowledge-sidebar-cap">In this domain</p>
         <nav>
           {record.knowledge_areas?.map((area) => (
-            <a href={`#knowledge-area-${area.id}`}>{area.title}</a>
+            <a href={`/knowledge/domain/${record.knowledge_domain}/${area.id}`}>{area.title}</a>
           ))}
         </nav>
-        <a class="knowledge-sidebar-all" href="/knowledge/all">
+        <a
+          class="knowledge-sidebar-all"
+          href={`/knowledge/all/?domain=${encodeURIComponent(record.knowledge_domain ?? '')}`}
+        >
           Browse all Knowledge →
         </a>
       </aside>
@@ -90,7 +96,11 @@ const featured = (record.knowledge_featured_pages ?? [])
           <div class="knowledge-area-tree">
             {record.knowledge_areas?.map((area) => (
               <div id={`knowledge-area-${area.id}`}>
-                <KnowledgeAreaTree area={area} pages={domainPages} />
+                <KnowledgeAreaTree
+                  area={area}
+                  pages={domainPages}
+                  domain={record.knowledge_domain ?? ''}
+                />
               </div>
             ))}
           </div>
@@ -112,11 +122,7 @@ const featured = (record.knowledge_featured_pages ?? [])
             </header>
             <div class="knowledge-path-steps">
               {pathItems.map((step, index) => (
-                <a class="knowledge-path-step" href={step.page.slug}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{step.label ?? step.page.title}</strong>
-                  <small>{step.page.description}</small>
-                </a>
+                <KnowledgePathStep step={step} index={index} />
               ))}
             </div>
           </section>

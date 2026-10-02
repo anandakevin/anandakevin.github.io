@@ -1,0 +1,19 @@
+---
+import type {
+  KnowledgePathStep as KnowledgePathStepData,
+  PublicContent,
+} from '../lib/public-contract';
+
+interface Props {
+  step: Omit<KnowledgePathStepData, 'page'> & { page: PublicContent };
+  index: number;
+}
+
+const { step, index } = Astro.props;
+---
+
+<a class="knowledge-path-step" href={step.page.slug}>
+  <span>{String(index + 1).padStart(2, '0')}</span>
+  <strong>{step.label ?? step.page.title}</strong>
+  <small>{step.page.description}</small>
+</a>

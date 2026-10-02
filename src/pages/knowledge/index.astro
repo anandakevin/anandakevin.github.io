@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
 import { knowledgeKindLabel, knowledgePathLabel } from '../../data/knowledge';
 import {
   getCuratedKnowledgeStartHere,
@@ -25,8 +26,9 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
       : 'A public reference library for reusable explanations, concepts, guides, and playbooks.'
   }
 >
+  <KnowledgeSearch />
   <section class="page-hero knowledge-hero">
-    <div class="shell knowledge-hero-inner">
+    <div class="shell">
       <p class="page-crumb">Knowledge / public reference library</p>
       <h1 class="display">
         Ideas arranged for <em>reuse.</em>
@@ -41,13 +43,19 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
           <input
             id="knowledge-home-search"
             name="q"
-            type="search"
+            type="text"
             placeholder="Search titles, topics, or descriptions"
             autocomplete="off"
+            readonly
+            data-knowledge-search-trigger
           />
-          <button type="submit">Search ↗</button>
+          <button type="button" data-knowledge-search-trigger>
+            Search ↗
+          </button>
         </div>
-        <small>Search is global. Browsing below is for orientation and discovery.</small>
+        <small>
+          Search is global. Press <kbd>⌘K</kbd> or <kbd>Ctrl K</kbd> from any Knowledge page.
+        </small>
       </form>
     </div>
   </section>
