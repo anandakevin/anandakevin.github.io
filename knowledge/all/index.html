@@ -1,4 +1,161 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="description" content="Search and browse the complete public Knowledge reference library."><link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><title>Browse all Knowledge · Ananda Kevin</title><link rel="stylesheet" href="/_astro/BaseLayout.BgsUcDEq.css"></head><body><a class="skip-link" href="#main-content">Skip to content</a><header class="site-header" data-site-header><div class="shell header-inner"><a class="brand" href="/" aria-label="Ananda Kevin home"><img class="brand-logo" src="/favicon.svg" width="33" height="33" alt=""><span><strong>Ananda Kevin</strong><small>system · software · explanation</small></span></a><button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav-panel">Menu</button><nav id="primary-nav-panel" class="primary-nav" aria-label="Primary navigation" data-nav-panel><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing">Writing</a><a href="/knowledge" aria-current="page">Knowledge</a><a href="/sketches">Sketches</a><a href="/contributions">Contributions</a><a href="/explore">Explore</a><a href="/about">About</a><a href="/credentials">Credentials</a></nav><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark colour theme">☾</button></div></header><script type="module">var e=document.querySelector(`[data-site-header]`),t=e?.querySelector(`[data-nav-toggle]`),n=e?.querySelector(`[data-nav-panel]`);t?.addEventListener(`click`,()=>{let n=e?.classList.toggle(`is-nav-open`);t.setAttribute(`aria-expanded`,n?`true`:`false`)}),n?.querySelectorAll(`a`).forEach(n=>{n.addEventListener(`click`,()=>{e?.classList.remove(`is-nav-open`),t?.setAttribute(`aria-expanded`,`false`)})});</script><main id="main-content"><section class="page-hero knowledge-index-hero"><div class="shell"><p class="page-crumb">Knowledge / Browse all</p><h1 class="display">Browse all <em>Knowledge.</em></h1><p class="lede">The complete reference index, independent of chronology.</p></div></section><section class="section knowledge-all-section"><div class="shell" data-knowledge-all data-knowledge-index-url="/knowledge/search-index.json" data-knowledge-page-size="40"><div class="knowledge-filterbar" aria-label="Knowledge filters" role="search"><label class="knowledge-filter-search"><span>Search</span><input data-knowledge-search type="search" placeholder="Search titles, topics, domains…" autocomplete="off" aria-keyshortcuts="/"></label><label><span>Domain</span><select data-knowledge-domain><option value="all">All domains</option><option value="computing">Computing</option><option value="learning-practice">Learning &amp; Practice</option><option value="life-sciences">Life Sciences</option><option value="mathematics">Mathematics</option></select></label><label><span>Kind</span><select data-knowledge-kind><option value="all">All kinds</option><option value="concept">Concept</option><option value="guide">Guide</option><option value="overview">Overview</option><option value="reference">Reference</option></select></label><label><span>Sort</span><select data-knowledge-sort><option value="title">Title</option><option value="updated">Recently updated</option></select></label></div><p class="knowledge-filter-status" data-knowledge-status aria-live="polite">Loading 10 pages…</p><div class="knowledge-index-list" data-knowledge-list id="knowledge-index-results"></div><p class="knowledge-empty" data-knowledge-empty hidden>No Knowledge pages match those filters.</p><p class="knowledge-index-error" data-knowledge-error hidden>The searchable index could not load. Please browse by domain instead.</p><button class="knowledge-show-more" type="button" data-knowledge-show-more aria-controls="knowledge-index-results" hidden></button><noscript><p class="knowledge-index-fallback">Browse Knowledge by <a href="/knowledge/">domain</a>. Search and the complete index need JavaScript enabled.</p></noscript></div></section></main><footer class="site-footer"><div class="shell"><p class="footer-motto">Build <em>Systems.</em> Create <em>Leverage.</em> Leave Lasting <em>Impact.</em></p><div class="footer-directory"><p class="footer-blurb">Engineering work, projects, writing, and teaching.</p><div class="footer-group"><span class="footer-group-label">Explore</span><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing">Writing</a><a href="/knowledge">Knowledge</a><a href="/contributions">Contributions</a><a href="/about">About</a></div><div class="footer-group"><span class="footer-group-label">More</span><a href="/explore">Explore</a><a href="/credentials">Credentials & Recognition</a></div><div class="footer-group"><span class="footer-group-label">Elsewhere</span><a href="https://github.com/anandakevin" rel="noopener noreferrer" target="_blank">GitHub ↗</a><a href="https://www.linkedin.com/in/ananda-kevin-refaldo-sariputra/" rel="noopener noreferrer" target="_blank">LinkedIn ↗</a><a href="https://scholar.google.com/citations?user=F_OlnVwAAAAJ" rel="noopener noreferrer" target="_blank">Google Scholar ↗</a><a href="https://www.kaggle.com/thechief28" rel="noopener noreferrer" target="_blank">Kaggle ↗</a><a href="mailto:ananda.kevin.rs@gmail.com">Email ↗</a></div></div><div class="footer-bottom"><span>Ananda Kevin</span><span>system · software · explanation</span></div></div></footer><script>
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="description" content="Search and browse the complete public Knowledge reference library."><link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><title>Browse all Knowledge · Ananda Kevin</title><link rel="stylesheet" href="/_astro/BaseLayout.oofHo60b.css"></head><body><a class="skip-link" href="#main-content">Skip to content</a><header class="site-header" data-site-header><div class="shell header-inner"><a class="brand" href="/" aria-label="Ananda Kevin home"><img class="brand-logo" src="/favicon.svg" width="33" height="33" alt=""><span><strong>Ananda Kevin</strong><small>system · software · explanation</small></span></a><button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav-panel">Menu</button><nav id="primary-nav-panel" class="primary-nav" aria-label="Primary navigation" data-nav-panel><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing">Writing</a><a href="/knowledge" aria-current="page">Knowledge</a><a href="/sketches">Sketches</a><a href="/contributions">Contributions</a><a href="/explore">Explore</a><a href="/about">About</a><a href="/credentials">Credentials</a></nav><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark colour theme">☾</button></div></header><script type="module">var e=document.querySelector(`[data-site-header]`),t=e?.querySelector(`[data-nav-toggle]`),n=e?.querySelector(`[data-nav-panel]`);t?.addEventListener(`click`,()=>{let n=e?.classList.toggle(`is-nav-open`);t.setAttribute(`aria-expanded`,n?`true`:`false`)}),n?.querySelectorAll(`a`).forEach(n=>{n.addEventListener(`click`,()=>{e?.classList.remove(`is-nav-open`),t?.setAttribute(`aria-expanded`,`false`)})});</script><main id="main-content"><div class="knowledge-search-modal" data-knowledge-search-modal hidden><div class="knowledge-search-backdrop" data-knowledge-search-close></div><section class="knowledge-search-dialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-search-title"><div class="knowledge-search-dialog-head"><p id="knowledge-search-title">Search Knowledge</p><button type="button" data-knowledge-search-close aria-label="Close Knowledge search">Esc</button></div><label class="knowledge-search-input-label"><span class="sr-only">Search Knowledge pages and areas</span><input data-knowledge-search-input type="search" placeholder="Search pages, domains, or areas…" autocomplete="off" aria-controls="knowledge-search-results" aria-autocomplete="list"></label><div id="knowledge-search-results" class="knowledge-search-results" role="listbox" aria-label="Knowledge search results"></div><a class="knowledge-search-all" data-knowledge-search-all href="/knowledge/all/">View all results →</a><p class="knowledge-search-hint">↑ ↓ to move · Enter to open · Esc to close</p></section></div><script>(function(){const indexUrl = "/knowledge/search-index.json";
+
+  const normalizeKnowledgeSearch = (value) =>
+    value
+      .normalize('NFKD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLocaleLowerCase()
+      .trim();
+  const modal = document.querySelector('[data-knowledge-search-modal]');
+  const input = modal?.querySelector('[data-knowledge-search-input]');
+  const results = modal?.querySelector('[data-knowledge-search-results]');
+  const allLink = modal?.querySelector('[data-knowledge-search-all]');
+  const closeControls = modal?.querySelectorAll('[data-knowledge-search-close]');
+  let pages = [];
+  let nodes = [];
+  let loaded = false;
+  let loading;
+  let activeIndex = -1;
+  let returnFocus = null;
+
+  const setActive = (index) => {
+    const items = [...(results?.querySelectorAll('[role="option"]') ?? [])];
+    activeIndex = items.length ? (index + items.length) % items.length : -1;
+    items.forEach((item, itemIndex) => {
+      item.classList.toggle('is-active', itemIndex === activeIndex);
+      item.setAttribute('aria-selected', String(itemIndex === activeIndex));
+    });
+  };
+
+  const render = () => {
+    if (!results || !input || !allLink) return;
+    const query = normalizeKnowledgeSearch(input.value);
+    const matches = (item) => !query || item.search.includes(query);
+    const pageMatches = pages.filter(matches).slice(0, 4);
+    const nodeMatches = nodes.filter(matches).slice(0, 3);
+    const totalMatches = pages.filter(matches).length + nodes.filter(matches).length;
+    results.replaceChildren();
+    activeIndex = -1;
+
+    if (!pageMatches.length && !nodeMatches.length) {
+      const empty = document.createElement('p');
+      empty.className = 'knowledge-search-empty';
+      empty.textContent = query
+        ? 'No quick results. Try the full index.'
+        : 'No Knowledge results yet.';
+      results.append(empty);
+    }
+
+    const addHeading = (label) => {
+      const heading = document.createElement('p');
+      heading.className = 'knowledge-search-group';
+      heading.textContent = label;
+      results.append(heading);
+    };
+    const addItem = (item, type) => {
+      const link = document.createElement('a');
+      link.className = 'knowledge-search-result';
+      link.href = item.href;
+      link.setAttribute('role', 'option');
+      link.setAttribute('aria-selected', 'false');
+      const title = document.createElement('strong');
+      title.textContent = item.title;
+      const meta = document.createElement('span');
+      meta.textContent =
+        type === 'page'
+          ? `${item.kindLabel} · ${item.domainLabel}${item.pathLabel ? ` · ${item.pathLabel}` : ''}`
+          : `${type === 'domain' ? 'Domain' : 'Area'} · ${item.domain}${item.pathLabel ? ` · ${item.pathLabel}` : ''}`;
+      link.append(title, meta);
+      results.append(link);
+    };
+
+    if (pageMatches.length) {
+      addHeading('Pages');
+      pageMatches.forEach((item) => addItem(item, 'page'));
+    }
+    if (nodeMatches.length) {
+      addHeading('Maps');
+      nodeMatches.forEach((item) => addItem(item, item.type));
+    }
+    allLink.href = `/knowledge/all/?${query ? `q=${encodeURIComponent(input.value.trim())}` : ''}`;
+    allLink.textContent =
+      totalMatches > 7 ? `View all ${totalMatches} results →` : 'View all results →';
+  };
+
+  const load = async () => {
+    if (loaded || !indexUrl) return;
+    loading ??= fetch(indexUrl, { headers: { Accept: 'application/json' } })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Search index returned ${response.status}`);
+        const payload = await response.json();
+        pages = Array.isArray(payload.items) ? payload.items : [];
+        nodes = Array.isArray(payload.nodes) ? payload.nodes : [];
+        loaded = true;
+      })
+      .catch(() => {
+        pages = [];
+        nodes = [];
+      });
+    await loading;
+  };
+
+  const close = () => {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('knowledge-search-open');
+    returnFocus?.focus();
+    returnFocus = null;
+  };
+
+  const open = async (trigger) => {
+    if (!modal || !input) return;
+    returnFocus =
+      trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    modal.hidden = false;
+    document.body.classList.add('knowledge-search-open');
+    input.value = '';
+    render();
+    input.focus();
+    await load();
+    render();
+  };
+
+  closeControls?.forEach((control) => control.addEventListener('click', close));
+  input?.addEventListener('input', render);
+  input?.addEventListener('keydown', (event) => {
+    const items = [...(results?.querySelectorAll('[role="option"]') ?? [])];
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActive(activeIndex + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActive(activeIndex - 1);
+    } else if (event.key === 'Enter' && activeIndex >= 0 && items[activeIndex]) {
+      event.preventDefault();
+      items[activeIndex].click();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      close();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      void open(document.activeElement instanceof HTMLElement ? document.activeElement : undefined);
+    } else if (event.key === 'Escape' && modal && !modal.hidden) {
+      close();
+    }
+  });
+  document.querySelectorAll('[data-knowledge-search-trigger]').forEach((trigger) => {
+    trigger.addEventListener('focus', () =>
+      trigger.setAttribute('aria-keyshortcuts', 'Control+K Meta+K'),
+    );
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      void open(trigger);
+    });
+  });
+})();</script><section class="page-hero knowledge-index-hero"><div class="shell"><p class="page-crumb">Knowledge / Browse all</p><h1 class="display">Browse all <em>Knowledge.</em></h1><p class="lede">The complete reference index, independent of chronology.</p></div></section><section class="section knowledge-all-section"><div class="shell" data-knowledge-all data-knowledge-index-url="/knowledge/search-index.json" data-knowledge-page-size="40"><div class="knowledge-all-toolbar"><label class="knowledge-filter-search"><span>Search the index</span><input data-knowledge-search type="search" placeholder="Search titles, topics, domains…" autocomplete="off" aria-keyshortcuts="/"></label><label class="knowledge-sort-control"><span>Sort</span><select data-knowledge-sort><option value="title">Title</option><option value="updated">Recently updated</option></select></label><button class="knowledge-mobile-filter-toggle" type="button" data-knowledge-filter-open aria-expanded="false" aria-controls="knowledge-filters">Filters <span data-knowledge-filter-count>0</span></button></div><div class="knowledge-filter-banner" data-knowledge-filter-banner hidden><div class="knowledge-filter-chips" data-knowledge-filter-chips></div><button type="button" data-knowledge-clear>Clear filters</button></div><div class="knowledge-all-layout"><div class="knowledge-filter-backdrop" data-knowledge-filter-close data-knowledge-filter-backdrop hidden></div><aside id="knowledge-filters" class="knowledge-filters" data-knowledge-filter-drawer aria-label="Knowledge filters"><div class="knowledge-filter-drawer-head"><p class="knowledge-sidebar-cap">Filter the library</p><button type="button" data-knowledge-filter-close aria-label="Close filters">Esc</button></div><div class="knowledge-filter-group" data-filter-group="domain"><p>Domain</p><button type="button" data-knowledge-filter="domain" data-value="all"><span>All domains</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="domain" data-value="computing"><span>Computing</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="domain" data-value="learning-practice"><span>Learning &amp; Practice</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="domain" data-value="life-sciences"><span>Life Sciences</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="domain" data-value="mathematics"><span>Mathematics</span><span data-filter-count>0</span></button></div><div class="knowledge-filter-group" data-filter-group="area"><p>Area</p><button type="button" data-knowledge-filter="area" data-path="systems" data-label="Systems"><span>Systems</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="software" data-label="Software"><span>Software</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="data" data-label="Data"><span>Data</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="infrastructure" data-label="Infrastructure"><span>Infrastructure</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="learning" data-label="Learning"><span>Learning</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="reflection" data-label="Reflection"><span>Reflection</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="molecular-biology" data-label="Molecular Biology"><span>Molecular Biology</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="physiology" data-label="Physiology"><span>Physiology</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="algebra" data-label="Algebra"><span>Algebra</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="probability" data-label="Probability"><span>Probability</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="area" data-path="combinatorics" data-label="Combinatorics"><span>Combinatorics</span><span data-filter-count>0</span></button></div><div class="knowledge-filter-group" data-filter-group="subarea"><p>Subarea</p><button type="button" data-knowledge-filter="subarea" data-path="systems/distributed-systems" data-label="Systems · Distributed Systems"><span>Systems · Distributed Systems</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="subarea" data-path="systems/messaging" data-label="Systems · Messaging"><span>Systems · Messaging</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="subarea" data-path="systems/reliability" data-label="Systems · Reliability"><span>Systems · Reliability</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="subarea" data-path="learning/deliberate-practice" data-label="Learning · Deliberate Practice"><span>Learning · Deliberate Practice</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="subarea" data-path="learning/reading" data-label="Learning · Reading"><span>Learning · Reading</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="subarea" data-path="molecular-biology/gene-regulation" data-label="Molecular Biology · Gene Regulation"><span>Molecular Biology · Gene Regulation</span><span data-filter-count>0</span></button></div><div class="knowledge-filter-group" data-filter-group="kind"><p>Kind</p><button type="button" data-knowledge-filter="kind" data-value="all"><span>All kinds</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="kind" data-value="concept"><span>Concept</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="kind" data-value="guide"><span>Guide</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="kind" data-value="overview"><span>Overview</span><span data-filter-count>0</span></button><button type="button" data-knowledge-filter="kind" data-value="reference"><span>Reference</span><span data-filter-count>0</span></button></div></aside><main class="knowledge-all-results" aria-labelledby="knowledge-results-title"><h2 id="knowledge-results-title" class="sr-only">Knowledge results</h2><p class="knowledge-filter-status" data-knowledge-status aria-live="polite">Loading 10 pages…</p><div class="knowledge-index-list" data-knowledge-list id="knowledge-index-results"></div><p class="knowledge-empty" data-knowledge-empty hidden>No Knowledge pages match those filters.</p><p class="knowledge-index-error" data-knowledge-error hidden>The searchable index could not load. Please browse by domain instead.</p><button class="knowledge-show-more" type="button" data-knowledge-show-more aria-controls="knowledge-index-results" hidden></button><noscript><p class="knowledge-index-fallback">Browse Knowledge by <a href="/knowledge/">domain</a>. Search and the complete index need JavaScript enabled.</p></noscript></main></div></div></section></main><footer class="site-footer"><div class="shell"><p class="footer-motto">Build <em>Systems.</em> Create <em>Leverage.</em> Leave Lasting <em>Impact.</em></p><div class="footer-directory"><p class="footer-blurb">Engineering work, projects, writing, and teaching.</p><div class="footer-group"><span class="footer-group-label">Explore</span><a href="/work">Work</a><a href="/projects">Projects</a><a href="/writing">Writing</a><a href="/knowledge">Knowledge</a><a href="/contributions">Contributions</a><a href="/about">About</a></div><div class="footer-group"><span class="footer-group-label">More</span><a href="/explore">Explore</a><a href="/credentials">Credentials & Recognition</a></div><div class="footer-group"><span class="footer-group-label">Elsewhere</span><a href="https://github.com/anandakevin" rel="noopener noreferrer" target="_blank">GitHub ↗</a><a href="https://www.linkedin.com/in/ananda-kevin-refaldo-sariputra/" rel="noopener noreferrer" target="_blank">LinkedIn ↗</a><a href="https://scholar.google.com/citations?user=F_OlnVwAAAAJ" rel="noopener noreferrer" target="_blank">Google Scholar ↗</a><a href="https://www.kaggle.com/thechief28" rel="noopener noreferrer" target="_blank">Kaggle ↗</a><a href="mailto:ananda.kevin.rs@gmail.com">Email ↗</a></div></div><div class="footer-bottom"><span>Ananda Kevin</span><span>system · software · explanation</span></div></div></footer><script>
       const root = document.documentElement;
       const themeButton = document.querySelector('[data-theme-toggle]');
       const syncThemeIcon = () => {
@@ -57,4 +214,4 @@
         '#tools': '/work',
       };
       if (legacy[location.hash]) location.replace(legacy[location.hash]);
-    </script></body></html><script type="module">function e(e){return e.normalize(`NFKD`).replace(/\p{Diacritic}/gu,``).toLocaleLowerCase().trim()}function t(t,n){let r=e(n.query);return t.filter(e=>{let t=!r||e.search.includes(r),i=n.domain===`all`||e.domain===n.domain,a=n.kind===`all`||e.kind===n.kind;return t&&i&&a})}function n(e,t){return[...e].sort((e,n)=>{if(t===`updated`){let t=(n.updated??``).localeCompare(e.updated??``);if(t!==0)return t}return e.title.localeCompare(n.title)})}function r(e,t){return e.slice(0,Math.max(0,t))}var i=document.querySelector(`[data-knowledge-all]`),a=i?.querySelector(`[data-knowledge-search]`),o=i?.querySelector(`[data-knowledge-domain]`),s=i?.querySelector(`[data-knowledge-kind]`),c=i?.querySelector(`[data-knowledge-sort]`),l=i?.querySelector(`[data-knowledge-list]`),u=i?.querySelector(`[data-knowledge-status]`),d=i?.querySelector(`[data-knowledge-empty]`),f=i?.querySelector(`[data-knowledge-error]`),p=i?.querySelector(`[data-knowledge-show-more]`);if(i&&a&&o&&s&&c&&l&&u&&d&&f&&p){let e=Number(i.dataset.knowledgePageSize??40),m=i.dataset.knowledgeIndexUrl,h=[],g=e,_,v=new URLSearchParams(window.location.search);a.value=v.get(`q`)??``;let y=v.get(`domain`);y&&[...o.options].some(e=>e.value===y)&&(o.value=y);let b=v.get(`kind`);b&&[...s.options].some(e=>e.value===b)&&(s.value=b);let x=v.get(`sort`);x&&[...c.options].some(e=>e.value===x)&&(c.value=x);let S=()=>{let e=new URLSearchParams(window.location.search),t=a.value.trim();t?e.set(`q`,t):e.delete(`q`),o.value===`all`?e.delete(`domain`):e.set(`domain`,o.value),s.value===`all`?e.delete(`kind`):e.set(`kind`,s.value),c.value===`title`?e.delete(`sort`):e.set(`sort`,c.value);let n=e.toString();window.history.replaceState({},``,`${window.location.pathname}${n?`?${n}`:``}${window.location.hash}`)},C=e=>{let t=document.createElement(`a`);t.className=`knowledge-index-row`,t.href=e.href;let n=document.createElement(`span`);n.className=`knowledge-index-kind`,n.textContent=e.kindLabel;let r=document.createElement(`span`);r.className=`knowledge-index-title-group`;let i=document.createElement(`strong`);i.textContent=e.title;let a=document.createElement(`small`);a.textContent=e.description,r.append(i,a);let o=document.createElement(`span`);return o.className=`knowledge-index-path`,o.textContent=[e.domainLabel,e.pathLabel].filter(Boolean).join(` · `),t.append(n,r,o),t},w=(i=!0)=>{if(!h.length&&!f.hidden)return;i&&(g=e);let m=a.value.trim(),_=n(t(h,{query:m,domain:o.value,kind:s.value}),c.value===`updated`?`updated`:`title`),v=r(_,g);l.replaceChildren(...v.map(C));let y=v.length,b=`${_.length} ${_.length===1?`page`:`pages`}`;if(u.textContent=m?`Showing ${y} of ${b} matching “${m}”`:`Showing ${y} of ${b}`,d.hidden=_.length>0,p.hidden=y>=_.length,!p.hidden){let t=_.length-y;p.textContent=`Show ${Math.min(e,t)} more (${t} remaining)`}S()};a.addEventListener(`input`,()=>{_&&window.clearTimeout(_),_=window.setTimeout(()=>w(),100)}),[o,s,c].forEach(e=>e.addEventListener(`change`,()=>w())),p.addEventListener(`click`,()=>{g+=e,w(!1)}),document.addEventListener(`keydown`,e=>{let t=e.target,n=t instanceof HTMLInputElement||t instanceof HTMLTextAreaElement||t instanceof HTMLSelectElement||t instanceof HTMLElement&&t.isContentEditable;e.key===`/`&&!n&&(e.preventDefault(),a.focus()),e.key===`Escape`&&document.activeElement===a&&a.value&&(a.value=``,w())}),(async()=>{if(m)try{let e=await fetch(m,{headers:{Accept:`application/json`}});if(!e.ok)throw Error(`Knowledge index returned ${e.status}`);let t=await e.json();if(!Array.isArray(t.items))throw Error(`Knowledge index payload is invalid`);h=t.items,w()}catch{u.textContent=`Search index unavailable`,f.hidden=!1,p.hidden=!0}})()}</script>
+    </script></body></html><script type="module" src="/_astro/all.astro_astro_type_script_index_0_lang.DoN_cMTc.js"></script>
