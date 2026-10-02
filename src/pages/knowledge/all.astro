@@ -1,0 +1,234 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KnowledgeIndexRow from '../../components/KnowledgeIndexRow.astro';
+import { knowledgeKindLabel } from '../../data/knowledge';
+import { getKnowledgeDomainItems, getKnowledgeItems, isFixtureMode } from '../../lib/content';
+
+const knowledgeIndexPageSize = 40;
+
+const pages = (await getKnowledgeItems()).sort((left, right) =>
+  left.title.localeCompare(right.title),
+);
+const domains = await getKnowledgeDomainItems();
+const domainTitleById = new Map(domains.map((domain) => [domain.knowledge_domain, domain.title]));
+const kinds = [...new Set(pages.map((page) => page.knowledge_kind).filter(Boolean))].sort();
+---
+
+<BaseLayout
+  title="Browse all Knowledge"
+  description={
+    isFixtureMode
+      ? 'Fixture index for searching and filtering the Knowledge architecture.'
+      : 'Search and browse the complete public Knowledge reference library.'
+  }
+>
+  <section class="page-hero knowledge-index-hero">
+    <div class="shell">
+      <p class="page-crumb">Knowledge / Browse all</p>
+      <h1 class="display">
+        Browse all <em>Knowledge.</em>
+      </h1>
+      <p class="lede">The complete reference index, independent of chronology.</p>
+    </div>
+  </section>
+
+  <section class="section knowledge-all-section">
+    <div class="shell" data-knowledge-all data-knowledge-page-size={knowledgeIndexPageSize}>
+      <div class="knowledge-filterbar" aria-label="Knowledge filters" role="search">
+        <label class="knowledge-filter-search">
+          <span>Search</span>
+          <input
+            data-knowledge-search
+            type="search"
+            placeholder="Search titles, topics, domains…"
+            autocomplete="off"
+            aria-keyshortcuts="/"
+          />
+        </label>
+        <label>
+          <span>Domain</span>
+          <select data-knowledge-domain>
+            <option value="all">All domains</option>
+            {domains.map((domain) => (
+              <option value={domain.knowledge_domain}>{domain.title}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Kind</span>
+          <select data-knowledge-kind>
+            <option value="all">All kinds</option>
+            {kinds.map((kind) => (
+              <option value={kind}>{knowledgeKindLabel(kind)}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Sort</span>
+          <select data-knowledge-sort>
+            <option value="title">Title</option>
+            <option value="updated">Recently updated</option>
+          </select>
+        </label>
+      </div>
+      <p class="knowledge-filter-status" data-knowledge-status aria-live="polite">
+        {pages.length} {pages.length === 1 ? 'page' : 'pages'}
+      </p>
+      <div class="knowledge-index-list" data-knowledge-list id="knowledge-index-results">
+        {pages.map((item) => (
+          <KnowledgeIndexRow
+            item={item}
+            domainTitle={
+              domainTitleById.get(item.knowledge_domain) ?? item.knowledge_domain ?? 'Knowledge'
+            }
+          />
+        ))}
+      </div>
+      <p class="knowledge-empty" data-knowledge-empty hidden>
+        No Knowledge pages match those filters.
+      </p>
+      <button
+        class="knowledge-show-more"
+        type="button"
+        data-knowledge-show-more
+        aria-controls="knowledge-index-results"
+        hidden
+      ></button>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    filterKnowledgeIndexEntries,
+    knowledgeIndexWindow,
+    sortKnowledgeIndexEntries,
+  } from '../../lib/knowledge-index';
+
+  const root = document.querySelector<HTMLElement>('[data-knowledge-all]');
+  const search = root?.querySelector<HTMLInputElement>('[data-knowledge-search]');
+  const domain = root?.querySelector<HTMLSelectElement>('[data-knowledge-domain]');
+  const kind = root?.querySelector<HTMLSelectElement>('[data-knowledge-kind]');
+  const sort = root?.querySelector<HTMLSelectElement>('[data-knowledge-sort]');
+  const list = root?.querySelector<HTMLElement>('[data-knowledge-list]');
+  const status = root?.querySelector<HTMLElement>('[data-knowledge-status]');
+  const empty = root?.querySelector<HTMLElement>('[data-knowledge-empty]');
+  const showMore = root?.querySelector<HTMLButtonElement>('[data-knowledge-show-more]');
+
+  if (root && search && domain && kind && sort && list && status && empty && showMore) {
+    const pageSize = Number(root.dataset.knowledgePageSize ?? 40);
+    const rows = [...list.querySelectorAll<HTMLElement>('[data-knowledge-row]')].map((element) => ({
+      element,
+      title: element.dataset.title ?? '',
+      search: element.dataset.search ?? '',
+      domain: element.dataset.domain,
+      kind: element.dataset.kind,
+      updated: element.dataset.updated,
+    }));
+    const params = new URLSearchParams(window.location.search);
+    search.value = params.get('q') ?? '';
+    const requestedDomain = params.get('domain');
+    if (requestedDomain && [...domain.options].some((option) => option.value === requestedDomain)) {
+      domain.value = requestedDomain;
+    }
+    const requestedKind = params.get('kind');
+    if (requestedKind && [...kind.options].some((option) => option.value === requestedKind)) {
+      kind.value = requestedKind;
+    }
+    const requestedSort = params.get('sort');
+    if (requestedSort && [...sort.options].some((option) => option.value === requestedSort)) {
+      sort.value = requestedSort;
+    }
+
+    let visibleLimit = pageSize;
+    let searchTimer: number | undefined;
+
+    const syncUrl = () => {
+      const next = new URLSearchParams(window.location.search);
+      const query = search.value.trim();
+      if (query) next.set('q', query);
+      else next.delete('q');
+      if (domain.value !== 'all') next.set('domain', domain.value);
+      else next.delete('domain');
+      if (kind.value !== 'all') next.set('kind', kind.value);
+      else next.delete('kind');
+      if (sort.value !== 'title') next.set('sort', sort.value);
+      else next.delete('sort');
+      const queryString = next.toString();
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash}`,
+      );
+    };
+
+    const apply = (resetWindow = true) => {
+      if (resetWindow) visibleLimit = pageSize;
+      const query = search.value.trim();
+      const matching = sortKnowledgeIndexEntries(
+        filterKnowledgeIndexEntries(rows, {
+          query,
+          domain: domain.value,
+          kind: kind.value,
+        }),
+        sort.value === 'updated' ? 'updated' : 'title',
+      );
+      const visible = knowledgeIndexWindow(matching, visibleLimit);
+      const matchingSet = new Set(matching);
+      const visibleSet = new Set(visible);
+      const fragment = document.createDocumentFragment();
+
+      for (const row of matching) {
+        row.element.hidden = !visibleSet.has(row);
+        fragment.append(row.element);
+      }
+      for (const row of rows) {
+        if (!matchingSet.has(row)) {
+          row.element.hidden = true;
+          fragment.append(row.element);
+        }
+      }
+      list.append(fragment);
+
+      const visibleCount = visible.length;
+      const countLabel = `${matching.length} ${matching.length === 1 ? 'page' : 'pages'}`;
+      status.textContent = query
+        ? `Showing ${visibleCount} of ${countLabel} matching “${query}”`
+        : `Showing ${visibleCount} of ${countLabel}`;
+      empty.hidden = matching.length > 0;
+      showMore.hidden = visibleCount >= matching.length;
+      if (!showMore.hidden) {
+        const remaining = matching.length - visibleCount;
+        showMore.textContent = `Show ${Math.min(pageSize, remaining)} more (${remaining} remaining)`;
+      }
+      syncUrl();
+    };
+
+    search.addEventListener('input', () => {
+      if (searchTimer) window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(() => apply(), 100);
+    });
+    [domain, kind, sort].forEach((control) => control.addEventListener('change', () => apply()));
+    showMore.addEventListener('click', () => {
+      visibleLimit += pageSize;
+      apply(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (event.key === '/' && !isTyping) {
+        event.preventDefault();
+        search.focus();
+      }
+      if (event.key === 'Escape' && document.activeElement === search && search.value) {
+        search.value = '';
+        apply();
+      }
+    });
+    apply();
+  }
+</script>

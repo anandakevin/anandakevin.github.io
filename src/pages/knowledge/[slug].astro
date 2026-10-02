@@ -1,0 +1,196 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import PublicMedia from '../../components/PublicMedia.astro';
+import SketchEmbeds from '../../components/SketchEmbeds.astro';
+import { knowledgeKindLabel } from '../../data/knowledge';
+import {
+  entryToPublicContent,
+  getKnowledgeDomainItems,
+  getKnowledgeEntriesForRoutes,
+  getRecordsById,
+  hrefForPublicRecord,
+  slugTail,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getKnowledgeEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const record = entryToPublicContent(entry);
+const domains = await getKnowledgeDomainItems();
+const domain = domains.find((item) => item.knowledge_domain === record.knowledge_domain);
+const byId = await getRecordsById();
+const { Content, headings } = await render(entry);
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const reading = record.knowledge_reading;
+const getRecord = (id?: string) => (id ? byId.get(id) : undefined);
+const parent = getRecord(reading?.parent);
+const prerequisites = (reading?.prerequisites ?? [])
+  .map((id) => getRecord(id))
+  .filter((item): item is NonNullable<typeof item> => Boolean(item));
+const previous = getRecord(reading?.previous);
+const next = getRecord(reading?.next);
+const nearby = (reading?.nearby ?? [])
+  .map((id) => getRecord(id))
+  .filter((item): item is NonNullable<typeof item> => Boolean(item));
+const sketches = (record.knowledge_sketches ?? [])
+  .map((id) => byId.get(id))
+  .filter((item): item is NonNullable<typeof item> => item?.content_kind === 'sketch');
+const references = record.knowledge_references ?? [];
+
+function areaLabels(path: string[]): string[] {
+  const labels: string[] = [];
+  let areas = domain?.knowledge_areas ?? [];
+  for (const id of path) {
+    const area = areas.find((candidate) => candidate.id === id);
+    if (!area) break;
+    labels.push(area.title);
+    areas = area.children;
+  }
+  return labels;
+}
+
+const labels = areaLabels(record.knowledge_area ?? []);
+---
+
+<BaseLayout title={record.title} description={record.description}>
+  <section class="page-hero knowledge-document-hero">
+    <div class="shell">
+      <p class="page-crumb">
+        <a href="/knowledge">Knowledge</a>
+        <span aria-hidden="true"> / </span>
+        {domain && <a href={`/knowledge/domain/${domain.knowledge_domain}`}>{domain.title}</a>}
+        {labels.map((label) => (
+          <span aria-hidden="true"> / {label}</span>
+        ))}
+      </p>
+      <p class="knowledge-document-kind">
+        {record.knowledge_kind ? (
+          <a href={`/knowledge/all?kind=${encodeURIComponent(record.knowledge_kind)}`}>
+            {knowledgeKindLabel(record.knowledge_kind)}
+          </a>
+        ) : (
+          knowledgeKindLabel(record.knowledge_kind)
+        )}{' '}
+        · {domain?.title ?? 'Knowledge'}
+      </p>
+      <h1 class="display">{record.title}</h1>
+      <p class="lede">{record.description}</p>
+      <div class="detail-pills knowledge-document-tags">
+        {record.tags.map((tag) => (
+          <span>{tag}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section knowledge-document-section">
+    <div class="shell knowledge-document-layout">
+      {tocHeadings.length > 0 ? (
+        <aside class="knowledge-toc" aria-label="On this page">
+          <p class="knowledge-sidebar-cap">On this page</p>
+          <nav>
+            {tocHeadings.map((heading) => (
+              <a
+                class:list={{ 'knowledge-toc-subheading': heading.depth === 3 }}
+                href={`#${heading.slug}`}
+              >
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      ) : (
+        <div />
+      )}
+
+      <article class="knowledge-document-body">
+        <MarkdownBody>
+          <Content />
+        </MarkdownBody>
+        <SketchEmbeds sketches={sketches} />
+        <PublicMedia media={record.media} />
+        {references.length > 0 && (
+          <section class="knowledge-references" aria-labelledby="knowledge-references-title">
+            <p class="section-index">References</p>
+            <h2 id="knowledge-references-title">
+              Further <em>reading.</em>
+            </h2>
+            <ul>
+              {references.map((reference) => (
+                <li>
+                  <a href={reference.url} target="_blank" rel="noreferrer">
+                    {reference.title} ↗
+                  </a>
+                  {reference.note && <small>{reference.note}</small>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </article>
+
+      <aside class="knowledge-reading-context" aria-label="Reading context">
+        <p class="knowledge-sidebar-cap">Reading context</p>
+        {parent && (
+          <a class="knowledge-read-block" href={hrefForPublicRecord(parent)}>
+            <small>Parent</small>
+            <strong>{parent.title}</strong>
+          </a>
+        )}
+        {prerequisites.length > 0 && (
+          <div class="knowledge-read-block">
+            <small>Prerequisite</small>
+            {prerequisites.map((item) => (
+              <a href={hrefForPublicRecord(item)}>
+                <strong>{item.title}</strong>
+              </a>
+            ))}
+          </div>
+        )}
+        <div class="knowledge-read-block knowledge-read-current">
+          <small>Current</small>
+          <strong>{record.title}</strong>
+        </div>
+        {previous && (
+          <a class="knowledge-read-block" href={hrefForPublicRecord(previous)}>
+            <small>Previous in path</small>
+            <strong>{previous.title}</strong>
+          </a>
+        )}
+        {next && (
+          <a class="knowledge-read-block" href={hrefForPublicRecord(next)}>
+            <small>Next in path</small>
+            <strong>{next.title}</strong>
+          </a>
+        )}
+        {nearby.length > 0 && (
+          <div class="knowledge-read-block">
+            <small>In this area</small>
+            {nearby.map((item) => (
+              <a href={hrefForPublicRecord(item)}>
+                <strong>{item.title}</strong>
+              </a>
+            ))}
+          </div>
+        )}
+        <a
+          class="knowledge-reading-domain"
+          href={domain ? `/knowledge/domain/${domain.knowledge_domain}` : '/knowledge'}
+        >
+          {domain ? `Back to ${domain.title}` : 'Browse Knowledge'} →
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <AtlasNeighborhood item={record} records={[...byId.values()]} />
+</BaseLayout>

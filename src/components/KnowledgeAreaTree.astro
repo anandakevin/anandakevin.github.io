@@ -1,0 +1,46 @@
+---
+import type { KnowledgeArea, PublicContent } from '../lib/public-contract';
+import KnowledgeAreaTree from './KnowledgeAreaTree.astro';
+
+interface Props {
+  area: KnowledgeArea;
+  pages: PublicContent[];
+  parentPath?: string[];
+}
+
+const { area, pages, parentPath = [] } = Astro.props;
+const path = [...parentPath, area.id];
+const directPages = pages.filter(
+  (page) => JSON.stringify(page.knowledge_area) === JSON.stringify(path),
+);
+---
+
+<section class="knowledge-area" data-knowledge-area>
+  <div class="knowledge-area-heading">
+    <div>
+      <h3>{area.title}</h3>
+      <p>{area.description}</p>
+    </div>
+    <span class="knowledge-area-count">
+      {directPages.length} {directPages.length === 1 ? 'page' : 'pages'}
+    </span>
+  </div>
+  {directPages.length > 0 && (
+    <div class="knowledge-area-pages">
+      {directPages.map((page) => (
+        <a class="knowledge-area-page" href={page.slug}>
+          <span>{page.knowledge_kind?.replaceAll('-', ' ')}</span>
+          <strong>{page.title}</strong>
+          <small>{page.description}</small>
+        </a>
+      ))}
+    </div>
+  )}
+  {area.children.length > 0 && (
+    <div class="knowledge-area-children">
+      {area.children.map((child) => (
+        <KnowledgeAreaTree area={child} pages={pages} parentPath={path} />
+      ))}
+    </div>
+  )}
+</section>
