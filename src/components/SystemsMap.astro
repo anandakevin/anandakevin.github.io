@@ -307,6 +307,9 @@ const payload = JSON.stringify(graph);
     const activePointers: Map<number, { x: number; y: number }> = new Map();
     let pinch: { distance: number; worldX: number; worldY: number; scale: number } | null = null;
     let animationFrame: number | null = null;
+    let interactionFrame: number | null = null;
+    let interactionShouldSyncUrl = false;
+    let wheelZoomEndTimer: number | null = null;
     let semanticZoomState = '';
     const MIN_SCALE = 0.58;
     const MAX_SCALE = 6;
@@ -865,14 +868,50 @@ const payload = JSON.stringify(graph);
       });
     };
 
-    const setTransform = (nextTx: number, nextTy: number, nextScale: number) => {
-      tx = nextTx;
-      ty = nextTy;
-      scale = nextScale;
+    const renderTransform = () => {
       viewport?.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
       syncSemanticZoom();
       positionInspector();
       positionHover();
+    };
+    const setTransform = (nextTx: number, nextTy: number, nextScale: number) => {
+      if (interactionFrame !== null) {
+        cancelAnimationFrame(interactionFrame);
+        interactionFrame = null;
+        interactionShouldSyncUrl = false;
+      }
+      tx = nextTx;
+      ty = nextTy;
+      scale = nextScale;
+      renderTransform();
+    };
+    const queueInteractionTransform = (
+      nextTx: number,
+      nextTy: number,
+      nextScale: number,
+      shouldSyncUrl = false,
+    ) => {
+      tx = nextTx;
+      ty = nextTy;
+      scale = nextScale;
+      interactionShouldSyncUrl ||= shouldSyncUrl;
+      if (interactionFrame !== null) return;
+      interactionFrame = requestAnimationFrame(() => {
+        interactionFrame = null;
+        renderTransform();
+        if (interactionShouldSyncUrl) syncUrl();
+        interactionShouldSyncUrl = false;
+      });
+    };
+    const startZoomRendering = () => root.classList.add('atlas-zooming');
+    const stopZoomRendering = () => root.classList.remove('atlas-zooming');
+    const markWheelZoom = () => {
+      startZoomRendering();
+      if (wheelZoomEndTimer !== null) window.clearTimeout(wheelZoomEndTimer);
+      wheelZoomEndTimer = window.setTimeout(() => {
+        wheelZoomEndTimer = null;
+        stopZoomRendering();
+      }, 140);
     };
     const clampScale = (value: number) => Math.max(MIN_SCALE, Math.min(MAX_SCALE, value));
     const clientToMap = (clientX: number, clientY: number) => {
@@ -884,15 +923,24 @@ const payload = JSON.stringify(graph);
         y: point.y,
       };
     };
-    const zoomAt = (clientX: number, clientY: number, nextScale: number) => {
+    const zoomAt = (
+      clientX: number,
+      clientY: number,
+      nextScale: number,
+      deferRender = false,
+    ) => {
       const point = clientToMap(clientX, clientY);
       if (!point) return;
       const boundedScale = clampScale(nextScale);
       const worldX = (point.x - tx) / scale;
       const worldY = (point.y - ty) / scale;
-      setTransform(point.x - worldX * boundedScale, point.y - worldY * boundedScale, boundedScale);
-      applyState();
-      syncUrl();
+      const nextTx = point.x - worldX * boundedScale;
+      const nextTy = point.y - worldY * boundedScale;
+      if (deferRender) queueInteractionTransform(nextTx, nextTy, boundedScale, true);
+      else {
+        setTransform(nextTx, nextTy, boundedScale);
+        syncUrl();
+      }
     };
     const overviewTransform = () => {
       const nextScale = matchMedia('(max-width: 760px)').matches ? 0.94 : 0.72;
@@ -1349,6 +1397,7 @@ const payload = JSON.stringify(graph);
       };
       dragging = false;
       startDrag = null;
+      startZoomRendering();
       map?.classList.add('atlas-dragging');
     };
     const updatePinch = () => {
@@ -1364,18 +1413,18 @@ const payload = JSON.stringify(graph);
       const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
       const nextScale = clampScale(pinch.scale * (distance / pinch.distance));
       if (Math.abs(nextScale - scale) > 0.002) moved = true;
-      setTransform(
+      queueInteractionTransform(
         point.x - pinch.worldX * nextScale,
         point.y - pinch.worldY * nextScale,
         nextScale,
       );
-      applyState();
     };
     const finishGesture = () => {
       const didMove = moved;
       dragging = false;
       pinch = null;
       startDrag = null;
+      stopZoomRendering();
       map?.classList.remove('atlas-dragging');
       if (didMove) syncUrl();
       window.setTimeout(() => {
@@ -1420,7 +1469,7 @@ const payload = JSON.stringify(graph);
       const dx = currentPoint.x - startPoint.x;
       const dy = currentPoint.y - startPoint.y;
       if (Math.hypot(event.clientX - startDrag.x, event.clientY - startDrag.y) > 4) moved = true;
-      setTransform(startDrag.tx + dx, startDrag.ty + dy, scale);
+      queueInteractionTransform(startDrag.tx + dx, startDrag.ty + dy, scale);
       event.preventDefault();
     });
     const releasePointer = (event: PointerEvent) => {
@@ -1434,6 +1483,7 @@ const payload = JSON.stringify(graph);
         const [remaining] = activePointers.values();
         dragging = true;
         pinch = null;
+        stopZoomRendering();
         startDrag = { x: remaining.x, y: remaining.y, tx, ty };
         return;
       }
@@ -1446,7 +1496,6 @@ const payload = JSON.stringify(graph);
       (event) => {
         event.preventDefault();
         if (animationFrame) cancelAnimationFrame(animationFrame);
-
         const multiplier =
           event.deltaMode === WheelEvent.DOM_DELTA_LINE
             ? 16
@@ -1457,10 +1506,10 @@ const payload = JSON.stringify(graph);
         const deltaY = event.deltaY * multiplier;
 
         // Trackpad pinch gestures are exposed as wheel events with ctrlKey;
-        // ordinary two-finger scrolling should move the canvas instead.
+        // ordinary two-finger scrolling pans the canvas.
         if (event.ctrlKey) {
-          const nextScale = scale * Math.pow(1.0015, -deltaY);
-          zoomAt(event.clientX, event.clientY, nextScale);
+          markWheelZoom();
+          zoomAt(event.clientX, event.clientY, scale * Math.pow(1.0015, -deltaY), true);
           return;
         }
 
@@ -1469,8 +1518,7 @@ const payload = JSON.stringify(graph);
         if (!startPoint || !endPoint) return;
         const dx = endPoint.x - startPoint.x;
         const dy = endPoint.y - startPoint.y;
-        setTransform(tx - dx, ty - dy, scale);
-        syncUrl();
+        queueInteractionTransform(tx - dx, ty - dy, scale, true);
       },
       { passive: false },
     );

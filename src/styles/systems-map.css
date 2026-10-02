@@ -636,6 +636,13 @@
   transition: 140ms ease;
 }
 
+/* Keep continuous zoom within the browser's SVG paint budget. */
+.semantic-atlas.atlas-zooming [data-atlas-viewport] text,
+.semantic-atlas.atlas-zooming .atlas-structural-edge,
+.semantic-atlas.atlas-zooming .atlas-edge {
+  display: none;
+}
+
 .atlas-home-link {
   stroke-dasharray: 3 12;
   opacity: 0.13;
