@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">PetaNetra engineering impact</title>
+  <desc id="desc">A product-level engineering diagram connecting Android camera input, on-device object detection, offline spatial guidance, Android architecture, product instrumentation, and delivery ownership.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1729"/>
+      <stop offset="1" stop-color="#12354b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4dd0e1"/>
+      <stop offset="1" stop-color="#7ee787"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#02060d" flood-opacity="0.34"/>
+    </filter>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,7 L10,3.5 z" fill="#69d4df"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#background)"/>
+  <circle cx="1090" cy="100" r="240" fill="#1e5c72" opacity="0.22"/>
+  <circle cx="55" cy="1130" r="285" fill="#1f6b58" opacity="0.16"/>
+
+  <text x="72" y="92" fill="#7ee787" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">
+    PETANETRA ENGINEERING RETROSPECTIVE
+  </text>
+  <text x="72" y="150" fill="#f5fbff" font-family="Inter, Arial, sans-serif" font-size="43" font-weight="750">
+    Engineering accessibility into the product
+  </text>
+  <text x="72" y="194" fill="#a9c1d0" font-family="Inter, Arial, sans-serif" font-size="22">
+    Connecting model constraints, architecture, product signals, and execution
+  </text>
+  <rect x="72" y="224" width="520" height="5" rx="2.5" fill="url(#accent)"/>
+
+  <text x="72" y="302" fill="#cbe2ec" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">
+    PRODUCT FLOW
+  </text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="338" width="280" height="184" rx="22" fill="#152b3d" stroke="#356178" stroke-width="2"/>
+    <text x="102" y="386" fill="#7ee787" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">INPUT</text>
+    <text x="102" y="431" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="700">Android camera</text>
+    <text x="102" y="471" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Real-world surroundings</text>
+
+    <rect x="460" y="338" width="280" height="184" rx="22" fill="#152b3d" stroke="#3d8192" stroke-width="2"/>
+    <text x="490" y="386" fill="#4dd0e1" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">ON-DEVICE ML</text>
+    <text x="490" y="431" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="700">Object detection</text>
+    <text x="490" y="471" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">ONNX / TensorFlow Lite</text>
+
+    <rect x="848" y="338" width="280" height="184" rx="22" fill="#152b3d" stroke="#438873" stroke-width="2"/>
+    <text x="878" y="386" fill="#7ee787" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">EXPERIENCE</text>
+    <text x="878" y="431" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="700">Spatial guidance</text>
+    <text x="878" y="471" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Offline and multilingual</text>
+  </g>
+
+  <line x1="352" y1="430" x2="445" y2="430" stroke="#69d4df" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="740" y1="430" x2="833" y2="430" stroke="#69d4df" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <text x="72" y="626" fill="#cbe2ec" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">
+    WHAT MADE IT PRODUCT ENGINEERING
+  </text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="662" width="330" height="254" rx="22" fill="#102538" stroke="#356178" stroke-width="2"/>
+    <text x="102" y="710" fill="#4dd0e1" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">ARCHITECTURE</text>
+    <text x="102" y="758" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">Clear Android</text>
+    <text x="102" y="794" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">boundaries</text>
+    <text x="102" y="846" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Maintainable ML integration</text>
+    <text x="102" y="879" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Clean architecture principles</text>
+
+    <rect x="435" y="662" width="330" height="254" rx="22" fill="#102538" stroke="#356178" stroke-width="2"/>
+    <text x="465" y="710" fill="#7ee787" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">PRODUCT SIGNALS</text>
+    <text x="465" y="758" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">Attribution</text>
+    <text x="465" y="794" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">instrumentation</text>
+    <text x="465" y="846" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Onboarding and navigation</text>
+    <text x="465" y="879" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">More granular usage signals</text>
+
+    <rect x="798" y="662" width="330" height="254" rx="22" fill="#102538" stroke="#356178" stroke-width="2"/>
+    <text x="828" y="710" fill="#4dd0e1" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">EXECUTION OWNERSHIP</text>
+    <text x="828" y="758" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">Android lead</text>
+    <text x="828" y="810" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Cross-platform planning</text>
+    <text x="828" y="843" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Smaller, ownable work</text>
+    <text x="828" y="876" fill="#abc2cf" font-family="Inter, Arial, sans-serif" font-size="20">Delivery coordination</text>
+  </g>
+
+  <rect x="72" y="1010" width="1056" height="1" fill="#356178"/>
+  <text x="72" y="1064" fill="#f5fbff" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="650">
+    Accessibility changes the engineering definition of "works."
+  </text>
+  <text x="72" y="1126" fill="#9fb9c9" font-family="Inter, Arial, sans-serif" font-size="17">
+    Volunteer software engineering | November 2024 - March 2026
+  </text>
+  <text x="1128" y="1126" text-anchor="end" fill="#7ee787" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">
+    ANANDA KEVIN REFALDO SARIPUTRA
+  </text>
+</svg>
