@@ -1,0 +1,451 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
+import { knowledgeKindLabel } from '../../data/knowledge';
+import { getKnowledgeDomainItems, getKnowledgeItems, isFixtureMode } from '../../lib/content';
+import { flattenKnowledgeAreas } from '../../lib/knowledge-navigation';
+
+const knowledgeIndexPageSize = 40;
+const knowledgeIndexUrl = `${import.meta.env.BASE_URL}knowledge/search-index.json`;
+const pages = await getKnowledgeItems();
+const domains = await getKnowledgeDomainItems();
+const kinds = [...new Set(pages.map((page) => page.knowledge_kind).filter(Boolean))].sort();
+const areaNodes = domains.flatMap((domain) => flattenKnowledgeAreas(domain));
+const areaOptions = areaNodes.filter((node) => node.path.length === 1);
+const subareaOptions = areaNodes.filter((node) => node.path.length >= 2);
+---
+
+<BaseLayout
+  title="Browse all Knowledge"
+  description={
+    isFixtureMode
+      ? 'Fixture index for searching and filtering the Knowledge architecture.'
+      : 'Search and browse the complete public Knowledge reference library.'
+  }
+>
+  <KnowledgeSearch />
+  <section class="page-hero knowledge-index-hero">
+    <div class="shell">
+      <p class="page-crumb">Knowledge / Browse all</p>
+      <h1 class="display">
+        Browse all <em>Knowledge.</em>
+      </h1>
+      <p class="lede">The complete reference index, independent of chronology.</p>
+    </div>
+  </section>
+
+  <section class="section knowledge-all-section">
+    <div
+      class="shell"
+      data-knowledge-all
+      data-knowledge-index-url={knowledgeIndexUrl}
+      data-knowledge-page-size={knowledgeIndexPageSize}
+    >
+      <div class="knowledge-all-toolbar">
+        <label class="knowledge-filter-search">
+          <span>Search the index</span>
+          <input
+            data-knowledge-search
+            type="search"
+            placeholder="Search titles, topics, domains…"
+            autocomplete="off"
+            aria-keyshortcuts="/"
+          />
+        </label>
+        <label class="knowledge-sort-control">
+          <span>Sort</span>
+          <select data-knowledge-sort>
+            <option value="title">Title</option>
+            <option value="updated">Recently updated</option>
+          </select>
+        </label>
+        <button
+          class="knowledge-mobile-filter-toggle"
+          type="button"
+          data-knowledge-filter-open
+          aria-expanded="false"
+          aria-controls="knowledge-filters"
+        >
+          Filters <span data-knowledge-filter-count>0</span>
+        </button>
+      </div>
+
+      <div class="knowledge-filter-banner" data-knowledge-filter-banner hidden>
+        <div class="knowledge-filter-chips" data-knowledge-filter-chips></div>
+        <button type="button" data-knowledge-clear>
+          Clear filters
+        </button>
+      </div>
+
+      <div class="knowledge-all-layout">
+        <div
+          class="knowledge-filter-backdrop"
+          data-knowledge-filter-close
+          data-knowledge-filter-backdrop
+          hidden
+        ></div>
+        <aside
+          id="knowledge-filters"
+          class="knowledge-filters"
+          data-knowledge-filter-drawer
+          aria-label="Knowledge filters"
+        >
+          <div class="knowledge-filter-drawer-head">
+            <p class="knowledge-sidebar-cap">Filter the library</p>
+            <button type="button" data-knowledge-filter-close aria-label="Close filters">
+              Esc
+            </button>
+          </div>
+          <div class="knowledge-filter-group" data-filter-group="domain">
+            <p>Domain</p>
+            <button type="button" data-knowledge-filter="domain" data-value="all">
+              <span>All domains</span>
+              <span data-filter-count>0</span>
+            </button>
+            {domains.map((domain) => (
+              <button
+                type="button"
+                data-knowledge-filter="domain"
+                data-value={domain.knowledge_domain}
+              >
+                <span>{domain.title}</span>
+                <span data-filter-count>0</span>
+              </button>
+            ))}
+          </div>
+          <div class="knowledge-filter-group" data-filter-group="area">
+            <p>Area</p>
+            {areaOptions.map((node) => (
+              <button
+                type="button"
+                data-knowledge-filter="area"
+                data-path={node.path.join('/')}
+                data-label={node.labelPath.join(' · ')}
+              >
+                <span>{node.area.title}</span>
+                <span data-filter-count>0</span>
+              </button>
+            ))}
+          </div>
+          {subareaOptions.length > 0 && (
+            <div class="knowledge-filter-group" data-filter-group="subarea">
+              <p>Subarea</p>
+              {subareaOptions.map((node) => (
+                <button
+                  type="button"
+                  data-knowledge-filter="subarea"
+                  data-path={node.path.join('/')}
+                  data-label={node.labelPath.join(' · ')}
+                >
+                  <span>{node.labelPath.join(' · ')}</span>
+                  <span data-filter-count>0</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <div class="knowledge-filter-group" data-filter-group="kind">
+            <p>Kind</p>
+            <button type="button" data-knowledge-filter="kind" data-value="all">
+              <span>All kinds</span>
+              <span data-filter-count>0</span>
+            </button>
+            {kinds.map((kind) => (
+              <button type="button" data-knowledge-filter="kind" data-value={kind}>
+                <span>{knowledgeKindLabel(kind)}</span>
+                <span data-filter-count>0</span>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <main class="knowledge-all-results" aria-labelledby="knowledge-results-title">
+          <h2 id="knowledge-results-title" class="sr-only">
+            Knowledge results
+          </h2>
+          <p class="knowledge-filter-status" data-knowledge-status aria-live="polite">
+            Loading {pages.length} {pages.length === 1 ? 'page' : 'pages'}…
+          </p>
+          <div class="knowledge-index-list" data-knowledge-list id="knowledge-index-results"></div>
+          <p class="knowledge-empty" data-knowledge-empty hidden>
+            No Knowledge pages match those filters.
+          </p>
+          <p class="knowledge-index-error" data-knowledge-error hidden>
+            The searchable index could not load. Please browse by domain instead.
+          </p>
+          <button
+            class="knowledge-show-more"
+            type="button"
+            data-knowledge-show-more
+            aria-controls="knowledge-index-results"
+            hidden
+          ></button>
+          <noscript>
+            <p class="knowledge-index-fallback">
+              Browse Knowledge by <a href="/knowledge/">domain</a>. Search and the complete index
+              need JavaScript enabled.
+            </p>
+          </noscript>
+        </main>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    filterKnowledgeIndexEntries,
+    knowledgeIndexWindow,
+    sortKnowledgeIndexEntries,
+    type KnowledgeIndexItem,
+  } from '../../lib/knowledge-index';
+  import { knowledgeAreaPathFromQuery } from '../../lib/knowledge-navigation';
+
+  const root = document.querySelector<HTMLElement>('[data-knowledge-all]');
+  const search = root?.querySelector<HTMLInputElement>('[data-knowledge-search]');
+  const sort = root?.querySelector<HTMLSelectElement>('[data-knowledge-sort]');
+  const list = root?.querySelector<HTMLElement>('[data-knowledge-list]');
+  const status = root?.querySelector<HTMLElement>('[data-knowledge-status]');
+  const empty = root?.querySelector<HTMLElement>('[data-knowledge-empty]');
+  const error = root?.querySelector<HTMLElement>('[data-knowledge-error]');
+  const showMore = root?.querySelector<HTMLButtonElement>('[data-knowledge-show-more]');
+  const filterDrawer = root?.querySelector<HTMLElement>('[data-knowledge-filter-drawer]');
+  const filterOpen = root?.querySelector<HTMLButtonElement>('[data-knowledge-filter-open]');
+  const filterBackdrop = root?.querySelector<HTMLElement>('[data-knowledge-filter-backdrop]');
+  const filterCount = root?.querySelector<HTMLElement>('[data-knowledge-filter-count]');
+  const filterBanner = root?.querySelector<HTMLElement>('[data-knowledge-filter-banner]');
+  const filterChips = root?.querySelector<HTMLElement>('[data-knowledge-filter-chips]');
+  const clearFilters = root?.querySelector<HTMLButtonElement>('[data-knowledge-clear]');
+  const facetButtons = root?.querySelectorAll<HTMLButtonElement>('[data-knowledge-filter]');
+
+  if (
+    root &&
+    search &&
+    sort &&
+    list &&
+    status &&
+    empty &&
+    error &&
+    showMore &&
+    filterDrawer &&
+    filterOpen &&
+    filterBackdrop &&
+    filterCount &&
+    filterBanner &&
+    filterChips &&
+    clearFilters &&
+    facetButtons
+  ) {
+    const pageSize = Number(root.dataset.knowledgePageSize ?? 40);
+    const indexUrl = root.dataset.knowledgeIndexUrl;
+    let items: KnowledgeIndexItem[] = [];
+    let visibleLimit = pageSize;
+    let searchTimer: number | undefined;
+    let selectedDomain = 'all';
+    let selectedKind = 'all';
+    let selectedAreaPath: string[] = [];
+    let filterReturnFocus: HTMLElement | null = null;
+
+    const params = new URLSearchParams(window.location.search);
+    search.value = params.get('q') ?? '';
+    selectedDomain = params.get('domain') ?? 'all';
+    selectedKind = params.get('kind') ?? 'all';
+    selectedAreaPath = knowledgeAreaPathFromQuery(params);
+    if (params.get('sort') === 'updated') sort.value = 'updated';
+
+    const currentFilters = () => ({
+      query: search.value.trim(),
+      domain: selectedDomain,
+      kind: selectedKind,
+      areaPath: selectedAreaPath,
+    });
+
+    const matchingFor = (overrides: Partial<ReturnType<typeof currentFilters>> = {}) =>
+      filterKnowledgeIndexEntries(items, { ...currentFilters(), ...overrides });
+
+    const syncUrl = () => {
+      const next = new URLSearchParams(window.location.search);
+      const query = search.value.trim();
+      if (query) next.set('q', query);
+      else next.delete('q');
+      if (selectedDomain !== 'all') next.set('domain', selectedDomain);
+      else next.delete('domain');
+      if (selectedKind !== 'all') next.set('kind', selectedKind);
+      else next.delete('kind');
+      next.delete('area');
+      next.delete('subarea');
+      next.delete('path');
+      if (selectedAreaPath.length === 1) next.set('area', selectedAreaPath[0]);
+      else if (selectedAreaPath.length === 2) {
+        next.set('area', selectedAreaPath[0]);
+        next.set('subarea', selectedAreaPath[1]);
+      } else if (selectedAreaPath.length > 2) next.set('path', selectedAreaPath.join('/'));
+      if (sort.value !== 'title') next.set('sort', sort.value);
+      else next.delete('sort');
+      const queryString = next.toString();
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash}`,
+      );
+    };
+
+    const updateFacets = () => {
+      facetButtons.forEach((button) => {
+        const dimension = button.dataset.knowledgeFilter;
+        const path = button.dataset.path?.split('/').filter(Boolean) ?? [];
+        const value = button.dataset.value ?? '';
+        const active =
+          dimension === 'domain'
+            ? selectedDomain === value
+            : dimension === 'kind'
+              ? selectedKind === value
+              : JSON.stringify(selectedAreaPath) === JSON.stringify(path);
+        button.classList.toggle('is-active', active);
+
+        const overrides =
+          dimension === 'domain'
+            ? { domain: value }
+            : dimension === 'kind'
+              ? { kind: value }
+              : { areaPath: path };
+        const count = button.querySelector<HTMLElement>('[data-filter-count]');
+        if (count) count.textContent = String(matchingFor(overrides).length);
+      });
+      const activeCount =
+        (selectedDomain !== 'all' ? 1 : 0) +
+        selectedAreaPath.length +
+        (selectedKind !== 'all' ? 1 : 0);
+      filterCount.textContent = String(activeCount);
+      filterCount.parentElement?.classList.toggle('has-filters', activeCount > 0);
+      filterBanner.hidden = activeCount === 0;
+      filterChips.replaceChildren();
+      const chips = [
+        ...(selectedDomain !== 'all' ? [selectedDomain] : []),
+        ...(selectedAreaPath.length ? [selectedAreaPath.join(' · ')] : []),
+        ...(selectedKind !== 'all' ? [selectedKind] : []),
+      ];
+      chips.forEach((label) => {
+        const chip = document.createElement('span');
+        chip.textContent = label.replaceAll('-', ' ');
+        filterChips.append(chip);
+      });
+    };
+
+    const createRow = (item: KnowledgeIndexItem) => {
+      const row = document.createElement('a');
+      row.className = 'knowledge-index-row';
+      row.href = item.href;
+      const kindLabel = document.createElement('span');
+      kindLabel.className = 'knowledge-index-kind';
+      kindLabel.textContent = item.kindLabel;
+      const titleGroup = document.createElement('span');
+      titleGroup.className = 'knowledge-index-title-group';
+      const title = document.createElement('strong');
+      title.textContent = item.title;
+      const description = document.createElement('small');
+      description.textContent = item.description;
+      titleGroup.append(title, description);
+      const path = document.createElement('span');
+      path.className = 'knowledge-index-path';
+      path.textContent = [item.domainLabel, item.pathLabel].filter(Boolean).join(' · ');
+      row.append(kindLabel, titleGroup, path);
+      return row;
+    };
+
+    const apply = (resetWindow = true) => {
+      if (!items.length && !error.hidden) return;
+      if (resetWindow) visibleLimit = pageSize;
+      const matching = sortKnowledgeIndexEntries(
+        matchingFor(),
+        sort.value === 'updated' ? 'updated' : 'title',
+      );
+      const visible = knowledgeIndexWindow(matching, visibleLimit);
+      list.replaceChildren(...visible.map(createRow));
+      status.textContent = search.value.trim()
+        ? `Showing ${visible.length} of ${matching.length} matching “${search.value.trim()}”`
+        : `Showing ${visible.length} of ${matching.length} ${matching.length === 1 ? 'page' : 'pages'}`;
+      empty.hidden = matching.length > 0;
+      showMore.hidden = visible.length >= matching.length;
+      if (!showMore.hidden)
+        showMore.textContent = `Show ${Math.min(pageSize, matching.length - visible.length)} more (${matching.length - visible.length} remaining)`;
+      updateFacets();
+      syncUrl();
+    };
+
+    const closeFilters = () => {
+      filterDrawer.classList.remove('is-open');
+      filterBackdrop.hidden = true;
+      filterOpen.setAttribute('aria-expanded', 'false');
+      filterReturnFocus?.focus();
+      filterReturnFocus = null;
+    };
+    const openFilters = () => {
+      filterReturnFocus =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      filterDrawer.classList.add('is-open');
+      filterBackdrop.hidden = false;
+      filterOpen.setAttribute('aria-expanded', 'true');
+      filterDrawer.querySelector<HTMLButtonElement>('[data-knowledge-filter-close]')?.focus();
+    };
+
+    facetButtons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const dimension = button.dataset.knowledgeFilter;
+        if (dimension === 'domain') selectedDomain = button.dataset.value ?? 'all';
+        else if (dimension === 'kind') selectedKind = button.dataset.value ?? 'all';
+        else selectedAreaPath = button.dataset.path?.split('/').filter(Boolean) ?? [];
+        apply();
+        if (window.matchMedia('(max-width: 850px)').matches) closeFilters();
+      }),
+    );
+    filterOpen.addEventListener('click', openFilters);
+    filterBackdrop.addEventListener('click', closeFilters);
+    root
+      .querySelectorAll<HTMLElement>('[data-knowledge-filter-close]')
+      .forEach((button) => button.addEventListener('click', closeFilters));
+    clearFilters.addEventListener('click', () => {
+      selectedDomain = 'all';
+      selectedKind = 'all';
+      selectedAreaPath = [];
+      apply();
+    });
+    search.addEventListener('input', () => {
+      if (searchTimer) window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(() => apply(), 100);
+    });
+    sort.addEventListener('change', () => apply());
+    showMore.addEventListener('click', () => {
+      visibleLimit += pageSize;
+      apply(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement;
+      if (event.key === '/' && !isTyping) {
+        event.preventDefault();
+        search.focus();
+      }
+      if (event.key === 'Escape' && filterDrawer.classList.contains('is-open')) closeFilters();
+    });
+
+    const loadIndex = async () => {
+      if (!indexUrl) return;
+      try {
+        const response = await fetch(indexUrl, { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`Knowledge index returned ${response.status}`);
+        const payload = (await response.json()) as { items?: KnowledgeIndexItem[] };
+        if (!Array.isArray(payload.items)) throw new Error('Knowledge index payload is invalid');
+        items = payload.items;
+        apply();
+      } catch {
+        status.textContent = 'Search index unavailable';
+        error.hidden = false;
+        showMore.hidden = true;
+      }
+    };
+    void loadIndex();
+  }
+</script>

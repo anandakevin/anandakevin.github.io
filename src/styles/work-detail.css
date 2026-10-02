@@ -1,0 +1,279 @@
+/* Work detail redesign: one dominant hero, one compact utility rail. */
+.work-detail-hero {
+  padding: 64px 0 72px;
+}
+
+.work-detail-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 72px;
+  align-items: end;
+}
+
+.work-detail-hero-copy .display {
+  max-width: 10ch;
+}
+
+.work-detail-hero-copy .lede {
+  max-width: 760px;
+}
+
+.work-glance {
+  align-self: end;
+  padding: 22px 24px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.work-glance-cap,
+.work-detail-aside-cap {
+  margin: 0;
+  color: var(--rust);
+  font: 700 10px/1.3 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.work-glance dl {
+  margin: 18px 0 0;
+}
+
+.work-glance dl > div {
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.work-glance dt {
+  color: var(--muted);
+  font: 700 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.work-glance dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.metric-estimate {
+  color: var(--muted);
+  font: 600 10px/1.3 var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.work-detail-layout {
+  grid-template-columns: minmax(0, 1.22fr) minmax(280px, 0.78fr);
+  gap: 72px;
+}
+
+.work-detail-layout .section-header {
+  display: block;
+}
+
+.work-detail-section-intro {
+  margin-bottom: 38px;
+}
+
+.work-detail-section-intro .section-index {
+  margin: 0 0 15px;
+}
+
+.work-detail-section-intro h2 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(44px, 4.6vw, 64px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.work-detail-section-intro h2 em {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: italic;
+}
+
+.work-detail-aside {
+  position: sticky;
+  top: 112px;
+  padding: 26px;
+}
+
+.work-detail-aside .work-detail-related a {
+  color: var(--rust);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.detail-left .detail-engagement,
+.work-context .work-engagement {
+  color: var(--rust);
+}
+
+@media (max-width: 850px) {
+  .work-detail-hero {
+    padding: 58px 0 62px;
+  }
+
+  .work-detail-hero-grid,
+  .work-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .work-glance {
+    width: 100%;
+  }
+
+  .work-detail-section-intro {
+    margin-bottom: 28px;
+  }
+
+  .work-detail-section-intro h2 {
+    font-size: 42px;
+  }
+
+  .work-detail-aside {
+    position: static;
+  }
+}
+
+.rating-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.rating-card {
+  min-width: 0;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 58%, transparent);
+}
+
+.rating-label {
+  display: block;
+  color: var(--teal);
+  font: 700 9px/1.35 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rating-card strong {
+  display: block;
+  margin-top: 17px;
+  font-family: var(--serif);
+  font-size: 35px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.rating-range {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 600 10px/1.4 var(--mono);
+  text-transform: uppercase;
+}
+
+.rating-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font: 600 9px/1.4 var(--mono);
+  text-transform: uppercase;
+}
+
+.stats .stat {
+  min-width: 0;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 58%, transparent);
+}
+
+.stats .stat-label {
+  display: block;
+  margin-top: 0;
+  color: var(--teal);
+  font: 700 9px/1.35 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stats .stat strong {
+  margin-top: 17px;
+}
+
+.stats .stat-detail {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 600 10px/1.4 var(--mono);
+  text-transform: uppercase;
+}
+
+.signal-groups {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.signal-metric {
+  min-width: 0;
+}
+
+.signal-metric strong {
+  display: block;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.signal-metric-label {
+  display: block;
+  margin-top: 14px;
+  color: var(--muted);
+  font: 700 10px/1.4 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.signal-metric-detail {
+  color: var(--muted);
+}
+
+.signal-groups .stats {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.stats .stat,
+.rating-card {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.stats .stat strong,
+.rating-card strong {
+  display: block;
+  font-size: 40px;
+  line-height: 1;
+}
+
+@media (max-width: 850px) {
+  .rating-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,77 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { fieldNoteSectionById } from '../data/writing-sections';
+
+interface Props {
+  item: PublicContent;
+  fixtureMode?: boolean;
+}
+
+const { item, fixtureMode = false } = Astro.props;
+const kind = item.content_kind;
+const href = item.slug.startsWith('/') ? item.slug : `/${item.slug}`;
+const isFieldNote = item.writing_mode === 'reference';
+const fieldNoteSection = fieldNoteSectionById.get(item.field_note_section ?? 'engineering-systems');
+
+function formatDate(value?: string) {
+  if (!value) return 'Review date not recorded';
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.valueOf())) return value;
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
+
+const kindLabels: Record<string, string> = {
+  case_study: 'Case study',
+  article: 'Article',
+  note: 'Note',
+  social_post: 'Social',
+};
+const kindLabel = isFieldNote
+  ? `Field note · ${fieldNoteSection?.title ?? 'Reference'}`
+  : fixtureMode
+    ? `Fixture / ${kindLabels[kind] ?? kind}`
+    : (kindLabels[kind] ?? kind.replaceAll('_', ' '));
+const footLabel = kind === 'case_study' ? 'Case study' : 'Read';
+---
+
+<article class="feed-card" data-feed-kind={kind} data-writing-mode={item.writing_mode}>
+  {isFieldNote ? (
+    <div class="field-note-feed-body">
+      <div>
+        <div class="feed-meta">
+          <span>{kindLabel}</span>
+        </div>
+        <h3>
+          <a href={href}>{item.title}</a>
+        </h3>
+      </div>
+      <p>{item.description}</p>
+      <time datetime={item.last_verified}>Reviewed {formatDate(item.last_verified)}</time>
+    </div>
+  ) : (
+    <>
+      <div class="feed-accent" aria-hidden="true"></div>
+      <div class="feed-body">
+        <div class="feed-meta">
+          <span>{kindLabel}</span>
+        </div>
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+        <div class="stack-pills feed-tags">
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+        <div class="feed-foot">
+          <span class="feed-ref">{footLabel}</span>
+          <a href={href}>Open ↗</a>
+        </div>
+      </div>
+    </>
+  )}
+</article>

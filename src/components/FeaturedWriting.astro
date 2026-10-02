@@ -1,0 +1,257 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { slugTail } from '../lib/content';
+import {
+  defaultProductionArch,
+  fixtureArchByWritingId,
+  type FixtureArch,
+} from '../data/fixture-arch';
+
+interface Props {
+  items: PublicContent[];
+  fixtureMode?: boolean;
+  archByWritingId?: Record<string, FixtureArch>;
+}
+const { items, fixtureMode = false, archByWritingId = {} } = Astro.props;
+
+function archFor(item: PublicContent): FixtureArch {
+  if (fixtureMode && fixtureArchByWritingId[item.id]) {
+    return fixtureArchByWritingId[item.id];
+  }
+  if (!fixtureMode && archByWritingId[item.id]) {
+    return archByWritingId[item.id];
+  }
+  return defaultProductionArch;
+}
+---
+
+<section
+  class="featured-writing case-stage"
+  data-featured-writing
+  aria-label={fixtureMode ? 'Featured writing implementation fixture' : 'Featured writing'}
+>
+  <div class="featured-nav case-nav">
+    <div class="featured-tabs case-tabs" role="tablist" aria-label="Featured writing selector">
+      {items.length > 1 &&
+        items.map((item, index) => (
+          <button
+            class:list={['featured-tab', 'case-tab', { active: index === 0 }]}
+            role="tab"
+            aria-selected={index === 0 ? 'true' : 'false'}
+            data-feature-index={index}
+          >
+            {String(index + 1).padStart(2, '0')}{' '}
+            {fixtureMode ? 'Fixture' : (item.featured_label ?? item.content_kind.replace('_', ' '))}
+          </button>
+        ))}
+    </div>
+    {items.length > 1 && (
+      <div class="featured-progress progress" aria-hidden="true">
+        <span></span>
+      </div>
+    )}
+  </div>
+  {items.map((item, index) => {
+    const arch = archFor(item);
+    const caseHref = item.slug.startsWith('/case-studies/')
+      ? item.slug
+      : `/case-studies/${slugTail(item.slug)}`;
+    return (
+      <article
+        class:list={['featured-panel', 'case-in', { active: index === 0 }]}
+        data-feature-panel={index}
+        data-feature-reading
+        hidden={index !== 0}
+      >
+        <div class="case-head">
+          <div class="featured-copy">
+            <p class="case-cap">Featured writing · {item.content_kind.replace('_', ' ')}</p>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+          </div>
+          <aside class="case-facts">
+            {fixtureMode && (
+              <>
+                <div class="fact">
+                  <b>Source</b>
+                  <span>Implementation fixture</span>
+                </div>
+                <div class="fact">
+                  <b>Status</b>
+                  <span>Not production content</span>
+                </div>
+              </>
+            )}
+            {item.tags.length > 0 && (
+              <div class="fact">
+                <b>Tags</b>
+                <span>{item.tags.join(' · ')}</span>
+              </div>
+            )}
+            {!fixtureMode && (
+              <a class="button alt featured-open" href={caseHref}>
+                Open full case study ↗
+              </a>
+            )}
+          </aside>
+        </div>
+        <div class="arch-stage">
+          <p class="arch-title">{arch.archTitle}</p>
+          <p class="arch-sketch-note">
+            <span class="sketch-note">{arch.sketchNote}</span>
+          </p>
+          <div class="arch-flow">
+            {arch.columns.map((column, colIndex) => [
+              colIndex > 0 ? (
+                <span class="arch-arrow" aria-hidden="true">
+                  →
+                </span>
+              ) : null,
+              <div class="arch-col">
+                <h4>{column.title}</h4>
+                <p>{column.body}</p>
+                {column.boxes?.map((box) => (
+                  <div class="arch-box">{box}</div>
+                ))}
+              </div>,
+            ])}
+          </div>
+          <div class="case-bottom">
+            <div class="stack case-stack">
+              {arch.stack.map((tag) => (
+                <span>{tag}</span>
+              ))}
+            </div>
+            <a class="case-ref" href={fixtureMode ? '/writing' : caseHref}>
+              {fixtureMode ? 'Open writing index ↗' : 'Open case study ↗'}
+            </a>
+          </div>
+        </div>
+      </article>
+    );
+  })}
+</section>
+<script>
+  const feature = document.querySelector<HTMLElement>('[data-featured-writing]');
+  if (feature) {
+    const DURATION_MS = 11_000;
+    const IDLE_RESUME_MS = 5_000;
+    const tabs = [...feature.querySelectorAll<HTMLButtonElement>('[data-feature-index]')];
+    const panels = [...feature.querySelectorAll<HTMLElement>('[data-feature-panel]')];
+    const readingPanels = [...feature.querySelectorAll<HTMLElement>('[data-feature-reading]')];
+    const progress = feature.querySelector<HTMLElement>('.featured-progress span');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let index = 0;
+    let tabPaused = false;
+    let readingHoverPaused = false;
+    let progressStartedAt = 0;
+    let progressTimer: ReturnType<typeof setInterval> | undefined;
+    let advanceTimer: ReturnType<typeof setTimeout> | undefined;
+    let idleResumeTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const clearProgressTimers = () => {
+      clearInterval(progressTimer);
+      clearTimeout(advanceTimer);
+    };
+
+    const clearIdleResume = () => {
+      clearTimeout(idleResumeTimer);
+    };
+
+    const canAutoAdvance = () => !reduced && tabs.length >= 2 && !tabPaused && !readingHoverPaused;
+
+    const syncSlide = (next: number) => {
+      index = next;
+      tabs.forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+        tab.setAttribute('aria-selected', String(i === index));
+      });
+      panels.forEach((panel, i) => {
+        panel.hidden = i !== index;
+        panel.classList.toggle('active', i === index);
+      });
+    };
+
+    const updateProgressBar = () => {
+      if (!progress) return;
+      const pct = Math.min(100, ((performance.now() - progressStartedAt) / DURATION_MS) * 100);
+      progress.style.width = `${pct}%`;
+    };
+
+    const stopProgress = (resetBar = false) => {
+      clearProgressTimers();
+      if (resetBar && progress) progress.style.width = '0%';
+    };
+
+    const startProgress = () => {
+      clearProgressTimers();
+      if (!canAutoAdvance()) return;
+      progressStartedAt = performance.now();
+      if (progress) progress.style.width = '0%';
+      progressTimer = setInterval(updateProgressBar, 80);
+      advanceTimer = setTimeout(() => {
+        syncSlide((index + 1) % panels.length);
+        tabPaused = false;
+        clearIdleResume();
+        startProgress();
+      }, DURATION_MS);
+    };
+
+    const beginIdleCountdown = () => {
+      clearIdleResume();
+      if (!tabPaused || readingHoverPaused) return;
+      idleResumeTimer = setTimeout(() => {
+        tabPaused = false;
+        startProgress();
+      }, IDLE_RESUME_MS);
+    };
+
+    const pauseForTabSelection = () => {
+      tabPaused = true;
+      stopProgress(true);
+      beginIdleCountdown();
+    };
+
+    const goToSlide = (next: number, fromTab = false) => {
+      syncSlide(next);
+      if (fromTab) {
+        pauseForTabSelection();
+        return;
+      }
+      tabPaused = false;
+      clearIdleResume();
+      startProgress();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => goToSlide(i, true));
+    });
+
+    readingPanels.forEach((panel) => {
+      panel.addEventListener('pointerenter', () => {
+        readingHoverPaused = true;
+        stopProgress();
+        clearIdleResume();
+      });
+      panel.addEventListener('pointerleave', () => {
+        readingHoverPaused = false;
+        if (tabPaused) beginIdleCountdown();
+        else startProgress();
+      });
+      panel.addEventListener('focusin', () => {
+        readingHoverPaused = true;
+        stopProgress();
+        clearIdleResume();
+      });
+      panel.addEventListener('focusout', (event) => {
+        const next = event.relatedTarget;
+        if (next instanceof Node && panel.contains(next)) return;
+        readingHoverPaused = false;
+        if (tabPaused) beginIdleCountdown();
+        else startProgress();
+      });
+    });
+
+    goToSlide(0);
+  }
+</script>

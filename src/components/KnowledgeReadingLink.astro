@@ -1,0 +1,18 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { hrefForPublicRecord } from '../lib/content';
+
+interface Props {
+  label: string;
+  item?: PublicContent;
+}
+
+const { label, item } = Astro.props;
+---
+
+{item && (
+  <a class="knowledge-read-block" href={hrefForPublicRecord(item)}>
+    <small>{label}</small>
+    <strong>{item.title}</strong>
+  </a>
+)}

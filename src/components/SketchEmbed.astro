@@ -1,0 +1,25 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { hrefForPublicRecord } from '../lib/content';
+import SketchViewer from './SketchViewer.astro';
+
+interface Props {
+  sketch: PublicContent;
+  caption?: string;
+  showBrowse?: boolean;
+}
+
+const { sketch, caption, showBrowse = true } = Astro.props;
+---
+
+<figure class="sketch-embed">
+  <div class="sketch-embed-heading">
+    <div>
+      <strong>{sketch.title}</strong>
+      <small>Embedded sketch · canonical artifact · read only</small>
+    </div>
+    <a href={hrefForPublicRecord(sketch)}>Open full sketch ↗</a>
+  </div>
+  <SketchViewer sketch={sketch} mode="embed" showBrowse={showBrowse} />
+  {caption && <figcaption class="sketch-embed-caption">{caption}</figcaption>}
+</figure>

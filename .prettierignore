@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.cache/
+.cursor/
+src/assets/line-awesome-1.3.0/
+src/content/generated/
+src/content/public/
+public/media/
+*.min.css
+*.min.js

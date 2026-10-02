@@ -2,10 +2,7 @@ name: Build and Test (Staging)
 
 on:
   push:
-    branches: [ "develop" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
+    branches: ['develop']
 
 permissions:
   contents: read
@@ -15,31 +12,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Lint
-      run: npm run lint # Add this script if you use ESLint
+      - name: Lint
+        run: npm run lint
 
-    - name: Build
-      run: npm run build
+      - name: Validate public-content boundary
+        run: npm run content:check
 
-    - name: Test build output
-      run: |
-        if [ ! -d "dist" ]; then
-          echo "Build failed - dist directory not found"
-          exit 1
-        fi
-        if [ ! -f "dist/index.html" ]; then
-          echo "Build failed - index.html not found in dist"
-          exit 1
-        fi
+      - name: Test public-content contracts
+        run: npm test
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build fixture foundation
+        run: npm run build:fixtures
+
+      - name: Test build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed - dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "dist/index.html" ]; then
+            echo "Build failed - index.html not found in dist"
+            exit 1
+          fi

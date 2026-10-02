@@ -1,0 +1,131 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import PublicLinks from '../../components/PublicLinks.astro';
+import PublicMedia from '../../components/PublicMedia.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import SketchEmbeds from '../../components/SketchEmbeds.astro';
+import { contributionTypeLabels } from '../../lib/contribution-type';
+import { formatContributionMetric } from '../../lib/contribution-metrics';
+import { formatEngagementType, formatProgramEngagementMeta } from '../../lib/engagement-period';
+import {
+  entryToPublicContent,
+  getContributionEntriesForRoutes,
+  getRecordsById,
+  isFixtureMode,
+  slugTail,
+  sketchesUsedIn,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  if (isFixtureMode) return [];
+  const entries = await getContributionEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const byId = await getRecordsById();
+const item = byId.get(entry.data.id) ?? entryToPublicContent(entry);
+const typeLabels = contributionTypeLabels(item.contribution_type);
+const roleLabel = typeLabels.join(' · ');
+const engagementMeta = formatProgramEngagementMeta(item);
+const engagementType = formatEngagementType(item.engagement_type);
+const contributionContext = [item.program_provider, engagementMeta.period]
+  .filter(Boolean)
+  .join(' · ');
+const metrics = item.public_metrics;
+const metricLabels: Record<string, string> = {
+  instruction_sessions: 'Instructional sessions',
+  mentoring_sessions: 'Mentoring/facilitation sessions',
+  teams_mentored: 'Teams mentored',
+  instruction_session_duration_hours: 'Instructional session duration',
+  mentoring_session_duration_hours: 'Mentoring session duration',
+  typical_attendees_per_session: 'Typical attendees per session',
+  scholarship_participants_supported: 'Scholarship participants supported',
+  instructor_rating_values: 'Instructor rating',
+  mentor_rating_values: 'Mentor rating',
+};
+const metricRows = Object.entries(metrics ?? {}).flatMap(([key, value]) => {
+  const label = metricLabels[key];
+  const formatted = formatContributionMetric(value, {
+    duration: key.endsWith('_duration_hours'),
+  });
+  return label && formatted ? [{ label, ...formatted }] : [];
+});
+const embeddedSketches = sketchesUsedIn([...byId.values()], entry.data.id);
+---
+
+<BaseLayout title={item.title} description={item.description}>
+  <section class="page-hero">
+    <div class="shell work-detail-hero-grid">
+      <div>
+        <p class="page-crumb">Contributions / {roleLabel}</p>
+        {contributionContext && <p class="contribution-context">{contributionContext}</p>}
+        <h1 class="display">{item.title}</h1>
+        <p class="lede">{item.description}</p>
+        <div class="detail-pills">
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      </div>
+      <aside class="work-glance" aria-label="At a glance">
+        <p class="work-glance-cap">At a glance</p>
+        <dl>
+          {item.program_provider && (
+            <div>
+              <dt>Provider</dt>
+              <dd>{item.program_provider}</dd>
+            </div>
+          )}
+          <div>
+            <dt>Contribution</dt>
+            <dd>{typeLabels.join(' · ')}</dd>
+          </div>
+          {engagementType && (
+            <div>
+              <dt>Engagement</dt>
+              <dd>{engagementType}</dd>
+            </div>
+          )}
+          {engagementMeta.period && (
+            <div>
+              <dt>Period</dt>
+              <dd>{engagementMeta.period}</dd>
+            </div>
+          )}
+          {metricRows.map((row) => (
+            <div>
+              <dt>{row.label}</dt>
+              <dd>
+                {row.value}
+                {row.estimated && <span class="metric-estimate"> (estimated)</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </aside>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      <MarkdownBody>
+        <Content />
+      </MarkdownBody>
+      <SketchEmbeds sketches={embeddedSketches} />
+      <PublicMedia media={item.media} />
+      <PublicLinks links={item.public_links} verificationUrl={item.verification_url} />
+      <div class="actions">
+        <a class="button alt" href="/contributions">
+          Back to contributions ↗
+        </a>
+      </div>
+    </div>
+  </section>
+  <AtlasNeighborhood item={item} records={[...byId.values()]} />
+</BaseLayout>

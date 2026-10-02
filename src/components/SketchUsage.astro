@@ -1,0 +1,30 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { hrefForPublicRecord } from '../lib/content';
+
+interface Props {
+  title: string;
+  links: PublicContent[];
+  emptyLabel: string;
+}
+
+const { title, links, emptyLabel } = Astro.props;
+---
+
+<section class="sketch-usage" aria-labelledby="sketch-usage-heading">
+  <p class="section-index">Provenance</p>
+  <h2 id="sketch-usage-heading">{title}</h2>
+  {links.length > 0 ? (
+    <div class="sketch-usage-grid">
+      {links.map((record) => (
+        <a class="sketch-usage-card" href={hrefForPublicRecord(record)}>
+          <small>{record.content_kind.replace('_', ' ')}</small>
+          <strong>{record.title}</strong>
+          <span>{record.description}</span>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <p class="signal-empty-stats">{emptyLabel}</p>
+  )}
+</section>

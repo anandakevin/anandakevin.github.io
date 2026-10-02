@@ -1,0 +1,236 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import AtlasNeighborhood from '../../../../components/AtlasNeighborhood.astro';
+import KnowledgeSearch from '../../../../components/KnowledgeSearch.astro';
+import { knowledgeKindLabel } from '../../../../data/knowledge';
+import {
+  entryToPublicContent,
+  getKnowledgeDomainEntriesForRoutes,
+  getKnowledgeItems,
+  getRecordsById,
+  hrefForPublicRecord,
+} from '../../../../lib/content';
+import {
+  flattenKnowledgeAreas,
+  knowledgeAreaAtPath,
+  knowledgeAreaHref,
+  knowledgeAreaLabels,
+  knowledgeAreaQuery,
+  knowledgePagesInArea,
+} from '../../../../lib/knowledge-navigation';
+
+export async function getStaticPaths() {
+  const entries = await getKnowledgeDomainEntriesForRoutes();
+  return entries.flatMap((entry) => {
+    const domain = entryToPublicContent(entry);
+    return flattenKnowledgeAreas(domain).map((node) => ({
+      params: { domain: domain.knowledge_domain, path: node.path.join('/') },
+      props: { entry, areaPath: node.path },
+    }));
+  });
+}
+
+const { entry } = Astro.props;
+const areaPath = (Astro.props.areaPath ?? []) as string[];
+const domain = entryToPublicContent(entry);
+const area = knowledgeAreaAtPath(domain.knowledge_areas, areaPath);
+if (!area) throw new Error(`Knowledge area not found: ${areaPath.join('/')}`);
+const pages = await getKnowledgeItems();
+const areaPages = knowledgePagesInArea(pages, domain.knowledge_domain, areaPath).sort(
+  (left, right) => left.title.localeCompare(right.title),
+);
+const byId = await getRecordsById();
+const labels = knowledgeAreaLabels(domain.knowledge_areas, areaPath);
+const parentPath = areaPath.slice(0, -1);
+const parentArea = knowledgeAreaAtPath(domain.knowledge_areas, parentPath);
+const siblingAreas = (parentArea?.children ?? domain.knowledge_areas ?? []).filter(
+  (candidate) => candidate.id !== area.id,
+);
+const childAreaPages = area.children.map((child) => ({
+  ...child,
+  pages: knowledgePagesInArea(pages, domain.knowledge_domain, [...areaPath, child.id]).length,
+}));
+const topics = [...new Set(areaPages.flatMap((page) => page.tags))].slice(0, 6);
+const pageList = areaPages.slice(0, 8);
+const atlasRecords = [...byId.values()];
+---
+
+<BaseLayout title={area.title} description={area.description}>
+  <KnowledgeSearch />
+  <section class="section knowledge-area-section">
+    <div class="shell">
+      <div class="knowledge-area-breadcrumbs" aria-label="Knowledge ancestry">
+        <a href="/knowledge/">Knowledge</a>
+        <span aria-hidden="true"> / </span>
+        <a href={`/knowledge/domain/${domain.knowledge_domain}/`}>{domain.title}</a>
+        {labels.map((label, index) => (
+          <>
+            <span aria-hidden="true"> / </span>
+            {index === labels.length - 1 ? (
+              <span aria-current="page">{label}</span>
+            ) : (
+              <a
+                href={knowledgeAreaHref(
+                  domain.knowledge_domain ?? '',
+                  areaPath.slice(0, index + 1),
+                )}
+              >
+                {label}
+              </a>
+            )}
+          </>
+        ))}
+      </div>
+
+      <div class="knowledge-area-layout">
+        <aside class="knowledge-area-sidebar" aria-label={`${area.title} navigation`}>
+          <p class="knowledge-sidebar-cap">You are in</p>
+          <nav>
+            <a href={`/knowledge/domain/${domain.knowledge_domain}/`}>{domain.title}</a>
+            {labels.map((label, index) => (
+              <a
+                class:list={{ 'is-current': index === labels.length - 1 }}
+                href={knowledgeAreaHref(
+                  domain.knowledge_domain ?? '',
+                  areaPath.slice(0, index + 1),
+                )}
+                aria-current={index === labels.length - 1 ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+          {(siblingAreas.length > 0 || area.children.length > 0) && (
+            <>
+              <p class="knowledge-sidebar-cap knowledge-sidebar-secondary-cap">Nearby areas</p>
+              <nav>
+                {[...area.children, ...siblingAreas].map((candidate) => {
+                  const candidatePath = area.children.includes(candidate)
+                    ? [...areaPath, candidate.id]
+                    : [...parentPath, candidate.id];
+                  return (
+                    <a href={knowledgeAreaHref(domain.knowledge_domain ?? '', candidatePath)}>
+                      {candidate.title}
+                    </a>
+                  );
+                })}
+              </nav>
+            </>
+          )}
+          <a
+            class="knowledge-sidebar-all"
+            href={knowledgeAreaQuery(domain.knowledge_domain ?? '', areaPath)}
+          >
+            Browse this area →
+          </a>
+        </aside>
+
+        <div class="knowledge-area-main">
+          <div class="knowledge-area-intro">
+            <p class="section-index">
+              Area / {domain.title}
+              {labels.slice(0, -1).length > 0 && ` / ${labels.slice(0, -1).join(' / ')}`}
+            </p>
+            <h1 class="display">
+              {area.title}
+              <em>.</em>
+            </h1>
+            <p class="lede">{area.description}</p>
+            <div class="knowledge-area-note">
+              This is a navigational area, not a document. It keeps the local map compact and hands
+              exhaustive retrieval to Browse All.
+            </div>
+          </div>
+
+          <section
+            class="knowledge-area-structure"
+            aria-labelledby="knowledge-area-structure-title"
+          >
+            <header class="knowledge-subsection-heading">
+              <div>
+                <p class="section-index">01 / Map of this area</p>
+                <h2 id="knowledge-area-structure-title">
+                  Local <em>structure.</em>
+                </h2>
+              </div>
+              <p>
+                {areaPages.length} {areaPages.length === 1 ? 'page' : 'pages'} in this area and its
+                child areas.
+              </p>
+            </header>
+            {childAreaPages.length > 0 ? (
+              <div class="knowledge-child-area-grid">
+                {childAreaPages.map((child) => (
+                  <a
+                    href={knowledgeAreaHref(domain.knowledge_domain ?? '', [...areaPath, child.id])}
+                  >
+                    <span>
+                      {child.pages} {child.pages === 1 ? 'page' : 'pages'}
+                    </span>
+                    <strong>{child.title}</strong>
+                    <small>{child.description}</small>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p class="knowledge-area-empty">
+                This area has no child areas yet. Its local pages are listed below.
+              </p>
+            )}
+            {topics.length > 0 && (
+              <div class="knowledge-area-topics" aria-label="Topics in this area">
+                {topics.map((topic) => (
+                  <span>{topic}</span>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section
+            class="knowledge-area-pages-section"
+            aria-labelledby="knowledge-area-pages-title"
+          >
+            <header class="knowledge-subsection-heading">
+              <div>
+                <p class="section-index">02 / Pages in this area</p>
+                <h2 id="knowledge-area-pages-title">
+                  Useful pages <em>here.</em>
+                </h2>
+              </div>
+              <p>
+                A small local list for orientation. The full index keeps these filters bookmarkable.
+              </p>
+            </header>
+            <div class="knowledge-area-page-list">
+              {pageList.map((page) => (
+                <a class="knowledge-area-page-row" href={hrefForPublicRecord(page)}>
+                  <span>{knowledgeKindLabel(page.knowledge_kind)}</span>
+                  <span>
+                    <strong>{page.title}</strong>
+                    <small>{page.description}</small>
+                  </span>
+                  <span>
+                    {knowledgeAreaLabels(domain.knowledge_areas, page.knowledge_area ?? []).at(
+                      -1,
+                    ) ?? area.title}
+                  </span>
+                </a>
+              ))}
+            </div>
+            {pageList.length === 0 && (
+              <p class="knowledge-area-empty">No pages are assigned here yet.</p>
+            )}
+            <a
+              class="knowledge-area-browse"
+              href={knowledgeAreaQuery(domain.knowledge_domain ?? '', areaPath)}
+            >
+              Browse this area in the full index →
+            </a>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <AtlasNeighborhood item={domain} records={atlasRecords} />
+</BaseLayout>

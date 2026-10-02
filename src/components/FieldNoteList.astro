@@ -1,0 +1,133 @@
+---
+import type { FieldNoteSectionDefinition } from '../data/writing-sections';
+import type { PublicContent } from '../lib/public-contract';
+
+interface Props {
+  items: PublicContent[];
+  sections: FieldNoteSectionDefinition[];
+  compact?: boolean;
+  searchable?: boolean;
+  variant?: 'directory' | 'cards';
+  grouped?: boolean;
+}
+
+const {
+  items,
+  sections,
+  compact = false,
+  searchable = false,
+  variant = 'directory',
+  grouped = true,
+} = Astro.props;
+const itemsBySection = new Map<string, PublicContent[]>();
+for (const item of items) {
+  const section = item.field_note_section ?? 'engineering-systems';
+  const current = itemsBySection.get(section) ?? [];
+  current.push(item);
+  itemsBySection.set(section, current);
+}
+
+function formatDate(value?: string) {
+  if (!value) return 'Review date not recorded';
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.valueOf())) return value;
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
+
+const sectionById = new Map(sections.map((section) => [section.id, section]));
+const groups = grouped
+  ? sections
+      .map((section) => ({
+        ...section,
+        items: itemsBySection.get(section.id) ?? [],
+      }))
+      .filter((section) => section.items.length > 0)
+  : [{ id: 'field-notes', title: 'Field Notes', description: '', items }];
+---
+
+<div
+  class:list={[
+    'field-note-sections',
+    {
+      'field-note-sections--compact': compact,
+      'field-note-sections--cards': variant === 'cards',
+    },
+  ]}
+>
+  {groups.map((section, sectionIndex) => {
+    return (
+      <section class="field-note-section" id={section.id}>
+        {grouped && (
+          <header class="field-note-section-heading">
+            {!compact && (
+              <p class="section-index">{String(sectionIndex + 1).padStart(2, '0')} / Field Notes</p>
+            )}
+            <div>
+              <h2>{section.title}</h2>
+              {!compact && <p>{section.description}</p>}
+            </div>
+          </header>
+        )}
+        <div class:list={['field-note-list', { 'field-note-list--cards': variant === 'cards' }]}>
+          {section.items.map((item) => {
+            const itemSection = sectionById.get(item.field_note_section ?? 'engineering-systems');
+            const searchAttrs = searchable
+              ? {
+                  'data-field-note-row': true,
+                  'data-field-note-search': [item.title, item.description, ...item.tags]
+                    .join(' ')
+                    .toLocaleLowerCase(),
+                }
+              : {};
+            return variant === 'cards' ? (
+              <article class="field-note-card" {...searchAttrs}>
+                <p class="field-note-cap">Field note · {itemSection?.title ?? 'Reference'}</p>
+                <h3>
+                  <a href={item.slug}>{item.title}</a>
+                </h3>
+                <p class="field-note-card-description">{item.description}</p>
+                <div class="stack-pills field-note-tags">
+                  {item.tags.map((tag) => (
+                    <span>{tag}</span>
+                  ))}
+                </div>
+                <div class="field-note-card-footer">
+                  <time datetime={item.last_verified}>
+                    Reviewed {formatDate(item.last_verified)}
+                  </time>
+                  <a href={item.slug} aria-label={`Read ${item.title}`}>
+                    Read ↗
+                  </a>
+                </div>
+              </article>
+            ) : (
+              <article class="field-note-row" {...searchAttrs}>
+                <div class="field-note-row-main">
+                  <p class="field-note-cap">Field note · {itemSection?.title ?? 'Reference'}</p>
+                  <h3>
+                    <a href={item.slug}>{item.title}</a>
+                  </h3>
+                  <p>{item.description}</p>
+                  <div class="stack-pills field-note-tags">
+                    {item.tags.map((tag) => (
+                      <span>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <div class="field-note-row-meta">
+                  <span>Reviewed</span>
+                  <time datetime={item.last_verified}>{formatDate(item.last_verified)}</time>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+</div>

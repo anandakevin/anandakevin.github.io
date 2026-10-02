@@ -1,0 +1,248 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import PublicMedia from '../../components/PublicMedia.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import SketchEmbeds from '../../components/SketchEmbeds.astro';
+import { fieldNoteSectionById } from '../../data/writing-sections';
+import {
+  entryToPublicContent,
+  getArticleNoteEntriesForRoutes,
+  getFieldNoteItems,
+  getRecordsById,
+  isFixtureMode,
+  resolveRelations,
+  slugTail,
+  sketchesUsedIn,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  if (isFixtureMode) return [];
+  const entries = await getArticleNoteEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const byId = await getRecordsById();
+const { Content, headings } = await render(entry);
+const item = entry.data;
+const record = entryToPublicContent(entry);
+const resolved = resolveRelations(record, byId);
+const isFieldNote = item.writing_mode === 'reference';
+const kindLabel = item.content_kind === 'note' ? 'Note' : 'Article';
+const fieldNotes = isFieldNote ? await getFieldNoteItems() : [];
+const currentIndex = fieldNotes.findIndex((note) => note.id === item.id);
+const previousNote = currentIndex > 0 ? fieldNotes[currentIndex - 1] : undefined;
+const nextNote = currentIndex >= 0 ? fieldNotes[currentIndex + 1] : undefined;
+const section = fieldNoteSectionById.get(item.field_note_section ?? 'engineering-systems');
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const contextualLinks = fieldNotes.filter((note) => note.id !== item.id);
+const embeddedSketches = sketchesUsedIn([...byId.values()], record.id);
+
+const relatedGroups = [
+  { prefix: 'work/', label: 'Related work' },
+  { prefix: 'projects/', label: 'Related projects' },
+  { prefix: 'writing/', label: 'Related writing' },
+  { prefix: 'credentials/', label: 'Related credentials' },
+]
+  .map((group) => ({
+    ...group,
+    links: resolved.filter((link) => link.targetId.startsWith(group.prefix)),
+  }))
+  .filter((group) => group.links.length > 0);
+
+function formatDate(value?: string) {
+  if (!value) return 'Review date not recorded';
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.valueOf())) return value;
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
+---
+
+{isFieldNote ? (
+  <BaseLayout title={item.title} description={item.description}>
+    <section class="field-note-detail-hero">
+      <div class="shell">
+        <p class="page-crumb">Writing / Field Notes / {section?.title ?? 'Reference'}</p>
+        <h1 class="display">{item.title}</h1>
+        <p class="lede">{item.description}</p>
+        <div class="detail-pills field-note-detail-meta">
+          <span>Field note</span>
+          {section && <span>{section.title}</span>}
+          <span>Reviewed {formatDate(item.last_verified)}</span>
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section class="section field-note-detail-section">
+      <div class="shell field-note-detail-layout">
+        <article>
+          <MarkdownBody>
+            <Content />
+          </MarkdownBody>
+          <SketchEmbeds sketches={embeddedSketches} />
+          <PublicMedia media={item.media} />
+          {relatedGroups.length > 0 && (
+            <div class="editorial-callout">
+              {relatedGroups.map((group) => (
+                <div class="related-group">
+                  <b>{group.label}</b>
+                  <ul>
+                    {group.links.map((link) => (
+                      <li>
+                        <a href={link.href}>{link.record.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+          {(previousNote || nextNote) && (
+            <nav class="field-note-pagination" aria-label="Field Note navigation">
+              {previousNote ? (
+                <a href={previousNote.slug}>
+                  <span>Previous note</span>
+                  <b>{previousNote.title}</b>
+                </a>
+              ) : (
+                <span />
+              )}
+              {nextNote ? (
+                <a href={nextNote.slug}>
+                  <span>Next note</span>
+                  <b>{nextNote.title}</b>
+                </a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+          <div class="actions">
+            <a class="button alt" href="/writing/notes">
+              Back to Field Notes ↗
+            </a>
+          </div>
+        </article>
+        <aside class="field-note-rail" aria-label="Field Note context">
+          {tocHeadings.length > 0 && (
+            <div class="field-note-rail-block">
+              <b>In this note</b>
+              <ol>
+                {tocHeadings.map((heading) => (
+                  <li class:list={{ 'field-note-rail-subheading': heading.depth === 3 }}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {contextualLinks.length > 0 && (
+            <div class="field-note-rail-block">
+              <b>More Field Notes</b>
+              <ul>
+                {contextualLinks.map((note) => (
+                  <li>
+                    <a href={note.slug}>{note.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <a class="field-note-rail-all" href="/writing/notes">
+            Browse the Field Notes ↗
+          </a>
+        </aside>
+        <details class="field-note-rail-mobile">
+          <summary>Open note contents and related notes</summary>
+          <div class="field-note-rail-mobile-body">
+            {tocHeadings.length > 0 && (
+              <div class="field-note-rail-block">
+                <b>In this note</b>
+                <ol>
+                  {tocHeadings.map((heading) => (
+                    <li>
+                      <a href={`#${heading.slug}`}>{heading.text}</a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            {contextualLinks.length > 0 && (
+              <div class="field-note-rail-block">
+                <b>More Field Notes</b>
+                <ul>
+                  {contextualLinks.map((note) => (
+                    <li>
+                      <a href={note.slug}>{note.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </details>
+      </div>
+    </section>
+    <AtlasNeighborhood item={record} records={[...byId.values()]} />
+  </BaseLayout>
+) : (
+  <BaseLayout title={item.title} description={item.description}>
+    <section class="page-hero">
+      <div class="shell">
+        <p class="page-crumb">
+          Writing / {kindLabel} / {item.title}
+        </p>
+        <h1 class="display">{item.title}</h1>
+        <p class="lede">{item.description}</p>
+        <div class="detail-pills">
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="shell">
+        <MarkdownBody>
+          <Content />
+        </MarkdownBody>
+        <SketchEmbeds sketches={embeddedSketches} />
+        <PublicMedia media={item.media} />
+        {relatedGroups.length > 0 && (
+          <div class="editorial-callout">
+            {relatedGroups.map((group) => (
+              <div class="related-group">
+                <b>{group.label}</b>
+                <ul>
+                  {group.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.record.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+        <div class="actions">
+          <a class="button alt" href="/writing">
+            Back to writing ↗
+          </a>
+        </div>
+      </div>
+    </section>
+    <AtlasNeighborhood item={record} records={[...byId.values()]} />
+  </BaseLayout>
+)}

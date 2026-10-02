@@ -1,0 +1,161 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AtlasNeighborhood from '../../../components/AtlasNeighborhood.astro';
+import KnowledgeAreaTree from '../../../components/KnowledgeAreaTree.astro';
+import KnowledgePathStep from '../../../components/KnowledgePathStep.astro';
+import KnowledgeSearch from '../../../components/KnowledgeSearch.astro';
+import { knowledgeKindLabel, knowledgePathLabel } from '../../../data/knowledge';
+import {
+  entryToPublicContent,
+  getKnowledgeDomainEntriesForRoutes,
+  getKnowledgeItems,
+  getRecordsById,
+  slugTail,
+} from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getKnowledgeDomainEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const record = entryToPublicContent(entry);
+const pages = await getKnowledgeItems();
+const domainPages = pages.filter((page) => page.knowledge_domain === record.knowledge_domain);
+const byId = await getRecordsById();
+const { Content } = await render(entry);
+const pathItems = (record.knowledge_guided_path ?? [])
+  .map((step) => ({ ...step, page: byId.get(step.page) }))
+  .filter((step): step is typeof step & { page: NonNullable<typeof step.page> } =>
+    Boolean(step.page),
+  );
+const featured = (record.knowledge_featured_pages ?? [])
+  .map((id) => byId.get(id))
+  .filter((page): page is NonNullable<typeof page> => page?.content_kind === 'knowledge');
+---
+
+<BaseLayout title={record.title} description={record.description}>
+  <KnowledgeSearch />
+  <section class="page-hero knowledge-domain-hero">
+    <div class="shell">
+      <p class="page-crumb">
+        <a href="/knowledge">Knowledge</a>
+        <span aria-hidden="true"> / </span>
+        <a href="/knowledge#knowledge-domains">Domains</a>
+        <span aria-hidden="true"> / {record.title}</span>
+      </p>
+      <h1 class="display">
+        {record.title}
+        <em>.</em>
+      </h1>
+      <p class="lede">{record.description}</p>
+      <div class="knowledge-domain-meta">
+        <span>{domainPages.length} reference pages</span>
+        <span>Hierarchical field map</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section knowledge-domain-section">
+    <div class="shell knowledge-domain-layout">
+      <aside class="knowledge-domain-sidebar" aria-label={`${record.title} navigation`}>
+        <p class="knowledge-sidebar-cap">In this domain</p>
+        <nav>
+          {record.knowledge_areas?.map((area) => (
+            <a href={`/knowledge/domain/${record.knowledge_domain}/${area.id}`}>{area.title}</a>
+          ))}
+        </nav>
+        <a
+          class="knowledge-sidebar-all"
+          href={`/knowledge/all/?domain=${encodeURIComponent(record.knowledge_domain ?? '')}`}
+        >
+          Browse all Knowledge →
+        </a>
+      </aside>
+      <div class="knowledge-domain-main">
+        <div class="knowledge-domain-framing content-body">
+          <Content />
+        </div>
+        <section class="knowledge-hierarchy" aria-labelledby="knowledge-hierarchy-title">
+          <header class="knowledge-subsection-heading">
+            <div>
+              <p class="section-index">01 / Map of the field</p>
+              <h2 id="knowledge-hierarchy-title">
+                Areas and <em>subareas.</em>
+              </h2>
+            </div>
+            <p>
+              Hierarchy provides orientation and can deepen over time without changing a document’s
+              canonical URL.
+            </p>
+          </header>
+          <div class="knowledge-area-tree">
+            {record.knowledge_areas?.map((area) => (
+              <div id={`knowledge-area-${area.id}`}>
+                <KnowledgeAreaTree
+                  area={area}
+                  pages={domainPages}
+                  domain={record.knowledge_domain ?? ''}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {pathItems.length > 0 && (
+          <section class="knowledge-pathway" aria-labelledby="knowledge-pathway-title">
+            <header class="knowledge-subsection-heading">
+              <div>
+                <p class="section-index">02 / Optional guided path</p>
+                <h2 id="knowledge-pathway-title">
+                  If you’re new to <em>{record.title}.</em>
+                </h2>
+              </div>
+              <p>
+                A curated sequence for readers who want progression. It is optional, not a
+                chronology.
+              </p>
+            </header>
+            <div class="knowledge-path-steps">
+              {pathItems.map((step, index) => (
+                <KnowledgePathStep step={step} index={index} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {featured.length > 0 && (
+          <section class="knowledge-featured-domain" aria-labelledby="knowledge-featured-title">
+            <header class="knowledge-subsection-heading">
+              <div>
+                <p class="section-index">03 / Entry points</p>
+                <h2 id="knowledge-featured-title">
+                  Useful <em>starting points.</em>
+                </h2>
+              </div>
+              <p>Manually selected pages for this area, independent of recency or popularity.</p>
+            </header>
+            <div class="knowledge-featured-grid">
+              {featured.map((page) => (
+                <a class="knowledge-featured-card" href={page.slug}>
+                  <span>
+                    {knowledgeKindLabel(page.knowledge_kind)} ·{' '}
+                    {knowledgePathLabel(page.knowledge_area ?? [])}
+                  </span>
+                  <strong>{page.title}</strong>
+                  <small>{page.description}</small>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <AtlasNeighborhood item={record} records={[...byId.values()]} />
+</BaseLayout>

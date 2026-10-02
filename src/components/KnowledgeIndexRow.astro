@@ -1,0 +1,40 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { knowledgeKindLabel, knowledgePathLabel } from '../data/knowledge';
+import { knowledgeSearchText } from '../lib/knowledge-index';
+
+interface Props {
+  item: PublicContent;
+  domainTitle: string;
+}
+
+const { item, domainTitle } = Astro.props;
+const searchable = knowledgeSearchText([
+  item.title,
+  item.description,
+  domainTitle,
+  item.knowledge_kind ?? '',
+  knowledgePathLabel(item.knowledge_area ?? []),
+  ...item.tags,
+]);
+---
+
+<a
+  class="knowledge-index-row"
+  href={item.slug}
+  data-knowledge-row
+  data-domain={item.knowledge_domain}
+  data-kind={item.knowledge_kind}
+  data-updated={item.updated_at ?? ''}
+  data-title={item.title}
+  data-search={searchable}
+>
+  <span class="knowledge-index-kind">{knowledgeKindLabel(item.knowledge_kind)}</span>
+  <span class="knowledge-index-title-group">
+    <strong>{item.title}</strong>
+    <small>{item.description}</small>
+  </span>
+  <span class="knowledge-index-path">
+    {domainTitle} · {knowledgePathLabel(item.knowledge_area ?? [])}
+  </span>
+</a>

@@ -1,0 +1,109 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import SketchViewer from '../../components/SketchViewer.astro';
+import SketchUsage from '../../components/SketchUsage.astro';
+import {
+  entryToPublicContent,
+  getRecordsById,
+  getSketchEntriesForRoutes,
+  hrefForPublicRecord,
+  isFixtureMode,
+  resolveRelations,
+  slugTail,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  if (isFixtureMode) return [];
+  const entries = await getSketchEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const record = entryToPublicContent(entry);
+const byId = await getRecordsById();
+const { Content } = await render(entry);
+const resolved = resolveRelations(record, byId);
+const usedIn = resolved.filter((link) => link.relation === 'used_in').map((link) => link.record);
+const related = resolved.filter((link) => link.relation !== 'used_in').map((link) => link.record);
+const role = record.sketch_role?.replace('-', ' ') ?? 'visual reasoning artifact';
+---
+
+<BaseLayout title={record.title} description={record.description}>
+  <section class="page-hero">
+    <div class="shell sketch-detail-hero-grid">
+      <div>
+        <p class="page-crumb">Sketches / {role}</p>
+        <h1 class="display">{record.title}</h1>
+        <p class="lede">{record.description}</p>
+        <div class="detail-pills">
+          {record.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      </div>
+      <aside class="sketch-detail-glance" aria-label="Sketch details">
+        <p>Canonical artifact</p>
+        <dl>
+          <div>
+            <dt>Role</dt>
+            <dd>{role}</dd>
+          </div>
+          <div>
+            <dt>Interaction</dt>
+            <dd>Read only · pan · zoom · fullscreen</dd>
+          </div>
+          <div>
+            <dt>Published</dt>
+            <dd>{record.published_at ?? 'Date not recorded'}</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="sketch-detail-viewer">
+        <SketchViewer sketch={record} />
+      </div>
+      <div class="sketch-detail-context">
+        <p class="section-index">Context</p>
+        <h2>
+          The drawing carries the <em>visual model.</em>
+        </h2>
+        <MarkdownBody>
+          <Content />
+        </MarkdownBody>
+      </div>
+      <SketchUsage
+        title="Used in"
+        links={usedIn}
+        emptyLabel="This sketch is currently standing on its own."
+      />
+      <section class="sketch-related" aria-labelledby="sketch-related-heading">
+        <p class="section-index">Relationships</p>
+        <h2 id="sketch-related-heading">Related artifacts</h2>
+        {related.length > 0 ? (
+          <div class="sketch-related-grid">
+            {related.map((item) => (
+              <a class="sketch-related-card" href={hrefForPublicRecord(item)}>
+                <small>{item.content_kind.replace('_', ' ')}</small>
+                <strong>{item.title}</strong>
+                <span>{item.description}</span>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p class="signal-empty-stats">No additional reviewed artifacts are connected yet.</p>
+        )}
+      </section>
+    </div>
+  </section>
+  <AtlasNeighborhood item={record} records={[...byId.values()]} />
+</BaseLayout>

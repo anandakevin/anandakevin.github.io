@@ -1,0 +1,141 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
+import { knowledgeKindLabel, knowledgePathLabel } from '../../data/knowledge';
+import {
+  getCuratedKnowledgeStartHere,
+  getKnowledgeDomainItems,
+  getKnowledgeItems,
+  isFixtureMode,
+} from '../../lib/content';
+
+const domains = (await getKnowledgeDomainItems()).sort((left, right) =>
+  left.title.localeCompare(right.title),
+);
+const pages = await getKnowledgeItems();
+const startHere = await getCuratedKnowledgeStartHere();
+const domainTitleById = new Map(domains.map((domain) => [domain.knowledge_domain, domain.title]));
+const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pages'}`;
+---
+
+<BaseLayout
+  title="Knowledge"
+  description={
+    isFixtureMode
+      ? 'Fixture reference library for testing domains, reading paths, and Knowledge navigation.'
+      : 'A public reference library for reusable explanations, concepts, guides, and playbooks.'
+  }
+>
+  <KnowledgeSearch />
+  <section class="page-hero knowledge-hero">
+    <div class="shell">
+      <p class="page-crumb">Knowledge / public reference library</p>
+      <h1 class="display">
+        Ideas arranged for <em>reuse.</em>
+      </h1>
+      <p class="lede">
+        A growing library of explanations, concepts, guides, and references. Browse by domain when
+        you want a map, or search directly for a page.
+      </p>
+      <form class="knowledge-global-search" action="/knowledge/all" method="get">
+        <span class="knowledge-global-search-label">Search Knowledge</span>
+        <div>
+          <input
+            id="knowledge-home-search"
+            name="q"
+            type="text"
+            placeholder="Search titles, topics, or descriptions"
+            autocomplete="off"
+            readonly
+            data-knowledge-search-trigger
+          />
+          <button type="button" data-knowledge-search-trigger>
+            Search ↗
+          </button>
+        </div>
+        <small>
+          Search is global. Press <kbd>⌘K</kbd> or <kbd>Ctrl K</kbd> from any Knowledge page.
+        </small>
+      </form>
+    </div>
+  </section>
+
+  <section class="section knowledge-section" id="knowledge-domains">
+    <div class="shell">
+      <div class="section-header">
+        <p class="section-index">01 / Browse</p>
+        <div>
+          <h2>
+            Explore by <em>domain.</em>
+          </h2>
+          <p>
+            Domains provide the broad map. They are editorial navigation, not a mirror of folders or
+            a permanent URL hierarchy.
+          </p>
+        </div>
+      </div>
+      <div class="knowledge-domain-grid">
+        {domains.map((domain) => {
+          const domainPages = pages.filter(
+            (page) => page.knowledge_domain === domain.knowledge_domain,
+          );
+          const areaLabels = (domain.knowledge_areas ?? []).slice(0, 3).map((area) => area.title);
+          return (
+            <a class="knowledge-domain-card" href={`/knowledge/domain/${domain.knowledge_domain}`}>
+              <span class="knowledge-card-cap">Domain · {pageCountLabel(domainPages.length)}</span>
+              <span class="knowledge-card-arrow" aria-hidden="true">
+                ↗
+              </span>
+              <h3>{domain.title}</h3>
+              <p>{domain.description}</p>
+              <span class="knowledge-card-meta">
+                {areaLabels.map((label) => (
+                  <span>{label}</span>
+                ))}
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="section knowledge-section knowledge-start-section">
+    <div class="shell">
+      <div class="section-header">
+        <p class="section-index">02 / Start here</p>
+        <div>
+          <h2>
+            Good entry <em>points.</em>
+          </h2>
+          <p>Manually curated starting points for readers who want a useful first page.</p>
+        </div>
+      </div>
+      <div class="knowledge-start-grid">
+        {startHere.map((item) => (
+          <a class="knowledge-start-card" href={item.slug}>
+            <span>
+              {knowledgeKindLabel(item.knowledge_kind)} ·{' '}
+              {domainTitleById.get(item.knowledge_domain)}
+            </span>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+            <small>{knowledgePathLabel(item.knowledge_area ?? [])}</small>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section knowledge-section">
+    <div class="shell">
+      <a class="knowledge-explore-all" href="/knowledge/all">
+        <span>
+          <strong>Browse all Knowledge</strong>
+          <small>Search, filter by domain or kind, and sort across every reference page.</small>
+        </span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

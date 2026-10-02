@@ -29,6 +29,8 @@ node_modules
 .idea/
 
 dist
+.astro/
+.cache/medium-writing.json
 
 # macOS files
 **/.DS_Store

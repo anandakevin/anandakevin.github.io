@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ExternalReaderBody from '../../../../components/ExternalReaderBody.astro';
+import { getMediumWriting, isFixtureMode } from '../../../../lib/content';
+import { mediumReaderSlug } from '../../../../lib/external-writing';
+
+export async function getStaticPaths() {
+  if (isFixtureMode) return [];
+  const items = await getMediumWriting();
+  return items.flatMap((item) => {
+    const slug = mediumReaderSlug(item.sourceId);
+    return slug ? [{ params: { slug }, props: { item } }] : [];
+  });
+}
+
+const { item } = Astro.props;
+const publishedLabel = item.publishedAt
+  ? new Intl.DateTimeFormat('en', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${item.publishedAt}T00:00:00Z`))
+  : undefined;
+---
+
+<BaseLayout title={item.title} description={item.description} canonicalUrl={item.canonicalUrl}>
+  <section class="page-hero">
+    <div class="shell">
+      <p class="page-crumb">Writing / Medium</p>
+      <h1 class="display">{item.title}</h1>
+      {item.description && <p class="lede">{item.description}</p>}
+      <div class="external-reader-source">
+        <span>Originally published on Medium{publishedLabel && ` · ${publishedLabel}`}</span>
+        <a href={item.url} target="_blank" rel="noopener noreferrer">
+          Open original ↗
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      <ExternalReaderBody
+        bodyHtml={item.bodyHtml}
+        originalUrl={item.url}
+        fallback={
+          item.bodyHtml
+            ? 'The article body could not be displayed here. Read the original on Medium.'
+            : 'Medium did not provide a full article body for this post. Read the original on Medium.'
+        }
+      />
+      <div class="actions">
+        <a class="button alt" href="/writing">
+          Back to writing ↗
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

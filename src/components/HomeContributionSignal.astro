@@ -1,0 +1,123 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import ContributionSignalBlock from './ContributionSignalBlock.astro';
+import type { ContributionSignal, PublicContent } from '../lib/public-contract';
+import { contributionRoleLabel } from '../lib/contribution-type';
+import { hrefForPublicRecord } from '../lib/content';
+
+interface Props {
+  fixtureMode: boolean;
+  contributions?: PublicContent[];
+  signal?: ContributionSignal;
+}
+
+const { fixtureMode, contributions = [], signal } = Astro.props;
+
+const rolePlaceholders = [
+  {
+    type: 'Teaching',
+    title: 'Instruction and mentoring',
+    description:
+      'Explaining technical ideas clearly, giving useful feedback, and helping people build confidence through practice.',
+  },
+  {
+    type: 'Community',
+    title: 'Community and career support',
+    description:
+      'Peer support, volunteering, and conversations that help other people navigate technical work and learning.',
+  },
+  {
+    type: 'Knowledge transfer',
+    title: 'Knowledge transfer',
+    description:
+      'Turning complicated ideas into models, exercises, and conversations people can reuse.',
+  },
+];
+
+const curatedCards = contributions.map((item) => ({
+  type: contributionRoleLabel(item),
+  title: item.title,
+  description: item.description,
+  href: hrefForPublicRecord(item),
+}));
+
+const displayCards = fixtureMode
+  ? rolePlaceholders.map((role) => ({ ...role, href: '/contributions' }))
+  : curatedCards.length > 0
+    ? curatedCards
+    : rolePlaceholders.map((role) => ({ ...role, href: '/contributions' }));
+---
+
+<section class="section">
+  <div class="shell">
+    <SectionHeader
+      index="06 / Contribution"
+      title="I also spend time teaching, mentoring, and reviewing"
+      emphasis="technical work."
+      description="Courses, capstone teams, curriculum work, code reviews, and community programs alongside engineering."
+    />
+    {fixtureMode && (
+      <div class="signal-block">
+        <div class="stats" aria-label="Fixture stats placeholder">
+          <div class="stat">
+            <strong>—</strong>
+            <span>fixture · sessions</span>
+          </div>
+          <div class="stat">
+            <strong>—</strong>
+            <span>fixture · teams mentored</span>
+          </div>
+          <div class="stat">
+            <strong>—</strong>
+            <span>fixture · ratings</span>
+          </div>
+        </div>
+        <div class="role-grid">
+          {displayCards.map((role) => (
+            <a class="role-card" href={role.href}>
+              <span class="role-open" aria-hidden="true">
+                ↗
+              </span>
+              <span class="role-type">{role.type}</span>
+              <h3>{role.title}</h3>
+              <p>{role.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+    {!fixtureMode && signal && (
+      <div>
+        <ContributionSignalBlock signal={signal} showHeader={false} />
+        <div class="role-grid">
+          {displayCards.map((role) => (
+            <a class="role-card" href={role.href}>
+              <span class="role-open" aria-hidden="true">
+                ↗
+              </span>
+              <span class="role-type">{role.type}</span>
+              <h3>{role.title}</h3>
+              <p>{role.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+    {!fixtureMode && !signal && (
+      <div class="signal-block">
+        <div class="role-grid">
+          {displayCards.map((role) => (
+            <a class="role-card" href={role.href}>
+              <span class="role-open" aria-hidden="true">
+                ↗
+              </span>
+              <span class="role-type">{role.type}</span>
+              <h3>{role.title}</h3>
+              <p>{role.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</section>

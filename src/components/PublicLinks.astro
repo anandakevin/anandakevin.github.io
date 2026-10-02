@@ -1,0 +1,57 @@
+---
+import type { PublicLink } from '../lib/public-contract';
+
+interface Props {
+  links?: PublicLink[];
+  verificationUrl?: string;
+}
+
+const { links = [], verificationUrl } = Astro.props;
+const renderedLinks = [...links];
+const formatDate = (value: string) =>
+  new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T00:00:00Z`));
+
+if (verificationUrl && !renderedLinks.some((link) => link.url === verificationUrl)) {
+  renderedLinks.unshift({
+    label: 'Verify this record',
+    url: verificationUrl,
+    kind: 'verification',
+    featured: true,
+  });
+}
+---
+
+{renderedLinks.length > 0 && (
+  <section class="public-links" aria-labelledby="public-links-title">
+    <div class="public-links-heading">
+      <p class="section-index">Evidence</p>
+      <h2 id="public-links-title">
+        Links and <em>references.</em>
+      </h2>
+    </div>
+    <div class="public-links-grid">
+      {renderedLinks.map((link) => (
+        <article class:list={['public-link-card', { 'public-link-card--featured': link.featured }]}>
+          <div>
+            <div class="public-link-meta">
+              <span class="public-link-kind">{link.kind}</span>
+              {link.published_at && (
+                <span class="public-link-date">{formatDate(link.published_at)}</span>
+              )}
+            </div>
+            <h3>{link.label}</h3>
+            {link.note && <p>{link.note}</p>}
+          </div>
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            Open link ↗
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+)}

@@ -1,0 +1,43 @@
+---
+description: Reconstruct logical Git history from large uncommitted portfolio changes
+alwaysApply: false
+---
+
+# Git history reconstruction
+
+Use this rule when a large working-tree diff needs to become an understandable sequence of commits.
+
+## Before staging
+
+- Inspect the complete working tree, including tracked, untracked, deleted, generated, and binary files.
+- Review the full diff and group changes by responsibility: platform/infrastructure, shared components, routes/features, styling, content, fixtures, and generated artifacts.
+- Write a proposed commit plan before staging anything. Explain dependencies and why each group belongs together.
+- Preserve the working tree as the source of truth. Do not reset, discard, redesign, or rewrite changes merely to make grouping easier.
+
+## Commit boundaries
+
+- Prefer cohesive development steps over one giant site-wide commit, one commit per file, or arbitrary folder-based commits.
+- Use partial staging when a file mixes implementation with editorial copy or unrelated changes.
+- Make each commit leave the repository in a reasonable state where practical; stage prerequisite schemas, loaders, components, and tests before their consumers.
+- Use concise conventional-style messages that name the actual feature or refactor.
+- Review every staged diff and run the relevant lint, type-check, test, content-check, or build command before committing when practical.
+
+## Editorial and generated-content boundary
+
+Deployment does not imply editorial approval. Do not commit real content merely because it is present in the working tree or already deployed.
+
+- Commit real Markdown records, personal copy, media, portraits, diagrams, and other public artifacts only when the user has explicitly confirmed they are approved for canonical Git history.
+- Treat AI-generated, migrated, refreshed, or generated content as unapproved unless explicitly reviewed and approved.
+- Engineering code, schemas, layouts, components, routes, styles, tooling, tests, fixture/demo content, and repository rules may be committed normally.
+- When implementation and content share a file, preserve the valid implementation with patch/partial staging and leave uncertain content uncommitted.
+- Leave generated caches, build output, and refresh reports uncommitted unless the repository explicitly treats them as canonical fixtures.
+
+## Completion report
+
+After the planned commits:
+
+- Show the resulting commit sequence and summarize each logical step.
+- Show what remains uncommitted and explain why each category was excluded.
+- Confirm that no unreviewed real content was committed.
+- Report validation results and any warnings or limitations.
+- Do not push, amend, reset, or change remotes unless the user explicitly asks.

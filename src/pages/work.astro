@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import WorkHeroVisual from '../components/WorkHeroVisual.astro';
+import WorkDetailRow from '../components/WorkDetailRow.astro';
+import { getCatalogRecords, getWorkItems, isFixtureMode } from '../lib/content';
+
+const workItems = await getWorkItems();
+const catalogRecords = await getCatalogRecords();
+---
+
+<BaseLayout
+  title="Work"
+  description={
+    isFixtureMode
+      ? 'Implementation fixture work surface.'
+      : 'Engineering work — chronology and case studies.'
+  }
+>
+  <section class="page-hero">
+    <div class="shell work-hero-grid">
+      <div>
+        <p class="page-crumb">Work</p>
+        <h1 class="display">
+          Engineering work, <em>in context.</em>
+        </h1>
+        <p class="lede">
+          {isFixtureMode
+            ? 'Fixture-only chronology validates the page family. Reviewed public role records will replace it before release.'
+            : 'A chronological view of my engineering work, with case studies for the problems and decisions worth unpacking.'}
+        </p>
+      </div>
+      <WorkHeroVisual />
+    </div>
+  </section>
+  {(isFixtureMode || workItems.length > 0) && (
+    <section class="section">
+      <div class="shell">
+        <div class="detail-list">
+          {workItems.map((item) => (
+            <WorkDetailRow item={item} fixtureMode={isFixtureMode} records={catalogRecords} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+  <section class="section">
+    <div class="shell">
+      <SectionHeader
+        index="Case studies"
+        title="Case"
+        emphasis="studies."
+        description="Some engineering problems make more sense when you can see the constraints, trade-offs, implementation choices, and lessons behind them."
+      />
+      <div class="actions">
+        <a class="button" href="/writing">
+          Read case studies ↗
+        </a>
+        <a class="button alt" href="/explore">
+          Explore these in the atlas →
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

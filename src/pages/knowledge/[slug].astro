@@ -1,0 +1,315 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
+import KnowledgeReadingLink from '../../components/KnowledgeReadingLink.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import PublicMedia from '../../components/PublicMedia.astro';
+import SketchEmbeds from '../../components/SketchEmbeds.astro';
+import { knowledgeKindLabel } from '../../data/knowledge';
+import {
+  entryToPublicContent,
+  getKnowledgeDomainItems,
+  getKnowledgeEntriesForRoutes,
+  getKnowledgeItems,
+  getRecordsById,
+  hrefForPublicRecord,
+  slugTail,
+} from '../../lib/content';
+import {
+  knowledgeAreaAtPath,
+  knowledgeAreaHref,
+  knowledgeAreaLabels,
+  knowledgeAreaQuery,
+  knowledgePagesDirectlyInArea,
+} from '../../lib/knowledge-navigation';
+
+export async function getStaticPaths() {
+  const entries = await getKnowledgeEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const record = entryToPublicContent(entry);
+const domains = await getKnowledgeDomainItems();
+const domain = domains.find((item) => item.knowledge_domain === record.knowledge_domain);
+const pages = await getKnowledgeItems();
+const byId = await getRecordsById();
+const { Content, headings } = await render(entry);
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const reading = record.knowledge_reading;
+const getRecord = (id?: string) => (id ? byId.get(id) : undefined);
+const prerequisites = (reading?.prerequisites ?? [])
+  .map((id) => getRecord(id))
+  .filter((item): item is NonNullable<typeof item> => Boolean(item));
+const previous = getRecord(reading?.previous);
+const next = getRecord(reading?.next);
+const sketches = (record.knowledge_sketches ?? [])
+  .map((id) => byId.get(id))
+  .filter((item): item is NonNullable<typeof item> => item?.content_kind === 'sketch');
+const references = record.knowledge_references ?? [];
+const areaPath = record.knowledge_area ?? [];
+const labels = knowledgeAreaLabels(domain?.knowledge_areas, areaPath);
+const area = knowledgeAreaAtPath(domain?.knowledge_areas, areaPath);
+const localPages = area
+  ? knowledgePagesDirectlyInArea(pages, record.knowledge_domain, areaPath).sort((left, right) =>
+      left.title.localeCompare(right.title),
+    )
+  : [];
+const parentPath = areaPath.slice(0, -1);
+const parentArea = knowledgeAreaAtPath(domain?.knowledge_areas, parentPath);
+const siblingAreas = (parentArea?.children ?? domain?.knowledge_areas ?? []).filter(
+  (candidate) => candidate.id !== area?.id,
+);
+const atlasRecords = [...byId.values()];
+---
+
+<BaseLayout title={record.title} description={record.description}>
+  <KnowledgeSearch />
+  <section class="section knowledge-reader-section">
+    <div class="shell">
+      <div class="knowledge-reader-mobile-tools" aria-label="Reader controls">
+        <button
+          type="button"
+          data-knowledge-reader-toggle="context"
+          aria-expanded="false"
+          aria-controls="knowledge-reader-context"
+        >
+          Browse this area <span aria-hidden="true">+</span>
+        </button>
+        {tocHeadings.length > 0 && (
+          <button
+            type="button"
+            data-knowledge-reader-toggle="toc"
+            aria-expanded="false"
+            aria-controls="knowledge-reader-toc"
+          >
+            On this page <span aria-hidden="true">+</span>
+          </button>
+        )}
+      </div>
+
+      <div class="knowledge-reader-layout">
+        <aside
+          id="knowledge-reader-context"
+          class="knowledge-reader-context knowledge-reader-panel"
+          aria-label="Current Knowledge area"
+        >
+          <p class="knowledge-sidebar-cap">Current ancestry</p>
+          <nav class="knowledge-reader-ancestry" aria-label="Knowledge ancestry">
+            <a href="/knowledge/">Knowledge</a>
+            {domain && <a href={`/knowledge/domain/${domain.knowledge_domain}/`}>{domain.title}</a>}
+            {labels.map((label, index) => (
+              <a
+                class:list={{ 'is-current': index === labels.length - 1 }}
+                href={knowledgeAreaHref(
+                  domain?.knowledge_domain ?? '',
+                  areaPath.slice(0, index + 1),
+                )}
+                aria-current={index === labels.length - 1 ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          {area && (
+            <div class="knowledge-reader-local">
+              <p class="knowledge-sidebar-cap">Local area</p>
+              <nav aria-label={`${area.title} local navigation`}>
+                {area.children.map((child) => (
+                  <a
+                    href={knowledgeAreaHref(domain?.knowledge_domain ?? '', [
+                      ...areaPath,
+                      child.id,
+                    ])}
+                  >
+                    {child.title}
+                  </a>
+                ))}
+                {siblingAreas.map((sibling) => (
+                  <a
+                    href={knowledgeAreaHref(domain?.knowledge_domain ?? '', [
+                      ...parentPath,
+                      sibling.id,
+                    ])}
+                  >
+                    {sibling.title}
+                  </a>
+                ))}
+                {localPages.slice(0, 8).map((page) => (
+                  <a
+                    href={hrefForPublicRecord(page)}
+                    aria-current={page.id === record.id ? 'page' : undefined}
+                    class:list={{ 'is-current': page.id === record.id }}
+                  >
+                    {page.title}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )}
+          <a
+            class="knowledge-reader-browse"
+            href={knowledgeAreaQuery(record.knowledge_domain ?? '', areaPath)}
+          >
+            Browse this area →
+          </a>
+        </aside>
+
+        <article class="knowledge-reader-article" aria-labelledby="knowledge-document-title">
+          <nav class="knowledge-reader-breadcrumbs" aria-label="Breadcrumb">
+            <a href="/knowledge/">Knowledge</a>
+            {domain && (
+              <>
+                <span aria-hidden="true"> / </span>
+                <a href={`/knowledge/domain/${domain.knowledge_domain}/`}>{domain.title}</a>
+              </>
+            )}
+            {labels.map((label, index) => (
+              <>
+                <span aria-hidden="true"> / </span>
+                <a
+                  href={knowledgeAreaHref(
+                    domain?.knowledge_domain ?? '',
+                    areaPath.slice(0, index + 1),
+                  )}
+                >
+                  {label}
+                </a>
+              </>
+            ))}
+            <span aria-hidden="true"> / </span>
+            <span aria-current="page">{record.title}</span>
+          </nav>
+
+          <header class="knowledge-reader-header">
+            <p class="knowledge-document-kind">
+              <a href={`/knowledge/all/?kind=${encodeURIComponent(record.knowledge_kind ?? '')}`}>
+                {knowledgeKindLabel(record.knowledge_kind)}
+              </a>
+              {' · '}
+              {domain?.title ?? 'Knowledge'}
+            </p>
+            <h1 id="knowledge-document-title" class="display">
+              {record.title}
+            </h1>
+            <p class="knowledge-reader-summary">{record.description}</p>
+            {record.tags.length > 0 && (
+              <div class="detail-pills knowledge-document-tags" aria-label="Topics">
+                {record.tags.map((tag) => (
+                  <span>{tag}</span>
+                ))}
+              </div>
+            )}
+          </header>
+
+          <div class="knowledge-reader-content">
+            <MarkdownBody>
+              <Content />
+            </MarkdownBody>
+            <SketchEmbeds sketches={sketches} />
+            <PublicMedia media={record.media} />
+            {references.length > 0 && (
+              <section class="knowledge-references" aria-labelledby="knowledge-references-title">
+                <p class="section-index">References and sources</p>
+                <h2 id="knowledge-references-title">
+                  Further <em>reading.</em>
+                </h2>
+                <ul>
+                  {references.map((reference) => (
+                    <li>
+                      <a href={reference.url} target="_blank" rel="noreferrer">
+                        {reference.title} ↗
+                      </a>
+                      {reference.note && <small>{reference.note}</small>}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+
+          <section
+            class="knowledge-inline-reading"
+            aria-labelledby="knowledge-inline-reading-title"
+          >
+            <p class="knowledge-sidebar-cap" id="knowledge-inline-reading-title">
+              Reading path
+            </p>
+            {prerequisites.map((item) => (
+              <KnowledgeReadingLink label="Prerequisite" item={item} />
+            ))}
+            <KnowledgeReadingLink label="Previous" item={previous} />
+            <KnowledgeReadingLink label="Next" item={next} />
+          </section>
+        </article>
+
+        <aside
+          id="knowledge-reader-toc"
+          class="knowledge-reader-right knowledge-reader-panel"
+          aria-label="On this page and reading path"
+        >
+          {tocHeadings.length > 0 && (
+            <nav class="knowledge-toc" aria-labelledby="knowledge-toc-title">
+              <p class="knowledge-sidebar-cap" id="knowledge-toc-title">
+                On this page
+              </p>
+              {tocHeadings.map((heading) => (
+                <a
+                  class:list={{ 'knowledge-toc-subheading': heading.depth === 3 }}
+                  href={`#${heading.slug}`}
+                >
+                  {heading.text}
+                </a>
+              ))}
+            </nav>
+          )}
+          <div class="knowledge-reading-context">
+            <p class="knowledge-sidebar-cap">Reading path</p>
+            {prerequisites.map((item) => (
+              <KnowledgeReadingLink label="Prerequisite" item={item} />
+            ))}
+            <KnowledgeReadingLink label="Previous" item={previous} />
+            <KnowledgeReadingLink label="Next" item={next} />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <AtlasNeighborhood item={record} records={atlasRecords} />
+</BaseLayout>
+
+<script>
+  const toggles = [
+    ...document.querySelectorAll<HTMLButtonElement>('[data-knowledge-reader-toggle]'),
+  ];
+  const closePanels = () => {
+    toggles.forEach((toggle) => {
+      const panel = document.getElementById(
+        `knowledge-reader-${toggle.dataset.knowledgeReaderToggle}`,
+      );
+      toggle.setAttribute('aria-expanded', 'false');
+      panel?.classList.remove('is-open');
+    });
+  };
+  toggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const key = toggle.dataset.knowledgeReaderToggle;
+      if (!key) return;
+      const panel = document.getElementById(`knowledge-reader-${key}`);
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      closePanels();
+      toggle.setAttribute('aria-expanded', String(open));
+      panel?.classList.toggle('is-open', open);
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closePanels();
+  });
+</script>

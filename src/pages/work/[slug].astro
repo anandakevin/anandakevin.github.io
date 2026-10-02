@@ -1,0 +1,186 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import MarkdownBody from '../../components/MarkdownBody.astro';
+import PublicLinks from '../../components/PublicLinks.astro';
+import PublicMedia from '../../components/PublicMedia.astro';
+import WritingFeedCard from '../../components/WritingFeedCard.astro';
+import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
+import SketchEmbeds from '../../components/SketchEmbeds.astro';
+import { formatEngagementPeriod, formatEngagementType } from '../../lib/engagement-period';
+import {
+  entryToPublicContent,
+  getRecordsById,
+  getMediumWriting,
+  getWorkEntriesForRoutes,
+  isFixtureMode,
+  relationsOfKind,
+  resolveRelations,
+  slugTail,
+  sketchesUsedIn,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  if (isFixtureMode) return [];
+  const entries = await getWorkEntriesForRoutes();
+  return entries.map((entry) => ({
+    params: { slug: slugTail(entry.data.slug) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const byId = await getRecordsById();
+const { Content } = await render(entry);
+const publicItem = byId.get(entry.data.id) ?? entryToPublicContent(entry);
+const item = publicItem;
+const resolved = resolveRelations(publicItem, byId);
+const relatedWriting = [
+  ...relationsOfKind(resolved, 'related_to'),
+  ...relationsOfKind(resolved, 'extracted_from'),
+].filter((link) => link.targetId.startsWith('writing/'));
+const relatedCaseStudies = relatedWriting.filter(
+  (link) => link.record.content_kind === 'case_study',
+);
+const embeddedSketches = sketchesUsedIn([...byId.values()], entry.data.id);
+const relatedNotes = relatedWriting.filter((link) => link.record.content_kind !== 'case_study');
+const engagementPeriod = formatEngagementPeriod(item);
+const engagementType = formatEngagementType(item.engagement_type);
+const relatedExternalWriting = (await getMediumWriting()).filter((writing) =>
+  writing.relatedRecords.includes(item.id),
+);
+const hasBody = Boolean(entry.body?.trim());
+const hasEvidence = item.media.length > 0 || item.public_links.length > 0 || item.verification_url;
+---
+
+<BaseLayout title={item.title} description={item.description}>
+  <section class="page-hero work-detail-hero">
+    <div class="shell work-detail-hero-grid">
+      <div class="work-detail-hero-copy">
+        <p class="page-crumb">Work / {item.title}</p>
+        <h1 class="display">{item.title}</h1>
+        <p class="lede">{item.description}</p>
+        <div class="detail-pills">
+          {item.tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      </div>
+      <aside class="work-glance" aria-label="At a glance">
+        <p class="work-glance-cap">At a glance</p>
+        <dl>
+          {item.work_organization && (
+            <div>
+              <dt>Organization</dt>
+              <dd>{item.work_organization}</dd>
+            </div>
+          )}
+          {item.work_role && (
+            <div>
+              <dt>Role</dt>
+              <dd>{item.work_role}</dd>
+            </div>
+          )}
+          {engagementType && (
+            <div>
+              <dt>Engagement</dt>
+              <dd>{engagementType}</dd>
+            </div>
+          )}
+          {engagementPeriod && (
+            <div>
+              <dt>Period</dt>
+              <dd>{engagementPeriod}</dd>
+            </div>
+          )}
+        </dl>
+      </aside>
+    </div>
+  </section>
+  {(hasBody || hasEvidence || relatedNotes.length > 0 || embeddedSketches.length > 0) && (
+    <section class="section">
+      <div class="shell work-detail-layout">
+        <div class="work-detail-main">
+          {hasBody && (
+            <>
+              <header class="work-detail-section-intro">
+                <p class="section-index">01 / Scope</p>
+                <h2>Scope</h2>
+              </header>
+              <MarkdownBody class="work-detail-body">
+                <Content />
+              </MarkdownBody>
+              <SketchEmbeds sketches={embeddedSketches} />
+            </>
+          )}
+          {hasEvidence && (
+            <>
+              <PublicMedia media={item.media} />
+              <PublicLinks links={item.public_links} verificationUrl={item.verification_url} />
+            </>
+          )}
+        </div>
+        <aside class="work-detail-aside">
+          <p class="work-detail-aside-cap">Related</p>
+          {relatedNotes.length > 0 && (
+            <div class="work-detail-related">
+              <b>Portfolio writing</b>
+              <ul>
+                {relatedNotes.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.record.title} ↗</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {relatedExternalWriting.length > 0 && (
+            <div class="work-detail-related">
+              <b>External writing</b>
+              <ul>
+                {relatedExternalWriting.map((writing) => (
+                  <li>
+                    <a href={writing.url} target="_blank" rel="noopener noreferrer">
+                      Medium — {writing.title} ↗
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
+    </section>
+  )}
+  <AtlasNeighborhood item={item} records={[...byId.values()]} />
+  {relatedCaseStudies.length > 0 && (
+    <section class="section" id="related-case-studies">
+      <div class="shell">
+        <SectionHeader
+          index="02 / Related case studies"
+          title="Related"
+          emphasis="case studies."
+          description="These case studies unpack some of the problems and decisions behind this work."
+        />
+        <div class="feed-grid">
+          {relatedCaseStudies.map((link) => (
+            <WritingFeedCard item={link.record} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+  <section class="section">
+    <div class="shell">
+      <div class="actions">
+        <a class="button alt" href="/work">
+          Back to work ↗
+        </a>
+        <a class="button alt" href="/writing">
+          Browse the library ↗
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
