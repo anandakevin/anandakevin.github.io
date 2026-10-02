@@ -2,36 +2,115 @@
 import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { contentVisibilityMode, isFixtureMode } from '../lib/content/publication';
 
-interface Props { title: string; description?: string; }
-const { title, description = 'Systems-oriented software engineering portfolio.' } = Astro.props;
-const fixtureMode = import.meta.env.PUBLIC_CONTENT_MODE === 'fixtures';
+interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+}
+const { title, description = 'Software engineering portfolio.', canonicalUrl } = Astro.props;
+const fixtureMode = isFixtureMode;
+const previewVisibility = contentVisibilityMode() === 'preview';
+const documentTitle =
+  title === 'Ananda Kevin'
+    ? 'Ananda Kevin — Backend & Platform Engineer'
+    : `${title} · Ananda Kevin`;
 ---
+
 <!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" href="/favicon.svg" />
-    <title>{title} · Ananda Kevin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{documentTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <SiteHeader />
-    {fixtureMode && <aside class="fixture-notice" aria-label="Fixture mode">Implementation fixture mode — no reviewed public content is present.</aside>}
-    <main id="main-content"><slot /></main>
+    <a class="skip-link" href="#main-content">
+      Skip to content
+    </a>
+    <SiteHeader currentPath={Astro.url.pathname} />
+    {fixtureMode && (
+      <aside class="fixture-notice" aria-label="Fixture mode">
+        Implementation fixture mode — no reviewed public content is present.
+      </aside>
+    )}
+    {previewVisibility && !fixtureMode && (
+      <aside class="fixture-notice" aria-label="Preview visibility">
+        Preview visibility — includes draft and review records hidden in production.
+      </aside>
+    )}
+    <main id="main-content">
+      <slot />
+    </main>
     <SiteFooter />
     <script is:inline>
       const root = document.documentElement;
+      const themeButton = document.querySelector('[data-theme-toggle]');
+      const syncThemeIcon = () => {
+        if (!themeButton) return;
+        const dark = root.dataset.theme === 'dark';
+        themeButton.textContent = dark ? '☀' : '☾';
+        themeButton.setAttribute(
+          'aria-label',
+          dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+        );
+      };
       const stored = localStorage.getItem('portfolio-theme');
-      root.dataset.theme = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+      root.dataset.theme =
+        stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      syncThemeIcon();
+      const enhanceArrowLinks = () => {
+        document.querySelectorAll('a').forEach((link) => {
+          if (link.querySelector('.link-arrow')) return;
+          const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+          textNodes.forEach((node) => {
+            const value = node.nodeValue ?? '';
+            if (!value.includes('↗')) return;
+            const parts = value.split('↗');
+            const fragment = document.createDocumentFragment();
+            parts.forEach((part, index) => {
+              if (part) fragment.append(document.createTextNode(part));
+              if (index < parts.length - 1) {
+                const arrow = document.createElement('span');
+                arrow.className = 'link-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                arrow.textContent = '↗';
+                fragment.append(arrow);
+              }
+            });
+            node.replaceWith(fragment);
+          });
+        });
+      };
+      enhanceArrowLinks();
+      document.addEventListener('astro:page-load', enhanceArrowLinks);
+      themeButton?.addEventListener('click', () => {
         const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
         root.dataset.theme = next;
         localStorage.setItem('portfolio-theme', next);
+        syncThemeIcon();
       });
-      const legacy = { '#about': '/about', '#exp': '/work', '#projects': '/projects', '#awards': '/credentials', '#scholarships': '/credentials', '#contact': '/contact', '#edu': '/about', '#tools': '/work' };
+      const legacy = {
+        '#about': '/about',
+        '#exp': '/work',
+        '#projects': '/projects',
+        '#awards': '/credentials',
+        '#scholarships': '/credentials',
+        '#edu': '/about',
+        '#tools': '/work',
+      };
       if (legacy[location.hash]) location.replace(legacy[location.hash]);
     </script>
   </body>
