@@ -1,0 +1,49 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import {
+  relatedCaseStudiesFor,
+  workDetailDisplayFor,
+  workDetailHref,
+  type RelatedWritingLink,
+} from '../data/work-display';
+
+interface Props {
+  item: PublicContent;
+  fixtureMode?: boolean;
+  records?: PublicContent[];
+}
+const { item, fixtureMode = false, records = [] } = Astro.props;
+const detail = workDetailDisplayFor(item, fixtureMode);
+const relatedCaseStudies: RelatedWritingLink[] = relatedCaseStudiesFor(item, records);
+const relatedCaseStudiesHref =
+  relatedCaseStudies.length > 0 ? `${workDetailHref(item)}#related-case-studies` : undefined;
+---
+
+<div class="detail-row" id={detail.anchorId}>
+  <small class="detail-left">
+    {detail.organization}
+    <br />
+    {detail.roleLine}
+    {detail.engagementType && (
+      <>
+        <br />
+        <span class="detail-engagement">{detail.engagementType}</span>
+      </>
+    )}
+    <br />
+    {detail.periodLine}
+  </small>
+  <div>
+    <h3>{detail.roleTitle}</h3>
+    <p>{detail.body}</p>
+    <div class="stack-pills detail-tags">
+      {detail.tags.map((tag) => (
+        <span>{tag}</span>
+      ))}
+    </div>
+  </div>
+  <div class="detail-right">
+    <a href={workDetailHref(item)}>Open work detail ↗</a>
+    {relatedCaseStudiesHref && <a href={relatedCaseStudiesHref}>View case studies ↗</a>}
+  </div>
+</div>

@@ -1,10 +1,58 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
-interface Props { item: PublicContent; signal: string; }
-const { item, signal } = Astro.props;
+import {
+  relatedCaseStudiesFor,
+  workCardDisplayFor,
+  workDetailHref,
+  type RelatedWritingLink,
+} from '../data/work-display';
+
+interface Props {
+  item: PublicContent;
+  fixtureMode?: boolean;
+  records?: PublicContent[];
+}
+const { item, fixtureMode = false, records = [] } = Astro.props;
+const display = workCardDisplayFor(item, fixtureMode);
+const detailHref = workDetailHref(item);
+const stack = display.stack ?? item.tags;
+const relatedCaseStudies: RelatedWritingLink[] = relatedCaseStudiesFor(item, records);
+const relatedCaseStudiesHref =
+  relatedCaseStudies.length > 0 ? `${detailHref}#related-case-studies` : undefined;
 ---
+
 <article class="work-card" id={item.id.replace('/', '-')}>
-  <div class="work-context"><strong>Fixture context</strong><span>Public record pending</span></div>
-  <div><h3>{item.title}</h3><p>{item.description}</p><div class="stack-pills">{item.tags.map((tag) => <span>{tag}</span>)}</div></div>
-  <div class="selected-signal"><span>Selected signal</span><strong>{signal}</strong><a href="/work">Open work detail ↗</a></div>
+  <div class="work-context">
+    <strong>{display.organization}</strong>
+    <span>{display.roleLine}</span>
+    {display.engagementType && <span class="work-engagement">{display.engagementType}</span>}
+    <span>{display.contextLine}</span>
+  </div>
+  <div class="work-card-main">
+    <h3>{item.title}</h3>
+    <p>{item.description}</p>
+    <div class="work-card-footer">
+      <div class="stack-pills">
+        {stack.map((tag) => (
+          <span>{tag}</span>
+        ))}
+      </div>
+      <div class="work-card-actions">
+        <a href={detailHref}>
+          <span>Open work detail</span>
+          <span class="work-card-arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+        {relatedCaseStudiesHref && (
+          <a href={relatedCaseStudiesHref}>
+            <span>View case studies</span>
+            <span class="work-card-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
 </article>

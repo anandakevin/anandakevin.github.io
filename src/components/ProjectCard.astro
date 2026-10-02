@@ -1,0 +1,66 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { hrefForPublicRecord, slugTail } from '../lib/content';
+import { projectCategoryLabel } from '../lib/project-category';
+
+interface Props {
+  item: PublicContent;
+  fixtureMode?: boolean;
+  surface?: 'home' | 'projects';
+  id?: string;
+}
+
+const { item, fixtureMode = false, surface = 'home', id } = Astro.props;
+
+function capFor(item: PublicContent): string {
+  if (fixtureMode) return 'Project / fixture';
+  const firstCategory = item.project_categories?.[0];
+  if (!firstCategory) return 'Project';
+  return projectCategoryLabel(firstCategory);
+}
+
+const writingTarget = item.public_relations.find((relation) =>
+  relation.target.startsWith('writing/'),
+);
+const isExternalProject = item.project_destination === 'external';
+const detailHref = hrefForPublicRecord(item);
+const footerHref =
+  surface === 'projects'
+    ? isExternalProject
+      ? detailHref
+      : writingTarget
+        ? `/case-studies/${slugTail(writingTarget.target)}`
+        : detailHref
+    : detailHref;
+const footerLabel = isExternalProject
+  ? 'Visit GitHub ↗'
+  : surface === 'projects'
+    ? writingTarget
+      ? 'Related case study ↗'
+      : 'Open project ↗'
+    : 'Open project ↗';
+---
+
+<article
+  id={id}
+  class="project-card"
+  data-project-categories={item.project_categories?.join(' ') ?? ''}
+>
+  <span class="project-cap">{capFor(item)}</span>
+  <h3>{item.title}</h3>
+  <p>{item.description}</p>
+  <div class="stack-pills">
+    {item.tags.map((tag) => (
+      <span>{tag}</span>
+    ))}
+  </div>
+  {footerHref && footerLabel && (
+    <a
+      href={footerHref}
+      target={isExternalProject ? '_blank' : undefined}
+      rel={isExternalProject ? 'noopener noreferrer' : undefined}
+    >
+      {footerLabel}
+    </a>
+  )}
+</article>

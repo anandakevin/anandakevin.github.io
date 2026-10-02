@@ -1,6 +1,182 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import { fixtureProjects } from '../data/fixtures';
+import ProjectsHeroVisual from '../components/ProjectsHeroVisual.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getProjectItems, isFixtureMode, slugTail } from '../lib/content';
+import { filterAccentFor } from '../lib/filter-presentation';
+import { PROJECT_CATEGORY_ORDER, projectCategoryLabel } from '../lib/project-category';
+
+const projects = await getProjectItems();
+
+const projectGroupConfig = [
+  {
+    id: 'core-engineering',
+    label: 'Core engineering projects',
+    description: 'Infrastructure tooling, applied research, and operational automation.',
+  },
+  {
+    id: 'experiments-community',
+    label: 'Experiments, open source, and community work',
+    description:
+      'Backend examples, infrastructure templates, open-source contributions, and community projects.',
+  },
+] as const;
+
+const projectGroupRank = new Map(projectGroupConfig.map((group, index) => [group.id, index]));
+const projectGroupFor = (project: (typeof projects)[number]) =>
+  project.project_group ?? 'core-engineering';
+const orderedProjects = [...projects].sort((left, right) => {
+  const leftGroup = projectGroupFor(left);
+  const rightGroup = projectGroupFor(right);
+  const groupDifference =
+    (projectGroupRank.get(leftGroup) ?? projectGroupConfig.length) -
+    (projectGroupRank.get(rightGroup) ?? projectGroupConfig.length);
+  if (groupDifference !== 0) return groupDifference;
+  const orderDifference = (left.project_order ?? 999) - (right.project_order ?? 999);
+  if (orderDifference !== 0) return orderDifference;
+  return left.title.localeCompare(right.title);
+});
+const projectGroups = projectGroupConfig
+  .map((group) => ({
+    ...group,
+    projects: orderedProjects.filter((project) => projectGroupFor(project) === group.id),
+  }))
+  .filter((group) => group.projects.length > 0);
+
+const availableCategories = PROJECT_CATEGORY_ORDER.filter((category) =>
+  projects.some((project) => project.project_categories?.includes(category)),
+);
+const projectFilters = [
+  { id: 'all', label: 'All' },
+  ...availableCategories.map((category) => ({
+    id: category,
+    label: projectCategoryLabel(category),
+  })),
+];
 ---
-<BaseLayout title="Projects" description="Implementation fixture project surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Projects / independent systems + public artifacts</p><h1 class="display">Projects are concrete things built to be <em>inspected.</em></h1><p class="lede">No candidate project is being promoted to launch content by this foundation.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Selected projects" title="Artifact first, then" emphasis="context." /><div class="three-grid">{fixtureProjects.map((item) => <article class="artifact-card"><small>Project / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/writing">Related thinking ↗</a></article>)}</div></div></section></BaseLayout>
+
+<BaseLayout
+  title="Projects"
+  description={
+    isFixtureMode
+      ? 'Implementation fixture project surface.'
+      : 'Independent projects, tools, and experiments.'
+  }
+>
+  <section class="page-hero">
+    <div class="shell projects-hero-grid">
+      <div>
+        <p class="page-crumb">Projects / independent builds and experiments</p>
+        <h1 class="display">
+          Things I've built, explored, and <em>experimented with.</em>
+        </h1>
+        <p class="lede">
+          {isFixtureMode
+            ? 'Fixture cards validate cap, tags, and artifact hierarchy without promoting a launch selection.'
+            : 'Independent projects, tools, and experiments — usually because I wanted to understand something better, automate a repetitive task, or make an existing process less painful.'}
+        </p>
+      </div>
+      <ProjectsHeroVisual />
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell" data-projects-feed>
+      <SectionHeader index="01 / Library" title="Selected" emphasis="projects." />
+      <div class="actions atlas-index-action">
+        <a class="button alt" href="/explore">
+          Explore these in the atlas →
+        </a>
+      </div>
+      <div
+        class="feed-controls project-controls"
+        role="tablist"
+        aria-label="Project category filters"
+      >
+        {projectFilters.map((filter) => (
+          <button
+            type="button"
+            class={filter.id === 'all' ? 'active' : ''}
+            data-project-filter={filter.id}
+            style={`--filter-accent: ${filterAccentFor(filter.id)}`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+      <div class="project-groups">
+        {projectGroups.map((group, index) => (
+          <section
+            class="project-group"
+            data-project-group={group.id}
+            aria-labelledby={`project-group-${group.id}`}
+          >
+            <header class="project-group-heading">
+              <p class="project-group-index">{String(index + 1).padStart(2, '0')} / Focus</p>
+              <div>
+                <h3 id={`project-group-${group.id}`} class="project-group-title">
+                  {group.label}
+                </h3>
+                <p class="project-group-description">{group.description}</p>
+              </div>
+            </header>
+            <div class="project-grid">
+              {group.projects.map((item) => (
+                <ProjectCard
+                  id={slugTail(item.slug)}
+                  item={item}
+                  fixtureMode={isFixtureMode}
+                  surface="projects"
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+        {!isFixtureMode && projects.length === 0 && (
+          <p class="signal-empty-stats">I'm still preparing a few projects to share here.</p>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+<script>
+  function initProjectFilters() {
+    const root = document.querySelector('[data-projects-feed]');
+    if (!root) return;
+
+    const buttons = [...root.querySelectorAll('[data-project-filter]')];
+    const cards = [...root.querySelectorAll('.project-card[data-project-categories]')];
+    const groups = [...root.querySelectorAll<HTMLElement>('[data-project-group]')];
+
+    const apply = (category: string) => {
+      buttons.forEach((button) => {
+        button.classList.toggle('active', button.getAttribute('data-project-filter') === category);
+      });
+      cards.forEach((card) => {
+        const cardCategories = (card.getAttribute('data-project-categories') ?? '')
+          .split(' ')
+          .filter(Boolean);
+        const show = category === 'all' || cardCategories.includes(category);
+        card.classList.toggle('project-card--hidden', !show);
+        card.toggleAttribute('hidden', !show);
+      });
+      groups.forEach((group) => {
+        group.toggleAttribute('hidden', !group.querySelector('.project-card:not([hidden])'));
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () =>
+        apply(button.getAttribute('data-project-filter') ?? 'all'),
+      );
+    });
+
+    apply(
+      root.querySelector('[data-project-filter].active')?.getAttribute('data-project-filter') ??
+        'all',
+    );
+  }
+
+  initProjectFilters();
+  document.addEventListener('astro:page-load', initProjectFilters);
+</script>
