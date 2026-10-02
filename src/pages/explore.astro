@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SystemsMap from '../components/SystemsMap.astro';
+import { getCatalogRecords } from '../lib/content';
+
+const records = await getCatalogRecords();
+const enabled = records.some((record) =>
+  [
+    'work',
+    'project',
+    'contribution',
+    'article',
+    'case_study',
+    'note',
+    'sketch',
+    'knowledge',
+    'knowledge_domain',
+  ].includes(record.content_kind),
+);
+---
+
+<BaseLayout
+  title="Semantic Atlas"
+  description="Explore the public corpus by territory, subject, and meaningful relationships."
+>
+  <section class="page-hero">
+    <div class="shell">
+      <p class="page-crumb">Explore / Semantic Atlas</p>
+      <h1 class="display">
+        Explore the public <em>corpus.</em>
+      </h1>
+      <p class="lede">
+        Published work, projects, writing, contributions, and Knowledge arranged by subject
+        territory and meaningful relationships.
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      {enabled ? (
+        <SystemsMap records={records} />
+      ) : (
+        <p class="lede">
+          The atlas will populate as more work and writing is published on the site.
+        </p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,35 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import SystemsMap from './SystemsMap.astro';
+
+interface Props {
+  records: PublicContent[];
+}
+
+const { records } = Astro.props;
+---
+
+<section class="section atlas-gateway">
+  <div class="shell">
+    <div class="atlas-gateway-heading">
+      <div>
+        <p class="section-index">03 / Explore</p>
+        <h2>
+          See the public <em>corpus.</em>
+        </h2>
+      </div>
+      <p>
+        Start at the overview, then follow territories and relationships into the work, writing,
+        contributions, and Knowledge.
+      </p>
+    </div>
+    <div class="atlas-gateway-map">
+      <SystemsMap records={records} mode="context" />
+    </div>
+    <div class="actions atlas-gateway-actions">
+      <a class="button alt" href="/explore">
+        Explore the full atlas →
+      </a>
+    </div>
+  </div>
+</section>

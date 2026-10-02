@@ -1,35 +1,1547 @@
 ---
-import type { PublicContent, Throughline } from '../lib/public-contract';
-interface Props { throughlines: Throughline[]; records: PublicContent[]; }
-const { throughlines, records } = Astro.props;
+import type { PublicContent } from '../lib/public-contract';
+import { buildSystemsMapGraph } from '../lib/systems-map-graph';
+
+interface Props {
+  records: PublicContent[];
+  focusId?: string;
+  mode?: 'full' | 'context';
+}
+
+const { records, focusId, mode = 'full' } = Astro.props;
+const graph = buildSystemsMapGraph(records);
+const payload = JSON.stringify(graph);
 ---
-<section class="systems-map" data-systems-map aria-label="Systems map" data-throughlines={JSON.stringify(throughlines)} data-records={JSON.stringify(records)}>
-  <div class="systems-map-bar"><span>Concept ↔ artifact relationships</span><button type="button" data-map-reset>Reset selection</button></div>
-  <div class="systems-map-grid">
-    <div class="systems-map-nodes" role="list">{throughlines.map((line) => <button type="button" role="listitem" data-map-node={line.id}><small>Concept</small><strong>{line.title}</strong><span>{line.description}</span></button>)}</div>
-    <aside data-map-detail><p>Select a concept to inspect its approved evidence relationships.</p></aside>
-  </div>
+
+<section
+  class:list={['semantic-atlas', mode === 'context' && 'semantic-atlas-context']}
+  data-semantic-atlas
+  data-atlas-focus={focusId}
+  data-atlas-mode={mode}
+  aria-label={mode === 'context' ? 'Atlas context' : 'Semantic Atlas'}
+>
+  {mode === 'full' && (
+    <aside class="atlas-sidebar" id="atlas-sidebar-panel" data-atlas-sidebar>
+      <div class="atlas-search-row">
+        <input
+          class="atlas-search"
+          data-atlas-search
+          type="search"
+          placeholder="Search artifacts…"
+          aria-label="Search map artifacts"
+        />
+        <button
+          class="atlas-sidebar-toggle"
+          data-atlas-sidebar-toggle
+          type="button"
+          aria-expanded="true"
+          aria-pressed="true"
+          aria-label="Unpin sidebar"
+          title="Unpin sidebar"
+        >
+          <svg
+            class="atlas-crosshair-glyph atlas-crosshair-glyph-pinned"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="7" />
+            <circle cx="12" cy="12" r="1.5" />
+            <path d="M12 1.5v3.5M12 19v3.5M1.5 12h3.5M19 12h3.5" />
+          </svg>
+          <svg
+            class="atlas-crosshair-glyph atlas-crosshair-glyph-unpinned"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="1.5" />
+            <path d="M12 6v3M12 15v3M6 12h3M15 12h3" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="atlas-label">Explore territories</div>
+      <div data-atlas-territory-filters></div>
+
+      <div class="atlas-label">Artifact kind</div>
+      <div data-atlas-kind-filters></div>
+
+      <div class="atlas-label">Layers</div>
+      <button class="atlas-toggle" data-atlas-edge-toggle type="button" aria-pressed="false">
+        <span>All semantic links</span>
+        <i></i>
+      </button>
+
+      <div class="atlas-legend">
+        Home = reset/orientation only.
+        <br />
+        Large beacon = major territory.
+        <br />
+        Small beacon = engineering sub-territory.
+        <br />
+        Dot color = artifact kind.
+        <br />
+        Faint dotted line = structural membership.
+        <br />
+        Strong line = meaningful artifact relation.
+      </div>
+    </aside>
+  )}
+
+  <main class="atlas-stage" data-atlas-stage>
+    <div class="atlas-topbar">
+      <div class="atlas-actions">
+        {mode === 'context' && (
+          <a
+            class="atlas-action atlas-icon-action"
+            data-atlas-full-atlas
+            href={focusId ? `/explore/?focus=${encodeURIComponent(focusId)}` : '/explore/'}
+            aria-label="Explore the full atlas"
+            title="Explore the full atlas"
+          >
+            <svg class="atlas-map-glyph" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5.5 9 4l6 2 5-1.5v14L15 20l-6-2-5 1.5zM9 4v14M15 6v14" />
+            </svg>
+          </a>
+        )}
+        {mode === 'full' && (
+          <button
+            class="atlas-action atlas-icon-action"
+            data-atlas-back
+            type="button"
+            aria-label="Go back"
+            title="Go back"
+          >
+            <svg class="atlas-back-glyph" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 12H5M11 6l-6 6 6 6" />
+            </svg>
+          </button>
+        )}
+        {mode === 'full' && (
+          <button
+            class="atlas-action atlas-icon-action"
+            data-atlas-overview
+            type="button"
+            aria-label="Return to overview"
+            title="Return to overview"
+          >
+            <svg class="atlas-home-glyph" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.5" />
+              <path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5S14.4 18.2 12 20.5M12 3.5C9.6 5.8 8.4 8.6 8.4 12s1.2 6.2 3.6 8.5" />
+            </svg>
+          </button>
+        )}
+        <button
+          class="atlas-action atlas-icon-action atlas-zoom-action"
+          data-atlas-zoom-out
+          type="button"
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          <svg class="atlas-zoom-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 12h12" />
+          </svg>
+        </button>
+        <button
+          class="atlas-action atlas-icon-action atlas-zoom-action"
+          data-atlas-zoom-in
+          type="button"
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          <svg class="atlas-zoom-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 6v12M6 12h12" />
+          </svg>
+        </button>
+        <button
+          class="atlas-action atlas-icon-action"
+          data-atlas-fullscreen
+          type="button"
+          aria-label="Enter fullscreen"
+          title="Enter fullscreen"
+          aria-pressed="false"
+        >
+          <svg
+            class="atlas-fullscreen-glyph atlas-fullscreen-glyph-enter"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6" />
+          </svg>
+          <svg
+            class="atlas-fullscreen-glyph atlas-fullscreen-glyph-exit"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M9 3v6H3M21 9h-6V3M15 21v-6h6M3 15h6v6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <svg
+      class="atlas-map"
+      data-atlas-map
+      viewBox="0 0 1800 1200"
+      role="img"
+      aria-label="Interactive semantic atlas of published work, projects, writing, contributions, and Knowledge"
+    >
+      <defs>
+        <filter id="atlas-neon-blur" x="-500%" y="-500%" width="1000%" height="1000%">
+          <feGaussianBlur stdDeviation="9"></feGaussianBlur>
+        </filter>
+        <filter id="atlas-beacon-blur" x="-500%" y="-500%" width="1000%" height="1000%">
+          <feGaussianBlur stdDeviation="15"></feGaussianBlur>
+        </filter>
+      </defs>
+      <g data-atlas-viewport>
+        <g data-atlas-structural></g>
+        <g data-atlas-territories></g>
+        <g data-atlas-subterritories></g>
+        <g data-atlas-edges></g>
+        <g data-atlas-home></g>
+        <g data-atlas-artifacts></g>
+      </g>
+    </svg>
+
+    <div class="atlas-hover-preview" data-atlas-hover-preview></div>
+    {mode === 'full' && (
+      <aside class="atlas-inspector" data-atlas-inspector aria-live="polite"></aside>
+    )}
+    <div class="atlas-zoom-readout" data-atlas-zoom>
+      overview · 72%
+    </div>
+  </main>
+
+  {mode === 'context' && (
+    <aside class="atlas-context-inspector" data-atlas-inspector aria-live="polite">
+      <p class="atlas-context-placeholder">Reading nearby relations…</p>
+    </aside>
+  )}
+
+  <script type="application/json" data-atlas-graph set:html={payload}></script>
 </section>
+
 <script>
-  type MapThroughline = { id: string; title: string; description: string };
-  type MapRecord = { title: string; throughlines: string[] };
-  const root = document.querySelector<HTMLElement>('[data-systems-map]');
+  import {
+    artifactBelongsToTerritory,
+    domainLabel,
+    MAP_COLORS,
+    type MapArtifactKind,
+    type MapTerritoryId,
+    type SystemsMapArtifact,
+    type SystemsMapGraph,
+  } from '../lib/systems-map-graph';
+  import type { MapDomain } from '../lib/public-contract';
+
+  const root = document.querySelector<HTMLElement>('[data-semantic-atlas]');
   if (root) {
-    const throughlines = JSON.parse(root.dataset.throughlines ?? '[]') as MapThroughline[];
-    const records = JSON.parse(root.dataset.records ?? '[]') as MapRecord[];
-    const detail = root.querySelector<HTMLElement>('[data-map-detail]');
-    const nodes = [...root.querySelectorAll<HTMLButtonElement>('[data-map-node]')];
-    const show = (id: string) => {
-      const throughline = throughlines.find((item) => item.id === id);
-      if (!throughline || !detail) return;
-      const evidence = records.filter((item) => item.throughlines.includes(id));
-      nodes.forEach((node) => node.classList.toggle('is-selected', node.dataset.mapNode === id));
-      detail.innerHTML = `<small>Selected concept</small><h3>${throughline.title}</h3><p>${throughline.description}</p><p><b>Evidence:</b> ${evidence.map((item) => item.title).join(', ') || 'No approved evidence.'}</p>`;
+    const contextMode = root.dataset.atlasMode === 'context';
+    const graphEl = root.querySelector<HTMLElement>('[data-atlas-graph]');
+    const graph = JSON.parse(graphEl?.textContent ?? '{}') as SystemsMapGraph;
+    const map = root.querySelector<SVGSVGElement>('[data-atlas-map]');
+    const viewport = root.querySelector<SVGGElement>('[data-atlas-viewport]');
+    const stage = root.querySelector<HTMLElement>('[data-atlas-stage]');
+    const structural = root.querySelector<SVGGElement>('[data-atlas-structural]');
+    const territoriesLayer = root.querySelector<SVGGElement>('[data-atlas-territories]');
+    const subterritoriesLayer = root.querySelector<SVGGElement>('[data-atlas-subterritories]');
+    const edgesLayer = root.querySelector<SVGGElement>('[data-atlas-edges]');
+    const homeLayer = root.querySelector<SVGGElement>('[data-atlas-home]');
+    const artifactsLayer = root.querySelector<SVGGElement>('[data-atlas-artifacts]');
+    const inspector = root.querySelector<HTMLElement>('[data-atlas-inspector]');
+    const hoverPreview = root.querySelector<HTMLElement>('[data-atlas-hover-preview]');
+    const search = root.querySelector<HTMLInputElement>('[data-atlas-search]');
+    const zoomReadout = root.querySelector<HTMLElement>('[data-atlas-zoom]');
+    const sidebarToggle = root.querySelector<HTMLButtonElement>('[data-atlas-sidebar-toggle]');
+    const initialFocusId = root.dataset.atlasFocus ?? null;
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let sidebarPinned = true;
+    try {
+      sidebarPinned = window.localStorage.getItem('semantic-atlas-sidebar-pinned') !== 'false';
+    } catch {
+      // Storage can be unavailable in private or embedded browsing contexts.
+    }
+    const syncSidebar = () => {
+      root.classList.toggle('atlas-sidebar-unpinned', !sidebarPinned);
+      sidebarToggle?.setAttribute('aria-expanded', String(sidebarPinned));
+      sidebarToggle?.setAttribute('aria-pressed', String(sidebarPinned));
+      sidebarToggle?.setAttribute('aria-label', sidebarPinned ? 'Unpin sidebar' : 'Pin sidebar');
+      sidebarToggle?.classList.toggle('atlas-pinned', sidebarPinned);
+      if (sidebarToggle) sidebarToggle.title = sidebarPinned ? 'Unpin sidebar' : 'Pin sidebar';
     };
-    nodes.forEach((node) => node.addEventListener('click', () => show(node.dataset.mapNode ?? '')));
-    root.querySelector<HTMLButtonElement>('[data-map-reset]')?.addEventListener('click', () => {
-      nodes.forEach((node) => node.classList.remove('is-selected'));
-      if (detail) detail.innerHTML = '<p>Select a concept to inspect its approved evidence relationships.</p>';
+    sidebarToggle?.addEventListener('click', () => {
+      sidebarPinned = !sidebarPinned;
+      syncSidebar();
+      try {
+        window.localStorage.setItem('semantic-atlas-sidebar-pinned', String(sidebarPinned));
+      } catch {
+        // Keep the control usable when storage is unavailable.
+      }
     });
+    syncSidebar();
+
+    type AtlasHistoryState = {
+      selected: string | null;
+      territoryFocus: MapTerritoryId | 'All';
+      subterritoryFocus: MapDomain | 'All';
+      kindFocus: MapArtifactKind | 'All';
+      showAllEdges: boolean;
+      tx: number;
+      ty: number;
+      scale: number;
+    };
+
+    let selected: string | null = null;
+    let hover: string | null = null;
+    let territoryFocus: MapTerritoryId | 'All' = 'All';
+    let subterritoryFocus: MapDomain | 'All' = 'All';
+    let kindFocus: MapArtifactKind | 'All' = 'All';
+    let showAllEdges = false;
+    let atlasHistory: Array<{ type: 'node' | 'territory' | 'sub'; id: string }> = [];
+    let tx = 0;
+    let ty = 0;
+    let scale = 0.72;
+    let dragging = false;
+    let moved = false;
+    let startDrag: { x: number; y: number; tx: number; ty: number } | null = null;
+    const activePointers: Map<number, { x: number; y: number }> = new Map();
+    let pinch: { distance: number; worldX: number; worldY: number; scale: number } | null = null;
+    let animationFrame: number | null = null;
+    let semanticZoomState = '';
+    const MIN_SCALE = 0.58;
+    const MAX_SCALE = 6;
+
+    const artifactById = (id: string) => graph.artifacts.find((artifact) => artifact.id === id);
+    const territoryById = (id: MapTerritoryId) =>
+      graph.territories.find((territory) => territory.id === id);
+    const subterritoryById = (id: MapDomain) =>
+      graph.subterritories.find((territory) => territory.id === id);
+    const relationFor = (id: string) =>
+      graph.edges
+        .filter((edge) => edge.a === id || edge.b === id)
+        .map((edge) => ({
+          artifact: artifactById(edge.a === id ? edge.b : edge.a),
+          label: edge.source === id ? edge.label : edge.reverseLabel,
+        }))
+        .filter((item): item is { artifact: SystemsMapArtifact; label: string } =>
+          Boolean(item.artifact),
+        );
+    const escapeHtml = (value: string) =>
+      value.replace(
+        /[&<>'"]/g,
+        (character) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character] ??
+          character,
+      );
+    const wrap = (value: string, max = 27) => {
+      const lines: string[] = [];
+      let line = '';
+      for (const word of value.split(' ')) {
+        const next = `${line} ${word}`.trim();
+        if (next.length > max && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = next;
+        }
+      }
+      if (line) lines.push(line);
+      return lines.slice(0, 2);
+    };
+    const svgEl = (tag: string, attrs: Record<string, string>) => {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+      return element;
+    };
+    const connectedSet = (id: string) => {
+      const connected = new Set([id]);
+      relationFor(id).forEach(({ artifact }) => connected.add(artifact.id));
+      return connected;
+    };
+    const tier = () => (scale < 0.86 ? 'overview' : scale < 1.36 ? 'neighborhood' : 'detail');
+    const anchorPoint = (domain: MapDomain) => {
+      const sub = subterritoryById(domain);
+      if (sub) return { x: sub.cx, y: sub.cy };
+      const territory = territoryById(domain === 'learning-education' ? 'learning' : 'knowledge');
+      return { x: territory?.cx ?? 0, y: territory?.cy ?? 0 };
+    };
+    const anchorsFor = (artifact: SystemsMapArtifact) => artifact.domains;
+    const topTerritory = (artifact: SystemsMapArtifact): MapTerritoryId => {
+      if (artifact.domains.some((domain) => domain === 'learning-education')) return 'learning';
+      if (artifact.domains.some((domain) => domain === 'knowledge-publishing')) return 'knowledge';
+      return 'engineering';
+    };
+    const artifactMatchesFocus = (artifact: SystemsMapArtifact) => {
+      if (subterritoryFocus !== 'All') return artifact.domains.includes(subterritoryFocus);
+      if (territoryFocus === 'All') return true;
+      return artifactBelongsToTerritory(artifact, territoryFocus);
+    };
+    const syncUrl = () => {
+      if (contextMode) return;
+      const params = new URLSearchParams(window.location.search);
+      params.delete('focus');
+      params.delete('territory');
+      params.delete('subterritory');
+      if (selected) params.set('focus', selected);
+      else if (subterritoryFocus !== 'All') params.set('subterritory', subterritoryFocus);
+      else if (territoryFocus !== 'All') params.set('territory', territoryFocus);
+      const query = params.toString();
+      const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+      const atlas: AtlasHistoryState = {
+        selected,
+        territoryFocus,
+        subterritoryFocus,
+        kindFocus,
+        showAllEdges,
+        tx,
+        ty,
+        scale,
+      };
+      window.history.replaceState({ ...window.history.state, atlas }, '', nextUrl);
+    };
+
+    const renderStructural = () => {
+      if (!structural) return;
+      structural.innerHTML = '';
+      graph.territories.forEach((territory) => {
+        const path = svgEl('path', {
+          class: 'atlas-structural-edge atlas-home-link',
+          d: `M ${graph.home.x} ${graph.home.y} Q ${(graph.home.x + territory.cx) / 2 + 18} ${(graph.home.y + territory.cy) / 2 - 16} ${territory.cx} ${territory.cy}`,
+        });
+        path.dataset.territory = territory.id;
+        path.dataset.type = 'home';
+        structural.appendChild(path);
+      });
+      graph.subterritories.forEach((subterritory) => {
+        const parent = territoryById(subterritory.parent);
+        if (!parent) return;
+        const path = svgEl('path', {
+          class: 'atlas-structural-edge atlas-parent-link',
+          d: `M ${parent.cx} ${parent.cy} Q ${(parent.cx + subterritory.cx) / 2} ${(parent.cy + subterritory.cy) / 2 - 16} ${subterritory.cx} ${subterritory.cy}`,
+        });
+        path.dataset.parent = subterritory.parent;
+        path.dataset.sub = subterritory.id;
+        path.dataset.type = 'parent';
+        structural.appendChild(path);
+      });
+      graph.artifacts.forEach((artifact) => {
+        anchorsFor(artifact).forEach((domain, index) => {
+          const anchor = anchorPoint(domain);
+          const dx = artifact.x - anchor.x;
+          const dy = artifact.y - anchor.y;
+          const path = svgEl('path', {
+            class: `atlas-structural-edge atlas-member${index > 0 ? ' atlas-secondary' : ''}`,
+            d: `M ${anchor.x} ${anchor.y} Q ${(anchor.x + artifact.x) / 2 + -dy * 0.025 + (index ? 8 : -8)} ${(anchor.y + artifact.y) / 2 + dx * 0.025} ${artifact.x} ${artifact.y}`,
+          });
+          path.dataset.anchor = domain;
+          path.dataset.node = artifact.id;
+          structural.appendChild(path);
+        });
+      });
+    };
+
+    const renderTerritories = () => {
+      if (!territoriesLayer) return;
+      territoriesLayer.innerHTML = '';
+      graph.territories.forEach((territory) => {
+        const group = svgEl('g', { class: 'atlas-territory' });
+        group.dataset.id = territory.id;
+        group.append(
+          svgEl('circle', {
+            class: 'atlas-aura',
+            cx: String(territory.cx),
+            cy: String(territory.cy),
+            r: '44',
+          }),
+          svgEl('circle', {
+            class: 'atlas-ring',
+            cx: String(territory.cx),
+            cy: String(territory.cy),
+            r: '14',
+          }),
+          svgEl('circle', {
+            class: 'atlas-core',
+            cx: String(territory.cx),
+            cy: String(territory.cy),
+            r: '5',
+          }),
+          svgEl('text', {
+            class: 'atlas-title',
+            x: String(territory.cx),
+            y: String(territory.cy - 29),
+            'text-anchor': 'middle',
+          }),
+          svgEl('text', {
+            class: 'atlas-count',
+            x: String(territory.cx),
+            y: String(territory.cy + 34),
+            'text-anchor': 'middle',
+          }),
+        );
+        const title = group.querySelector('.atlas-title');
+        const count = group.querySelector('.atlas-count');
+        if (title) title.textContent = territory.label;
+        if (count)
+          count.textContent = `${graph.artifacts.filter((artifact) => topTerritory(artifact) === territory.id).length} artifacts`;
+        group.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!moved) focusTerritory(territory.id, true);
+        });
+        territoriesLayer.appendChild(group);
+      });
+    };
+
+    const renderSubterritories = () => {
+      if (!subterritoriesLayer) return;
+      subterritoriesLayer.innerHTML = '';
+      graph.subterritories.forEach((subterritory) => {
+        const group = svgEl('g', { class: 'atlas-subterritory' });
+        group.dataset.id = subterritory.id;
+        group.dataset.parent = subterritory.parent;
+        group.append(
+          svgEl('circle', {
+            class: 'atlas-aura',
+            cx: String(subterritory.cx),
+            cy: String(subterritory.cy),
+            r: '33',
+          }),
+          svgEl('circle', {
+            class: 'atlas-ring',
+            cx: String(subterritory.cx),
+            cy: String(subterritory.cy),
+            r: '10',
+          }),
+          svgEl('circle', {
+            class: 'atlas-core',
+            cx: String(subterritory.cx),
+            cy: String(subterritory.cy),
+            r: '3.8',
+          }),
+          svgEl('text', {
+            class: 'atlas-title',
+            x: String(subterritory.cx),
+            y: String(subterritory.cy - 23),
+            'text-anchor': 'middle',
+          }),
+          svgEl('text', {
+            class: 'atlas-count',
+            x: String(subterritory.cx),
+            y: String(subterritory.cy + 27),
+            'text-anchor': 'middle',
+          }),
+        );
+        const title = group.querySelector('.atlas-title');
+        const count = group.querySelector('.atlas-count');
+        if (title) title.textContent = subterritory.label;
+        if (count)
+          count.textContent = `${graph.artifacts.filter((artifact) => artifact.domains.includes(subterritory.id)).length} artifacts`;
+        group.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!moved) focusSubterritory(subterritory.id, true);
+        });
+        subterritoriesLayer.appendChild(group);
+      });
+    };
+
+    const renderHome = () => {
+      if (!homeLayer) return;
+      homeLayer.innerHTML = '';
+      const group = svgEl('g', { class: 'atlas-home-node' });
+      group.append(
+        svgEl('circle', {
+          class: 'atlas-aura',
+          cx: String(graph.home.x),
+          cy: String(graph.home.y),
+          r: '34',
+        }),
+        svgEl('circle', {
+          class: 'atlas-ring',
+          cx: String(graph.home.x),
+          cy: String(graph.home.y),
+          r: '10',
+        }),
+        svgEl('circle', {
+          class: 'atlas-core',
+          cx: String(graph.home.x),
+          cy: String(graph.home.y),
+          r: '3.7',
+        }),
+        svgEl('text', {
+          class: 'atlas-title',
+          x: String(graph.home.x),
+          y: String(graph.home.y + 27),
+          'text-anchor': 'middle',
+        }),
+      );
+      const title = group.querySelector('.atlas-title');
+      if (title) title.textContent = graph.home.label;
+      group.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (!moved) overview();
+      });
+      homeLayer.appendChild(group);
+    };
+
+    const renderEdges = () => {
+      if (!edgesLayer) return;
+      edgesLayer.innerHTML = '';
+      graph.edges.forEach((edge) => {
+        const first = artifactById(edge.a);
+        const second = artifactById(edge.b);
+        if (!first || !second) return;
+        const dx = second.x - first.x;
+        const dy = second.y - first.y;
+        const bend = Math.min(38, Math.max(10, Math.hypot(dx, dy) * 0.045));
+        const path = svgEl('path', {
+          class: 'atlas-edge',
+          d: `M ${first.x} ${first.y} C ${first.x + dx * 0.34} ${first.y + dy * 0.34 - bend},${first.x + dx * 0.66} ${first.y + dy * 0.66 - bend},${second.x} ${second.y}`,
+        });
+        path.dataset.a = edge.a;
+        path.dataset.b = edge.b;
+        edgesLayer.appendChild(path);
+        const label = svgEl('text', {
+          class: 'atlas-edge-label',
+          x: String((first.x + second.x) / 2 + 3),
+          y: String((first.y + second.y) / 2 - bend * 0.7),
+        });
+        label.textContent = edge.label;
+        label.dataset.a = edge.a;
+        label.dataset.b = edge.b;
+        edgesLayer.appendChild(label);
+      });
+    };
+
+    const renderArtifacts = () => {
+      if (!artifactsLayer) return;
+      artifactsLayer.innerHTML = '';
+      graph.artifacts.forEach((artifact) => {
+        const group = svgEl('g', { class: 'atlas-artifact' });
+        group.dataset.id = artifact.id;
+        group.style.color = MAP_COLORS[artifact.kind];
+        group.setAttribute('tabindex', '0');
+        group.setAttribute('role', 'button');
+        group.setAttribute('aria-label', `${artifact.kind}: ${artifact.title}`);
+        group.append(
+          svgEl('circle', {
+            class: 'atlas-hit',
+            cx: String(artifact.x),
+            cy: String(artifact.y),
+            r: '22',
+          }),
+          svgEl('circle', {
+            class: 'atlas-halo',
+            cx: String(artifact.x),
+            cy: String(artifact.y),
+            r: String(artifact.r + 13),
+          }),
+          svgEl('circle', {
+            class: 'atlas-ring',
+            cx: String(artifact.x),
+            cy: String(artifact.y),
+            r: String(artifact.r + 6),
+          }),
+          svgEl('circle', {
+            class: 'atlas-dot',
+            cx: String(artifact.x),
+            cy: String(artifact.y),
+            r: String(artifact.r),
+          }),
+        );
+        const lines = wrap(artifact.title, artifact.prominence === 'landmark' ? 31 : 26);
+        const below = graph.artifacts.indexOf(artifact) % 3 !== 0;
+        const base = below
+          ? artifact.y + artifact.r + 18
+          : artifact.y - artifact.r - 14 - (lines.length - 1) * 12;
+        lines.forEach((line, index) => {
+          const title = svgEl('text', {
+            class: 'atlas-artifact-title',
+            x: String(artifact.x),
+            y: String(base + index * 12),
+            'text-anchor': 'middle',
+          });
+          title.textContent = line;
+          group.appendChild(title);
+        });
+        if (artifact.prominence === 'landmark') {
+          const subtype = svgEl('text', {
+            class: 'atlas-subtype',
+            x: String(artifact.x),
+            y: String(below ? base + lines.length * 12 + 9 : base - 9),
+            'text-anchor': 'middle',
+          });
+          subtype.textContent = `${artifact.kind.toUpperCase()} · ${artifact.subtype.toUpperCase()}`;
+          group.appendChild(subtype);
+        }
+        group.addEventListener('mouseenter', () => {
+          hover = artifact.id;
+          showHover(artifact);
+          applyState();
+        });
+        group.addEventListener('mouseleave', () => {
+          hover = null;
+          hideHover();
+          applyState();
+        });
+        group.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!moved) selectNode(artifact.id, true);
+        });
+        group.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            selectNode(artifact.id, true);
+          }
+        });
+        artifactsLayer.appendChild(group);
+      });
+    };
+
+    const semanticZoom = () => {
+      const currentTier = tier();
+      const focus = selected ?? hover;
+      const local = focus ? connectedSet(focus) : null;
+      const query = search?.value.trim().toLowerCase() ?? '';
+      root.querySelectorAll<SVGGElement>('.atlas-subterritory').forEach((element) => {
+        const hidden =
+          currentTier === 'overview' &&
+          territoryFocus !== 'engineering' &&
+          subterritoryFocus === 'All';
+        element.classList.toggle('atlas-hidden-level', hidden);
+      });
+      root.querySelectorAll<SVGGElement>('.atlas-artifact').forEach((element) => {
+        const artifact = artifactById(element.dataset.id ?? '');
+        if (!artifact) return;
+        const hidden = currentTier === 'overview' && artifact.prominence !== 'landmark';
+        const queryHit = Boolean(
+          query &&
+          [
+            artifact.title,
+            artifact.kind,
+            artifact.subtype,
+            artifact.description,
+            ...artifact.subjectPath,
+          ]
+            .join(' ')
+            .toLowerCase()
+            .includes(query),
+        );
+        const showLabel =
+          currentTier === 'overview'
+            ? artifact.prominence === 'landmark' || queryHit
+            : currentTier === 'neighborhood'
+              ? artifact.prominence === 'landmark' ||
+                artifact.id === selected ||
+                artifact.id === hover ||
+                queryHit
+              : local
+                ? local.has(artifact.id) || queryHit
+                : scale >= 3 || artifact.prominence === 'landmark' || queryHit;
+        element
+          .querySelectorAll<SVGTextElement>('.atlas-artifact-title, .atlas-subtype')
+          .forEach((label) => label.classList.toggle('atlas-label-hidden', !showLabel));
+        element.classList.toggle(
+          'atlas-hidden-by-zoom',
+          hidden && selected !== artifact.id && hover !== artifact.id,
+        );
+      });
+      if (zoomReadout) zoomReadout.textContent = `${currentTier} · ${Math.round(scale * 100)}%`;
+    };
+
+    const syncSemanticZoom = (force = false) => {
+      const state = [
+        tier(),
+        scale >= 3,
+        selected,
+        hover,
+        territoryFocus,
+        subterritoryFocus,
+        search?.value.trim().toLowerCase() ?? '',
+      ].join('|');
+      if (force || state !== semanticZoomState) {
+        semanticZoomState = state;
+        semanticZoom();
+        return;
+      }
+      if (zoomReadout) zoomReadout.textContent = `${tier()} · ${Math.round(scale * 100)}%`;
+    };
+
+    const applyState = () => {
+      const focus = selected ?? hover;
+      const local = focus ? connectedSet(focus) : null;
+      const contextLocal = contextMode && selected ? connectedSet(selected) : null;
+      const query = search?.value.trim().toLowerCase() ?? '';
+      root.querySelectorAll<SVGGElement>('.atlas-territory').forEach((element) => {
+        const id = element.dataset.id;
+        const focused = territoryFocus !== 'All' && id === territoryFocus;
+        element.classList.toggle('atlas-focused', focused);
+        element.classList.toggle('atlas-dim', territoryFocus !== 'All' && !focused);
+      });
+      root.querySelectorAll<SVGGElement>('.atlas-subterritory').forEach((element) => {
+        const focused = subterritoryFocus !== 'All' && element.dataset.id === subterritoryFocus;
+        const relevant = territoryFocus === 'All' || territoryFocus === 'engineering' || focused;
+        element.classList.toggle('atlas-focused', focused);
+        element.classList.toggle('atlas-dim', !relevant);
+      });
+      root.querySelectorAll<SVGGElement>('.atlas-artifact').forEach((element) => {
+        const artifact = artifactById(element.dataset.id ?? '');
+        if (!artifact) return;
+        const territoryOk = artifactMatchesFocus(artifact);
+        const kindOk = kindFocus === 'All' || artifact.kind === kindFocus;
+        const queryOk =
+          !query ||
+          [
+            artifact.title,
+            artifact.kind,
+            artifact.subtype,
+            artifact.description,
+            ...artifact.subjectPath,
+          ]
+            .join(' ')
+            .toLowerCase()
+            .includes(query);
+        const localOk = !local || local.has(artifact.id);
+        element.classList.toggle('atlas-dim', !(territoryOk && kindOk && queryOk && localOk));
+        element.classList.toggle(
+          'atlas-context-hidden',
+          Boolean(contextLocal && !contextLocal.has(artifact.id)),
+        );
+        element.classList.toggle('atlas-selected', artifact.id === selected);
+        element.classList.toggle(
+          'atlas-search-hit',
+          Boolean(query && queryOk && territoryOk && kindOk),
+        );
+      });
+      root.querySelectorAll<SVGPathElement>('.atlas-home-link').forEach((path) => {
+        path.classList.toggle(
+          'atlas-hot',
+          territoryFocus !== 'All' && path.dataset.territory === territoryFocus,
+        );
+      });
+      root.querySelectorAll<SVGPathElement>('.atlas-parent-link').forEach((path) => {
+        path.classList.toggle(
+          'atlas-hot',
+          subterritoryFocus !== 'All' && path.dataset.sub === subterritoryFocus,
+        );
+        path.classList.toggle('atlas-focused', territoryFocus === 'engineering');
+      });
+      root.querySelectorAll<SVGPathElement>('.atlas-member').forEach((path) => {
+        const artifact = artifactById(path.dataset.node ?? '');
+        const artifactElement = Array.from(root.querySelectorAll('.atlas-artifact')).find(
+          (element) => (element as SVGGElement).dataset.id === path.dataset.node,
+        ) as SVGGElement | undefined;
+        const hidden = artifactElement?.classList.contains('atlas-hidden-by-zoom');
+        const isSelected = focus === path.dataset.node;
+        const contextHidden = Boolean(contextLocal && !contextLocal.has(path.dataset.node ?? ''));
+        const anchorFocused =
+          (subterritoryFocus !== 'All' && path.dataset.anchor === subterritoryFocus) ||
+          (territoryFocus !== 'All' &&
+            artifact &&
+            artifactBelongsToTerritory(artifact, territoryFocus));
+        path.classList.toggle('atlas-hot', Boolean(isSelected));
+        path.classList.toggle('atlas-focused', Boolean(anchorFocused && !isSelected));
+        path.classList.toggle(
+          'atlas-hidden-member',
+          Boolean(hidden && !isSelected && !anchorFocused),
+        );
+        path.classList.toggle('atlas-context-hidden', contextHidden);
+      });
+      root.querySelectorAll<SVGPathElement>('.atlas-edge').forEach((path) => {
+        const hot = Boolean(focus && (path.dataset.a === focus || path.dataset.b === focus));
+        path.classList.toggle('atlas-visible', showAllEdges || hot);
+        path.classList.toggle('atlas-hot', hot);
+      });
+      root.querySelectorAll<SVGTextElement>('.atlas-edge-label').forEach((label) => {
+        const hot = Boolean(focus && (label.dataset.a === focus || label.dataset.b === focus));
+        label.classList.toggle('atlas-visible', hot);
+      });
+      syncSemanticZoom(true);
+      root.querySelectorAll<SVGPathElement>('.atlas-member').forEach((path) => {
+        const artifactElement = Array.from(root.querySelectorAll('.atlas-artifact')).find(
+          (element) => (element as SVGGElement).dataset.id === path.dataset.node,
+        ) as SVGGElement | undefined;
+        const hidden = artifactElement?.classList.contains('atlas-hidden-by-zoom');
+        const isSelected = focus === path.dataset.node;
+        if (hidden && !isSelected) path.classList.add('atlas-hidden-member');
+      });
+    };
+
+    const setTransform = (nextTx: number, nextTy: number, nextScale: number) => {
+      tx = nextTx;
+      ty = nextTy;
+      scale = nextScale;
+      viewport?.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
+      syncSemanticZoom();
+      positionInspector();
+      positionHover();
+    };
+    const clampScale = (value: number) => Math.max(MIN_SCALE, Math.min(MAX_SCALE, value));
+    const clientToMap = (clientX: number, clientY: number) => {
+      const rect = map?.getBoundingClientRect();
+      if (!rect) return null;
+      return {
+        x: ((clientX - rect.left) / rect.width) * 1800,
+        y: ((clientY - rect.top) / rect.height) * 1200,
+      };
+    };
+    const zoomAt = (clientX: number, clientY: number, nextScale: number) => {
+      const point = clientToMap(clientX, clientY);
+      if (!point) return;
+      const boundedScale = clampScale(nextScale);
+      const worldX = (point.x - tx) / scale;
+      const worldY = (point.y - ty) / scale;
+      setTransform(point.x - worldX * boundedScale, point.y - worldY * boundedScale, boundedScale);
+      applyState();
+      syncUrl();
+    };
+    const overviewTransform = () => {
+      const nextScale = matchMedia('(max-width: 760px)').matches ? 0.94 : 0.72;
+      return {
+        tx: nextScale === 0.72 ? 0 : (1800 * (1 - nextScale)) / 2,
+        ty: nextScale === 0.72 ? 0 : (1200 * (1 - nextScale)) / 2,
+        scale: nextScale,
+      };
+    };
+    const animateTo = (nextTx: number, nextTy: number, nextScale: number, duration = 340) => {
+      if (reducedMotion) {
+        setTransform(nextTx, nextTy, nextScale);
+        syncUrl();
+        return;
+      }
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      const start = performance.now();
+      const startTx = tx;
+      const startTy = ty;
+      const startScale = scale;
+      const ease = (value: number) => 1 - Math.pow(1 - value, 3);
+      const step = (now: number) => {
+        const progress = Math.min(1, (now - start) / duration);
+        const eased = ease(progress);
+        setTransform(
+          startTx + (nextTx - startTx) * eased,
+          startTy + (nextTy - startTy) * eased,
+          startScale + (nextScale - startScale) * eased,
+        );
+        if (progress < 1) animationFrame = requestAnimationFrame(step);
+        else {
+          animationFrame = null;
+          syncUrl();
+        }
+      };
+      animationFrame = requestAnimationFrame(step);
+    };
+    const flyTo = (
+      x: number,
+      y: number,
+      nextScale: number,
+      anchor: { x: number; y: number } = { x: 0.5, y: 0.5 },
+    ) => {
+      const viewBox = map?.viewBox.baseVal;
+      if (!viewBox) return;
+      const boundedScale = clampScale(nextScale);
+      animateTo(
+        viewBox.width * anchor.x - x * boundedScale,
+        viewBox.height * anchor.y - y * boundedScale,
+        boundedScale,
+      );
+    };
+    const worldToClient = (x: number, y: number) => {
+      const mapRect = map?.getBoundingClientRect();
+      const stageRect = stage?.getBoundingClientRect();
+      if (!mapRect || !stageRect) return { x: 0, y: 0 };
+      return {
+        x: mapRect.left - stageRect.left + ((x * scale + tx) / 1800) * mapRect.width,
+        y: mapRect.top - stageRect.top + ((y * scale + ty) / 1200) * mapRect.height,
+      };
+    };
+    const showHover = (artifact: SystemsMapArtifact) => {
+      if (!hoverPreview || innerWidth <= 760) return;
+      hoverPreview.style.display = 'flex';
+      hoverPreview.style.color = MAP_COLORS[artifact.kind];
+      hoverPreview.innerHTML = `<span class="atlas-big-dot"></span><span><b>${escapeHtml(artifact.kind)} · ${escapeHtml(artifact.subtype)}</b><strong>${escapeHtml(artifact.title)}</strong></span>`;
+      positionHover();
+    };
+    const hideHover = () => {
+      if (hoverPreview) hoverPreview.style.display = 'none';
+    };
+    const positionHover = () => {
+      if (!hover || !hoverPreview || hoverPreview.style.display === 'none' || innerWidth <= 760)
+        return;
+      const artifact = artifactById(hover);
+      const stageRect = stage?.getBoundingClientRect();
+      if (!artifact || !stageRect) return;
+      const point = worldToClient(artifact.x, artifact.y);
+      const width = hoverPreview.offsetWidth || 220;
+      const height = hoverPreview.offsetHeight || 54;
+      let left = point.x + 34;
+      let top = point.y - height - 24;
+      if (left + width > stageRect.width - 14) left = point.x - width - 34;
+      if (top < 54) top = point.y + 28;
+      hoverPreview.style.left = `${Math.max(14, left)}px`;
+      hoverPreview.style.top = `${Math.min(stageRect.height - height - 14, top)}px`;
+    };
+    const renderContextOverview = () => {
+      if (!contextMode || !inspector) return;
+      const territoryMarkup = graph.territories
+        .map((territory) => {
+          const count = graph.artifacts.filter((artifact) =>
+            artifactBelongsToTerritory(artifact, territory.id),
+          ).length;
+          return `<a class="atlas-context-relation" href="/explore/?territory=${encodeURIComponent(territory.id)}"><span><b>${escapeHtml(territory.label)}</b><small>${count} artifacts · territory</small></span><span>↗</span></a>`;
+        })
+        .join('');
+      inspector.style.display = 'flex';
+      inspector.style.color = '#8b969a';
+      inspector.innerHTML = `<div class="atlas-context-header"><div class="atlas-context-kind">Atlas overview</div><h3>The public corpus</h3><p class="atlas-context-description">Start with a territory, then follow the relations into the work.</p></div><div class="atlas-context-relations-section"><div class="atlas-panel-section">Territories <span class="atlas-panel-count">${graph.territories.length}</span></div><div class="atlas-context-relations" aria-label="Atlas territories">${territoryMarkup}</div></div><a class="atlas-context-open" href="/explore/">Explore the full atlas ↗</a>`;
+    };
+    const renderContextTerritory = (id: MapTerritoryId) => {
+      if (!contextMode || !inspector) return;
+      const territory = territoryById(id);
+      if (!territory) return;
+      const artifacts = graph.artifacts.filter((artifact) =>
+        artifactBelongsToTerritory(artifact, territory.id),
+      );
+      inspector.style.display = 'flex';
+      inspector.style.color = '#8b969a';
+      inspector.innerHTML = `<div class="atlas-context-header"><div class="atlas-context-kind">Territory</div><h3>${escapeHtml(territory.label)}</h3><p class="atlas-context-description">${artifacts.length} artifacts in this part of the public corpus.</p></div><a class="atlas-context-open" href="/explore/?territory=${encodeURIComponent(territory.id)}">Explore this territory ↗</a>`;
+    };
+    const renderInspector = (artifact: SystemsMapArtifact) => {
+      if (!inspector) return;
+      const relations = relationFor(artifact.id);
+      const domains = anchorsFor(artifact);
+      const primary = domains[0];
+      const contextChips = [
+        ...domains.map((domain) => domainLabel(domain)),
+        ...artifact.subjectPath,
+      ];
+      if (contextMode) {
+        const contextRelationMarkup = relations.length
+          ? `<div class="atlas-context-relations-section"><div class="atlas-panel-section">Nearby artifacts <span class="atlas-panel-count">${relations.length}</span></div><div class="atlas-context-relations" aria-label="Nearby artifacts">${relations
+              .map(
+                ({ artifact: related, label }) =>
+                  `<a class="atlas-context-relation" href="${escapeHtml(related.href)}"><span><b>${escapeHtml(related.title)}</b><small>${escapeHtml(label)} · ${escapeHtml(related.kind)}</small></span><span>↗</span></a>`,
+              )
+              .join('')}</div></div>`
+          : '<p class="atlas-context-empty">No reviewed relations yet.</p>';
+        inspector.style.display = 'flex';
+        inspector.style.color = MAP_COLORS[artifact.kind];
+        inspector.innerHTML = `<div class="atlas-context-header"><div class="atlas-context-kind">${escapeHtml(artifact.kind)} · ${escapeHtml(artifact.subtype)}</div><h3>${escapeHtml(artifact.title)}</h3></div>${contextRelationMarkup}<a class="atlas-context-open" href="${escapeHtml(artifact.href)}">Open artifact ↗</a>`;
+        return;
+      }
+      const relationMarkup = relations.length
+        ? `<div class="atlas-inspector-relations"><div class="atlas-panel-section">Connected artifacts <span class="atlas-panel-count">${relations.length}</span></div><div class="atlas-relations-list" aria-label="Connected artifacts">${relations
+            .map(
+              ({ artifact: related, label }) =>
+                `<button class="atlas-relation" type="button" data-atlas-related="${escapeHtml(related.id)}"><span><b>${escapeHtml(related.title)}</b><small>${escapeHtml(label)} · ${escapeHtml(related.kind)}</small></span><span>↗</span></button>`,
+            )
+            .join('')}</div></div>`
+        : '';
+      inspector.style.display = 'flex';
+      inspector.style.color = MAP_COLORS[artifact.kind];
+      inspector.innerHTML = `<button class="atlas-close-inspector" type="button" aria-label="Close detail panel">×</button><div class="atlas-inspector-header"><div class="atlas-kind">${escapeHtml(artifact.kind)} · ${escapeHtml(artifact.subtype)}</div><h3>${escapeHtml(artifact.title)}</h3><p>${escapeHtml(artifact.description)}</p><div class="atlas-chips">${contextChips.map((label) => `<span>${escapeHtml(label)}</span>`).join('')}</div></div><div class="atlas-panel-section">Primary territory</div><button class="atlas-relation atlas-inspector-anchor" type="button" data-atlas-anchor="${escapeHtml(primary)}"><span><b>${escapeHtml(domainLabel(primary))}</b><small>structural home</small></span><span>◎</span></button>${relationMarkup}<a class="atlas-open-button" href="${escapeHtml(artifact.href)}">Open artifact ↗</a>`;
+      inspector
+        .querySelector<HTMLButtonElement>('.atlas-close-inspector')
+        ?.addEventListener('click', () => {
+          selected = null;
+          inspector.style.display = 'none';
+          applyState();
+          syncUrl();
+        });
+      inspector
+        .querySelector<HTMLButtonElement>('[data-atlas-anchor]')
+        ?.addEventListener('click', () => {
+          const domain = primary;
+          if (domain.startsWith('engineering/')) focusSubterritory(domain, true);
+          else focusTerritory(domain === 'learning-education' ? 'learning' : 'knowledge', true);
+        });
+      inspector.querySelectorAll<HTMLButtonElement>('[data-atlas-related]').forEach((button) => {
+        button.addEventListener('click', () => selectNode(button.dataset.atlasRelated ?? '', true));
+      });
+      requestAnimationFrame(positionInspector);
+    };
+    const positionInspector = () => {
+      if (
+        contextMode ||
+        !selected ||
+        !inspector ||
+        inspector.style.display === 'none' ||
+        innerWidth <= 760
+      )
+        return;
+      const artifact = artifactById(selected);
+      const stageRect = stage?.getBoundingClientRect();
+      if (!artifact || !stageRect) return;
+      const point = worldToClient(artifact.x, artifact.y);
+      const width = Math.min(335, stageRect.width - 32);
+      const height = Math.min(inspector.offsetHeight || 280, stageRect.height - 50);
+      let left = point.x + 105;
+      let top = point.y - height * 0.35;
+      if (left + width > stageRect.width - 18) left = point.x - width - 105;
+      if (left < 18) left = 18;
+      if (top < 58) top = 58;
+      if (top + height > stageRect.height - 18) top = stageRect.height - height - 18;
+      inspector.style.left = `${left}px`;
+      inspector.style.top = `${top}px`;
+    };
+    const syncButtons = () => {
+      root
+        .querySelectorAll<HTMLElement>('[data-atlas-territory]')
+        .forEach((button) =>
+          button.classList.toggle('atlas-active', button.dataset.atlasTerritory === territoryFocus),
+        );
+      root
+        .querySelectorAll<HTMLElement>('[data-atlas-subterritory]')
+        .forEach((button) =>
+          button.classList.toggle(
+            'atlas-active',
+            button.dataset.atlasSubterritory === subterritoryFocus,
+          ),
+        );
+      root
+        .querySelectorAll<HTMLElement>('[data-atlas-kind]')
+        .forEach((button) =>
+          button.classList.toggle('atlas-active', button.dataset.atlasKind === kindFocus),
+        );
+    };
+    const syncEdgeToggle = () => {
+      const button = root.querySelector<HTMLButtonElement>('[data-atlas-edge-toggle]');
+      button?.classList.toggle('atlas-on', showAllEdges);
+      button?.setAttribute('aria-pressed', String(showAllEdges));
+    };
+    const selectNode = (id: string, push: boolean) => {
+      const artifact = artifactById(id);
+      if (!artifact) return;
+      if (push && selected && selected !== id) atlasHistory.push({ type: 'node', id: selected });
+      else if (push && subterritoryFocus !== 'All')
+        atlasHistory.push({ type: 'sub', id: subterritoryFocus });
+      else if (push && territoryFocus !== 'All')
+        atlasHistory.push({ type: 'territory', id: territoryFocus });
+      selected = id;
+      territoryFocus = 'All';
+      subterritoryFocus = 'All';
+      hideHover();
+      const isMobile = matchMedia('(max-width: 760px)').matches;
+      const selectionScale = isMobile ? Math.max(scale, 3.4) : 1.42;
+      flyTo(artifact.x, artifact.y, selectionScale, isMobile ? { x: 0.5, y: 0.3 } : undefined);
+      renderInspector(artifact);
+      syncButtons();
+      applyState();
+      syncUrl();
+    };
+    const focusTerritory = (id: MapTerritoryId, push: boolean) => {
+      if (push && selected) atlasHistory.push({ type: 'node', id: selected });
+      else if (push && subterritoryFocus !== 'All')
+        atlasHistory.push({ type: 'sub', id: subterritoryFocus });
+      else if (push && territoryFocus !== 'All')
+        atlasHistory.push({ type: 'territory', id: territoryFocus });
+      selected = null;
+      subterritoryFocus = 'All';
+      territoryFocus = id;
+      if (inspector) inspector.style.display = 'none';
+      hideHover();
+      const territory = territoryById(id);
+      if (territory) flyTo(territory.cx, territory.cy, territory.focusScale);
+      syncButtons();
+      applyState();
+      if (territory) renderContextTerritory(territory.id);
+      syncUrl();
+    };
+    const focusSubterritory = (id: MapDomain, push: boolean) => {
+      if (push && selected) atlasHistory.push({ type: 'node', id: selected });
+      else if (push && subterritoryFocus !== 'All')
+        atlasHistory.push({ type: 'sub', id: subterritoryFocus });
+      else if (push && territoryFocus !== 'All')
+        atlasHistory.push({ type: 'territory', id: territoryFocus });
+      selected = null;
+      territoryFocus = 'engineering';
+      subterritoryFocus = id;
+      if (inspector) inspector.style.display = 'none';
+      hideHover();
+      const subterritory = subterritoryById(id);
+      if (subterritory) flyTo(subterritory.cx, subterritory.cy, subterritory.focusScale);
+      syncButtons();
+      applyState();
+      if (contextMode && subterritory && inspector) {
+        inspector.style.display = 'flex';
+        inspector.style.color = '#8b969a';
+        inspector.innerHTML = `<div class="atlas-context-header"><div class="atlas-context-kind">Engineering sub-territory</div><h3>${escapeHtml(subterritory.label)}</h3><p class="atlas-context-description">Follow this focused engineering area in the full atlas.</p></div><a class="atlas-context-open" href="/explore/?subterritory=${encodeURIComponent(subterritory.id)}">Explore this sub-territory ↗</a>`;
+      }
+      syncUrl();
+    };
+    const overview = () => {
+      if (selected) atlasHistory.push({ type: 'node', id: selected });
+      else if (subterritoryFocus !== 'All')
+        atlasHistory.push({ type: 'sub', id: subterritoryFocus });
+      else if (territoryFocus !== 'All')
+        atlasHistory.push({ type: 'territory', id: territoryFocus });
+      selected = null;
+      territoryFocus = 'All';
+      subterritoryFocus = 'All';
+      kindFocus = 'All';
+      if (inspector) inspector.style.display = 'none';
+      hideHover();
+      const transform = overviewTransform();
+      animateTo(transform.tx, transform.ty, transform.scale);
+      syncButtons();
+      applyState();
+      if (contextMode) renderContextOverview();
+      syncUrl();
+    };
+    const back = () => {
+      const previous = atlasHistory.pop();
+      if (!previous) return overview();
+      if (previous.type === 'node') selectNode(previous.id, false);
+      else if (previous.type === 'sub') focusSubterritory(previous.id as MapDomain, false);
+      else focusTerritory(previous.id as MapTerritoryId, false);
+    };
+
+    const buildFilters = () => {
+      const territoryFilters = root.querySelector<HTMLElement>('[data-atlas-territory-filters]');
+      if (territoryFilters) {
+        const overviewButton = document.createElement('button');
+        overviewButton.type = 'button';
+        overviewButton.className = 'atlas-side-button atlas-active';
+        overviewButton.dataset.atlasTerritory = 'All';
+        overviewButton.innerHTML = `<span>Overview</span><small>${graph.artifacts.length}</small>`;
+        overviewButton.addEventListener('click', overview);
+        territoryFilters.appendChild(overviewButton);
+        graph.territories.forEach((territory) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'atlas-side-button';
+          button.dataset.atlasTerritory = territory.id;
+          button.innerHTML = `<span>${escapeHtml(territory.label)}</span><small>${graph.artifacts.filter((artifact) => topTerritory(artifact) === territory.id).length}</small>`;
+          button.addEventListener('click', () => focusTerritory(territory.id, true));
+          territoryFilters.appendChild(button);
+          if (territory.id === 'engineering') {
+            graph.subterritories.forEach((subterritory) => {
+              const subButton = document.createElement('button');
+              subButton.type = 'button';
+              subButton.className = 'atlas-side-button atlas-sub-button';
+              subButton.dataset.atlasSubterritory = subterritory.id;
+              subButton.innerHTML = `<span>↳ ${escapeHtml(subterritory.label)}</span><small>${graph.artifacts.filter((artifact) => artifact.domains.includes(subterritory.id)).length}</small>`;
+              subButton.addEventListener('click', () => focusSubterritory(subterritory.id, true));
+              territoryFilters.appendChild(subButton);
+            });
+          }
+        });
+      }
+      const kindFilters = root.querySelector<HTMLElement>('[data-atlas-kind-filters]');
+      if (kindFilters) {
+        (
+          ['All', 'Work', 'Project', 'Writing', 'Contribution', 'Sketch', 'Knowledge'] as const
+        ).forEach((kind) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `atlas-side-button${kind === 'All' ? ' atlas-active' : ''}`;
+          button.dataset.atlasKind = kind;
+          const count =
+            kind === 'All'
+              ? graph.artifacts.length
+              : graph.artifacts.filter((artifact) => artifact.kind === kind).length;
+          const color = kind === 'All' ? '#8b969a' : MAP_COLORS[kind];
+          button.innerHTML = `<span class="atlas-kind-key" style="color:${color}"><i></i><em>${kind}</em></span><small>${count}</small>`;
+          button.addEventListener('click', () => {
+            kindFocus = kind;
+            selected = null;
+            if (inspector) inspector.style.display = 'none';
+            syncButtons();
+            applyState();
+            syncUrl();
+          });
+          kindFilters.appendChild(button);
+        });
+      }
+    };
+
+    search?.addEventListener('input', applyState);
+    search?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') return;
+      const query = search.value.trim().toLowerCase();
+      const match = graph.artifacts.find((artifact) =>
+        [artifact.title, artifact.kind, artifact.subtype, artifact.description]
+          .join(' ')
+          .toLowerCase()
+          .includes(query),
+      );
+      if (match) selectNode(match.id, true);
+    });
+    root
+      .querySelector<HTMLButtonElement>('[data-atlas-edge-toggle]')
+      ?.addEventListener('click', (event) => {
+        showAllEdges = !showAllEdges;
+        const button = event.currentTarget as HTMLButtonElement;
+        button.classList.toggle('atlas-on', showAllEdges);
+        button.setAttribute('aria-pressed', String(showAllEdges));
+        applyState();
+        syncUrl();
+      });
+    root.querySelector<HTMLButtonElement>('[data-atlas-back]')?.addEventListener('click', back);
+    root
+      .querySelector<HTMLButtonElement>('[data-atlas-overview]')
+      ?.addEventListener('click', overview);
+    root.querySelector<HTMLButtonElement>('[data-atlas-zoom-in]')?.addEventListener('click', () => {
+      const rect = map?.getBoundingClientRect();
+      if (rect) zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, scale * 1.35);
+    });
+    root
+      .querySelector<HTMLButtonElement>('[data-atlas-zoom-out]')
+      ?.addEventListener('click', () => {
+        const rect = map?.getBoundingClientRect();
+        if (rect) zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, scale / 1.35);
+      });
+
+    const fullscreenButton = root.querySelector<HTMLButtonElement>('[data-atlas-fullscreen]');
+    const syncFullscreenButton = () => {
+      if (!fullscreenButton) return;
+
+      const isFullscreen = document.fullscreenElement === root;
+      fullscreenButton.classList.toggle('atlas-fullscreen-active', isFullscreen);
+      fullscreenButton.setAttribute(
+        'aria-label',
+        isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen',
+      );
+      fullscreenButton.title = isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen';
+      fullscreenButton.setAttribute('aria-pressed', String(isFullscreen));
+    };
+
+    if (!document.fullscreenEnabled || !root.requestFullscreen) {
+      fullscreenButton?.setAttribute('disabled', 'true');
+    } else {
+      fullscreenButton?.addEventListener('click', async () => {
+        try {
+          if (document.fullscreenElement === root) {
+            await document.exitFullscreen();
+          } else {
+            await root.requestFullscreen();
+          }
+        } catch {
+          // Fullscreen can be rejected by the browser or embedding context.
+        }
+
+        syncFullscreenButton();
+      });
+    }
+
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+    syncFullscreenButton();
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !contextMode) back();
+    });
+
+    const beginPinch = () => {
+      const pointers = [...activePointers.values()];
+      if (pointers.length < 2) return;
+      const [first, second] = pointers;
+      const midpoint = {
+        x: (first.x + second.x) / 2,
+        y: (first.y + second.y) / 2,
+      };
+      const point = clientToMap(midpoint.x, midpoint.y);
+      if (!point) return;
+      pinch = {
+        distance: Math.max(1, Math.hypot(second.x - first.x, second.y - first.y)),
+        worldX: (point.x - tx) / scale,
+        worldY: (point.y - ty) / scale,
+        scale,
+      };
+      dragging = false;
+      startDrag = null;
+      map?.classList.add('atlas-dragging');
+    };
+    const updatePinch = () => {
+      const pointers = [...activePointers.values()];
+      if (!pinch || pointers.length < 2) return;
+      const [first, second] = pointers;
+      const midpoint = {
+        x: (first.x + second.x) / 2,
+        y: (first.y + second.y) / 2,
+      };
+      const point = clientToMap(midpoint.x, midpoint.y);
+      if (!point) return;
+      const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
+      const nextScale = clampScale(pinch.scale * (distance / pinch.distance));
+      if (Math.abs(nextScale - scale) > 0.002) moved = true;
+      setTransform(
+        point.x - pinch.worldX * nextScale,
+        point.y - pinch.worldY * nextScale,
+        nextScale,
+      );
+      applyState();
+    };
+    const finishGesture = () => {
+      const didMove = moved;
+      dragging = false;
+      pinch = null;
+      startDrag = null;
+      map?.classList.remove('atlas-dragging');
+      if (didMove) syncUrl();
+      window.setTimeout(() => {
+        moved = false;
+      }, 0);
+    };
+    map?.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      if (activePointers.size >= 2) {
+        map.setPointerCapture(event.pointerId);
+        beginPinch();
+        event.preventDefault();
+        return;
+      }
+      if (
+        (event.target as Element).closest(
+          '.atlas-artifact,.atlas-territory,.atlas-subterritory,.atlas-home-node',
+        )
+      )
+        return;
+      map.setPointerCapture(event.pointerId);
+      dragging = true;
+      moved = false;
+      startDrag = { x: event.clientX, y: event.clientY, tx, ty };
+      map.classList.add('atlas-dragging');
+      event.preventDefault();
+    });
+    map?.addEventListener('pointermove', (event) => {
+      if (!activePointers.has(event.pointerId) || !map) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size >= 2) {
+        updatePinch();
+        event.preventDefault();
+        return;
+      }
+      if (!dragging || !startDrag) return;
+      const rect = map.getBoundingClientRect();
+      const dx = ((event.clientX - startDrag.x) / rect.width) * 1800;
+      const dy = ((event.clientY - startDrag.y) / rect.height) * 1200;
+      if (Math.hypot(event.clientX - startDrag.x, event.clientY - startDrag.y) > 4) moved = true;
+      setTransform(startDrag.tx + dx, startDrag.ty + dy, scale);
+      event.preventDefault();
+    });
+    const releasePointer = (event: PointerEvent) => {
+      activePointers.delete(event.pointerId);
+      if (map?.hasPointerCapture(event.pointerId)) map.releasePointerCapture(event.pointerId);
+      if (activePointers.size >= 2) {
+        beginPinch();
+        return;
+      }
+      if (activePointers.size === 1) {
+        const [remaining] = activePointers.values();
+        dragging = true;
+        pinch = null;
+        startDrag = { x: remaining.x, y: remaining.y, tx, ty };
+        return;
+      }
+      finishGesture();
+    };
+    map?.addEventListener('pointerup', releasePointer);
+    map?.addEventListener('pointercancel', releasePointer);
+    map?.addEventListener(
+      'wheel',
+      (event) => {
+        event.preventDefault();
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        zoomAt(event.clientX, event.clientY, scale * (event.deltaY < 0 ? 1.09 : 0.92));
+      },
+      { passive: false },
+    );
+    window.addEventListener('resize', () => {
+      positionInspector();
+      positionHover();
+    });
+
+    renderStructural();
+    renderTerritories();
+    renderSubterritories();
+    renderEdges();
+    renderHome();
+    renderArtifacts();
+    buildFilters();
+    const initialTransform = overviewTransform();
+    setTransform(initialTransform.tx, initialTransform.ty, initialTransform.scale);
+    syncButtons();
+    syncEdgeToggle();
+    applyState();
+
+    const params = new URLSearchParams(window.location.search);
+    const focusId = params.get('focus') ?? initialFocusId;
+    const territoryId = params.get('territory') as MapTerritoryId | null;
+    const subterritoryId = params.get('subterritory') as MapDomain | null;
+    const stored = window.history.state?.atlas as Partial<AtlasHistoryState> | undefined;
+    const isFiniteNumber = (value: unknown): value is number =>
+      typeof value === 'number' && Number.isFinite(value);
+    const hasStoredTransform = Boolean(
+      stored &&
+      isFiniteNumber(stored.tx) &&
+      isFiniteNumber(stored.ty) &&
+      isFiniteNumber(stored.scale) &&
+      stored.scale >= MIN_SCALE &&
+      stored.scale <= MAX_SCALE,
+    );
+    const storedMatchesUrl =
+      !contextMode &&
+      Boolean(
+        stored &&
+        hasStoredTransform &&
+        (focusId
+          ? stored.selected === focusId
+          : subterritoryId
+            ? stored.selected === null && stored.subterritoryFocus === subterritoryId
+            : territoryId
+              ? stored.selected === null && stored.territoryFocus === territoryId
+              : stored.selected === null &&
+                stored.territoryFocus === 'All' &&
+                stored.subterritoryFocus === 'All'),
+      );
+    const validKind = (value: unknown): value is MapArtifactKind | 'All' =>
+      value === 'All' ||
+      ['Work', 'Project', 'Writing', 'Contribution', 'Sketch', 'Knowledge'].includes(
+        value as string,
+      );
+    const restoreStoredState = (state: Partial<AtlasHistoryState>) => {
+      selected = state.selected && artifactById(state.selected) ? state.selected : null;
+      territoryFocus = territoryById(state.territoryFocus as MapTerritoryId)
+        ? (state.territoryFocus as MapTerritoryId)
+        : 'All';
+      subterritoryFocus = subterritoryById(state.subterritoryFocus as MapDomain)
+        ? (state.subterritoryFocus as MapDomain)
+        : 'All';
+      kindFocus = validKind(state.kindFocus) ? state.kindFocus : 'All';
+      showAllEdges = state.showAllEdges === true;
+
+      if (selected) {
+        territoryFocus = 'All';
+        subterritoryFocus = 'All';
+        const artifact = artifactById(selected);
+        if (artifact) {
+          renderInspector(artifact);
+        }
+      } else if (subterritoryFocus !== 'All') {
+        territoryFocus = 'engineering';
+        if (inspector) inspector.style.display = 'none';
+      } else if (territoryFocus !== 'All') {
+        if (inspector) inspector.style.display = 'none';
+      } else {
+        if (inspector) inspector.style.display = 'none';
+      }
+
+      setTransform(state.tx as number, state.ty as number, state.scale as number);
+      syncButtons();
+      syncEdgeToggle();
+      applyState();
+    };
+
+    if (storedMatchesUrl && stored) {
+      restoreStoredState(stored);
+    } else if (focusId && artifactById(focusId)) {
+      selectNode(focusId, false);
+    } else if (subterritoryId && subterritoryById(subterritoryId)) {
+      focusSubterritory(subterritoryId, false);
+    } else if (territoryId && territoryById(territoryId)) {
+      focusTerritory(territoryId, false);
+    } else if (contextMode) {
+      renderContextOverview();
+    }
   }
 </script>
