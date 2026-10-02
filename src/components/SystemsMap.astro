@@ -876,11 +876,12 @@ const payload = JSON.stringify(graph);
     };
     const clampScale = (value: number) => Math.max(MIN_SCALE, Math.min(MAX_SCALE, value));
     const clientToMap = (clientX: number, clientY: number) => {
-      const rect = map?.getBoundingClientRect();
-      if (!rect) return null;
+      const transform = map?.getScreenCTM();
+      if (!transform) return null;
+      const point = new DOMPoint(clientX, clientY).matrixTransform(transform.inverse());
       return {
-        x: ((clientX - rect.left) / rect.width) * 1800,
-        y: ((clientY - rect.top) / rect.height) * 1200,
+        x: point.x,
+        y: point.y,
       };
     };
     const zoomAt = (clientX: number, clientY: number, nextScale: number) => {
@@ -945,12 +946,13 @@ const payload = JSON.stringify(graph);
       );
     };
     const worldToClient = (x: number, y: number) => {
-      const mapRect = map?.getBoundingClientRect();
       const stageRect = stage?.getBoundingClientRect();
-      if (!mapRect || !stageRect) return { x: 0, y: 0 };
+      const transform = viewport?.getScreenCTM();
+      if (!stageRect || !transform) return { x: 0, y: 0 };
+      const point = new DOMPoint(x, y).matrixTransform(transform);
       return {
-        x: mapRect.left - stageRect.left + ((x * scale + tx) / 1800) * mapRect.width,
-        y: mapRect.top - stageRect.top + ((y * scale + ty) / 1200) * mapRect.height,
+        x: point.x - stageRect.left,
+        y: point.y - stageRect.top,
       };
     };
     const showHover = (artifact: SystemsMapArtifact) => {
@@ -1412,9 +1414,11 @@ const payload = JSON.stringify(graph);
         return;
       }
       if (!dragging || !startDrag) return;
-      const rect = map.getBoundingClientRect();
-      const dx = ((event.clientX - startDrag.x) / rect.width) * 1800;
-      const dy = ((event.clientY - startDrag.y) / rect.height) * 1200;
+      const startPoint = clientToMap(startDrag.x, startDrag.y);
+      const currentPoint = clientToMap(event.clientX, event.clientY);
+      if (!startPoint || !currentPoint) return;
+      const dx = currentPoint.x - startPoint.x;
+      const dy = currentPoint.y - startPoint.y;
       if (Math.hypot(event.clientX - startDrag.x, event.clientY - startDrag.y) > 4) moved = true;
       setTransform(startDrag.tx + dx, startDrag.ty + dy, scale);
       event.preventDefault();
@@ -1442,7 +1446,31 @@ const payload = JSON.stringify(graph);
       (event) => {
         event.preventDefault();
         if (animationFrame) cancelAnimationFrame(animationFrame);
-        zoomAt(event.clientX, event.clientY, scale * (event.deltaY < 0 ? 1.09 : 0.92));
+
+        const multiplier =
+          event.deltaMode === WheelEvent.DOM_DELTA_LINE
+            ? 16
+            : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+              ? window.innerHeight
+              : 1;
+        const deltaX = event.deltaX * multiplier;
+        const deltaY = event.deltaY * multiplier;
+
+        // Trackpad pinch gestures are exposed as wheel events with ctrlKey;
+        // ordinary two-finger scrolling should move the canvas instead.
+        if (event.ctrlKey) {
+          const nextScale = scale * Math.pow(1.0015, -deltaY);
+          zoomAt(event.clientX, event.clientY, nextScale);
+          return;
+        }
+
+        const startPoint = clientToMap(event.clientX, event.clientY);
+        const endPoint = clientToMap(event.clientX + deltaX, event.clientY + deltaY);
+        if (!startPoint || !endPoint) return;
+        const dx = endPoint.x - startPoint.x;
+        const dy = endPoint.y - startPoint.y;
+        setTransform(tx - dx, ty - dy, scale);
+        syncUrl();
       },
       { passive: false },
     );
