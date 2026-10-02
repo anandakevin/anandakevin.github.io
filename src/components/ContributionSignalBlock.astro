@@ -1,0 +1,48 @@
+---
+import type { ContributionSignal } from '../lib/public-contract';
+
+interface Props {
+  signal: ContributionSignal;
+  class?: string;
+  showHeader?: boolean;
+}
+
+const { signal, class: className = '', showHeader = true } = Astro.props;
+const { headline } = signal;
+const activityFallbackDetails: Record<string, string> = {
+  'Instructional sessions': 'Teaching + tutoring · 2022–present',
+  'Mentoring and facilitation sessions': '2022–present',
+  'Hours instructed': 'Recorded session duration · 2022–present',
+  'Hours mentored': 'Estimated from available session records',
+};
+---
+
+<div class={`signal-block ${className}`.trim()}>
+  {showHeader && (
+    <>
+      <div class="signal-top">
+        <span>{signal.index_label}</span>
+        {signal.counter && <span>{signal.counter}</span>}
+      </div>
+      <h2 class="signal-headline">
+        {headline.headline_before}
+        <em>{headline.emphasis}</em>
+        {headline.headline_after}
+      </h2>
+    </>
+  )}
+  <div class="signal-groups" aria-label="Contribution metrics">
+    {signal.metrics.map((metric) => {
+      const detail = metric.detail?.trim() || activityFallbackDetails[metric.label];
+      return (
+        <div class="signal-metric">
+          <strong>{metric.value}</strong>
+          <span class="signal-metric-label">
+            {metric.label}
+            {detail && <span class="signal-metric-detail">({detail})</span>}
+          </span>
+        </div>
+      );
+    })}
+  </div>
+</div>

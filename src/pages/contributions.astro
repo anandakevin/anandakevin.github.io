@@ -1,6 +1,156 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ContributionsHeroVisual from '../components/ContributionsHeroVisual.astro';
+import ContributionDetailRow from '../components/ContributionDetailRow.astro';
+import ContributionSignalBlock from '../components/ContributionSignalBlock.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import { fixtureContributions } from '../data/fixtures';
+import { CONTRIBUTION_TYPE_ORDER, contributionTypeLabel } from '../lib/contribution-type';
+import { getContributionItems, getContributionsHomeSignal, isFixtureMode } from '../lib/content';
+import { filterAccentFor } from '../lib/filter-presentation';
+
+const contributions = await getContributionItems();
+const signal = await getContributionsHomeSignal();
+const availableTypes = CONTRIBUTION_TYPE_ORDER.filter((type) =>
+  contributions.some((item) => item.contribution_type?.includes(type)),
+);
+const contributionFilters = [
+  { id: 'all', label: 'All' },
+  ...availableTypes.map((type) => ({ id: type, label: contributionTypeLabel(type) })),
+];
 ---
-<BaseLayout title="Contributions" description="Implementation fixture contribution surface."><section class="page-hero"><div class="shell"><p class="page-crumb">Contributions / technical knowledge transfer</p><h1 class="display">Technical work becomes more useful when it can be <em>passed on.</em></h1><p class="lede">This supports the engineering story without recreating a separate teaching-first portfolio.</p></div></section><section class="section"><div class="shell"><SectionHeader index="01 / Contributions" title="Capability transferred, not a" emphasis="certificate wall." /><div class="three-grid">{fixtureContributions.map((item) => <article class="artifact-card"><small>Contribution / fixture</small><h3>{item.title}</h3><p>{item.description}</p><a href="/writing">Related thinking ↗</a></article>)}</div></div></section></BaseLayout>
+
+<BaseLayout
+  title="Contributions"
+  description={
+    isFixtureMode
+      ? 'Implementation fixture contribution surface.'
+      : 'Teaching, mentoring, curriculum work, technical review, and community contributions alongside software engineering.'
+  }
+>
+  <section class="page-hero">
+    <div class="shell contributions-hero-grid">
+      <div>
+        <p class="page-crumb">Contributions</p>
+        <h1 class="display">
+          Some of my work happens <em>outside the codebase, too.</em>
+        </h1>
+        <p class="lede">
+          I teach, mentor, develop learning material, and review technical work across
+          software-development programs and communities.
+        </p>
+      </div>
+      <ContributionsHeroVisual />
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      {isFixtureMode && (
+        <div class="signal-block contributions-signal">
+          <div class="stats" aria-label="Fixture stats placeholder">
+            <div class="stat">
+              <strong>—</strong>
+              <span>fixture · sessions</span>
+            </div>
+            <div class="stat">
+              <strong>—</strong>
+              <span>fixture · teams</span>
+            </div>
+            <div class="stat">
+              <strong>—</strong>
+              <span>fixture · ratings</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {!isFixtureMode && signal && (
+        <ContributionSignalBlock signal={signal} class="contributions-signal" showHeader={false} />
+      )}
+    </div>
+  </section>
+  <section class="section contribution-index-section">
+    <div class="shell contribution-index-shell" data-contributions-feed>
+      <SectionHeader index="01 / Library" title="What I've " emphasis="contributed." />
+      <div class="actions atlas-index-action">
+        <a class="button alt" href="/explore">
+          Explore these in the atlas →
+        </a>
+      </div>
+      <div class="feed-controls" role="tablist" aria-label="Contribution role filters">
+        {contributionFilters.map((filter) => (
+          <button
+            type="button"
+            class={filter.id === 'all' ? 'active' : ''}
+            data-contribution-filter={filter.id}
+            style={`--filter-accent: ${filterAccentFor(filter.id)}`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+      <div class="detail-list contribution-feed-list">
+        {contributions.map((item) => (
+          <ContributionDetailRow item={item} fixtureMode={isFixtureMode} />
+        ))}
+      </div>
+      {isFixtureMode && (
+        <div class="detail-list">
+          <div class="detail-row" id="fixture-program-placeholder">
+            <small class="detail-left">
+              Fixture program
+              <br />
+              layout row
+            </small>
+            <div>
+              <h3>Second program row shell</h3>
+              <p>
+                Preserves detail-list rhythm on the contributions page until additional reviewed
+                contribution records exist.
+              </p>
+              <div class="stack-pills detail-tags">
+                <span>fixture-labeled</span>
+              </div>
+            </div>
+            <div class="detail-right">
+              <span>evidence pending</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {!isFixtureMode && contributions.length === 0 && (
+        <p class="signal-empty-stats">I'm still preparing these entries for publication.</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+<script>
+  function initContributionFilters() {
+    const root = document.querySelector('[data-contributions-feed]');
+    if (!root) return;
+
+    const buttons = [...root.querySelectorAll('[data-contribution-filter]')];
+    const rows = [...root.querySelectorAll('.contribution-detail-row[data-contribution-types]')];
+
+    const apply = (type: string) => {
+      buttons.forEach((button) => {
+        button.classList.toggle('active', button.getAttribute('data-contribution-filter') === type);
+      });
+      rows.forEach((row) => {
+        const rowTypes = (row.getAttribute('data-contribution-types') ?? '')
+          .split(' ')
+          .filter(Boolean);
+        const show = type === 'all' || rowTypes.includes(type);
+        row.classList.toggle('contribution-detail-row--hidden', !show);
+        row.toggleAttribute('hidden', !show);
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () =>
+        apply(button.getAttribute('data-contribution-filter') ?? 'all'),
+      );
+    });
+  }
+
+  initContributionFilters();
+  document.addEventListener('astro:page-load', initContributionFilters);
+</script>

@@ -1,0 +1,68 @@
+---
+import type { PublicContent } from '../lib/public-contract';
+import { contributionTypeLabels } from '../lib/contribution-type';
+import { formatProgramEngagementMeta } from '../lib/engagement-period';
+import { hrefForPublicRecord, slugTail } from '../lib/content';
+
+interface Props {
+  item: PublicContent;
+  fixtureMode?: boolean;
+}
+
+const { item, fixtureMode = false } = Astro.props;
+const anchor = slugTail(item.slug);
+const engagementMeta = formatProgramEngagementMeta(item);
+const typeLabels = contributionTypeLabels(item.contribution_type);
+---
+
+<div
+  class="detail-row contribution-detail-row"
+  id={anchor}
+  data-contribution-types={item.contribution_type?.join(' ') ?? ''}
+>
+  <small class="detail-left">
+    {fixtureMode ? (
+      <>
+        Fixture program
+        <br />
+        layout only
+      </>
+    ) : (
+      <>
+        {engagementMeta.provider && <span class="detail-provider">{engagementMeta.provider}</span>}
+        {engagementMeta.period ? (
+          <span class="detail-period">{engagementMeta.period}</span>
+        ) : !engagementMeta.provider ? (
+          <span class="detail-period">Date TBD</span>
+        ) : null}
+        {typeLabels.length > 0 && (
+          <>
+            {(item.contribution_type ?? []).map((type, index) => (
+              <span class={`detail-type-label detail-type-label--${type}`}>
+                {typeLabels[index]}
+              </span>
+            ))}
+          </>
+        )}
+      </>
+    )}
+  </small>
+  <div>
+    <h3>{item.title}</h3>
+    <p>{item.description}</p>
+    <div class="stack-pills detail-tags">
+      {item.tags.map((tag) => (
+        <span>{tag}</span>
+      ))}
+    </div>
+  </div>
+  <div class="detail-right">
+    {fixtureMode && <span>evidence pending</span>}
+    {!fixtureMode && item.verification_url && (
+      <a href={item.verification_url} rel="noopener noreferrer">
+        Verify ↗
+      </a>
+    )}
+    <a href={fixtureMode ? `/contributions#${anchor}` : hrefForPublicRecord(item)}>Open detail ↗</a>
+  </div>
+</div>
