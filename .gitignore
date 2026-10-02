@@ -30,6 +30,7 @@ node_modules
 
 dist
 .astro/
+.cache/medium-writing.json
 
 # macOS files
 **/.DS_Store
