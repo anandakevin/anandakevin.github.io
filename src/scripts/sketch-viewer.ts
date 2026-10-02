@@ -13,10 +13,6 @@ type SketchViewerRoot = HTMLElement & {
 type SketchApi = Parameters<
   NonNullable<React.ComponentProps<typeof Excalidraw>['excalidrawAPI']>
 >[0];
-type ZoomValue = ReturnType<SketchApi['getAppState']>['zoom']['value'];
-
-const asZoomValue = (value: number) => value as ZoomValue;
-
 const getSiteTheme = (): 'light' | 'dark' =>
   document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
 
@@ -68,28 +64,6 @@ function mountSketchViewer(root: SketchViewerRoot) {
       subtree: true,
     });
   }
-
-  const handleWheel = (event: WheelEvent) => {
-    if (!api) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const multiplier =
-      event.deltaMode === WheelEvent.DOM_DELTA_LINE
-        ? 16
-        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
-          ? window.innerHeight
-          : 1;
-    const nextZoom = api.getAppState().zoom.value * Math.pow(1.0015, -event.deltaY * multiplier);
-
-    api.updateScene({
-      appState: {
-        zoom: { value: asZoomValue(Math.max(0.1, Math.min(3, nextZoom))) },
-      },
-    });
-  };
-  canvas.addEventListener('wheel', handleWheel, { capture: true, passive: false });
 
   const fitToSketch = () => {
     if (!api) return;
