@@ -1,0 +1,1 @@
+import{n as e}from"./SketchViewer.astro_astro_type_script_index_0_lang.DQRDm9Gm.js";import{t}from"./react-dom.BUtwLWtJ.js";var n=e((e=>{var n=t();e.createRoot=n.createRoot,e.hydrateRoot=n.hydrateRoot}));export default n();
