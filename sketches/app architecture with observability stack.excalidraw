@@ -1,7 +1,7 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/tag/2.17.2",
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
   "elements": [
     {
       "id": "B7N70Qe7qlWLf6fkL4mxz",
@@ -80,8 +80,7 @@
       "containerId": "B7N70Qe7qlWLf6fkL4mxz",
       "originalText": "FE",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "J30qeRjUdV_y7ej3KXUHZ",
@@ -168,8 +167,7 @@
       "containerId": "J30qeRjUdV_y7ej3KXUHZ",
       "originalText": "middleware",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "Ftlsz8EeANwLX9nILOXT2",
@@ -314,8 +312,7 @@
       "containerId": "m92fcHtN3-JE_fKLD76c2",
       "originalText": "service 1",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "qlfTGxZ_Zytc1409RTuoc",
@@ -398,8 +395,7 @@
       "containerId": "qlfTGxZ_Zytc1409RTuoc",
       "originalText": "service 2",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "g2VI9irBxY9-TYsMai39_",
@@ -478,8 +474,7 @@
       "containerId": "g2VI9irBxY9-TYsMai39_",
       "originalText": "service 3",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "M9GOUd9xpL26MYdGt262R",
@@ -728,8 +723,7 @@
       "containerId": "q19tCNbIFWZg9jrprukBb",
       "originalText": "log service 1\nservice 1/log_timestamp1.txt",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "X80uJSSrHBT0Hnw58u4ty",
@@ -820,8 +814,7 @@
       "containerId": "X80uJSSrHBT0Hnw58u4ty",
       "originalText": "log service 1\nservice 1/log_timestamp2.txt",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "j6oW4x4dEaF51TAvsfR0C",
@@ -904,8 +897,7 @@
       "containerId": "j6oW4x4dEaF51TAvsfR0C",
       "originalText": "log service 2\nservice 2/log.txt",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "4D3zszS4k9bx0PjF9WUE5",
@@ -1158,8 +1150,7 @@
       "containerId": "nPxcdS6P7W9RBY6UsbnqG",
       "originalText": "logstash",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "W_84ulWgzgYl3l5S3NRxr",
@@ -1258,8 +1249,7 @@
       "containerId": "W_84ulWgzgYl3l5S3NRxr",
       "originalText": "grab",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "FP-rkRgcSHtlNc_Sq0fcu",
@@ -1358,8 +1348,7 @@
       "containerId": "FP-rkRgcSHtlNc_Sq0fcu",
       "originalText": "grab",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "XH_0Q93C03bhxfbUPt3A8",
@@ -1458,8 +1447,7 @@
       "containerId": "XH_0Q93C03bhxfbUPt3A8",
       "originalText": "grab",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "P-KG5he5VRmYC0oCnvlP4",
@@ -1542,8 +1530,7 @@
       "containerId": "P-KG5he5VRmYC0oCnvlP4",
       "originalText": "elastic",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "amn1u8Ivd_gvjyfUJyx--",
@@ -1642,8 +1629,7 @@
       "containerId": "amn1u8Ivd_gvjyfUJyx--",
       "originalText": "feed",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "metCQHBEvavPut5NS7THJ",
@@ -1722,8 +1708,7 @@
       "containerId": "metCQHBEvavPut5NS7THJ",
       "originalText": "kibana",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "Gi-tcR2xf_peySSc2KzG2",
@@ -1822,8 +1807,7 @@
       "containerId": "Gi-tcR2xf_peySSc2KzG2",
       "originalText": "visualized by",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "3x1UDBP9mxMFAcsDdf6u6",
@@ -1906,8 +1890,7 @@
       "containerId": "3x1UDBP9mxMFAcsDdf6u6",
       "originalText": "loki",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "q43Cm_s3G2aWlY5F3aDaT",
@@ -1990,8 +1973,7 @@
       "containerId": "q43Cm_s3G2aWlY5F3aDaT",
       "originalText": "mimir",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "FaTfwbdj1xRQxaGaV0zHo",
@@ -2074,8 +2056,7 @@
       "containerId": "FaTfwbdj1xRQxaGaV0zHo",
       "originalText": "tempo",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "PqXHHTJ4vDxJthcOKAdte",
@@ -2216,8 +2197,7 @@
       "containerId": "U87aieqk0Dk0SACFy6Cos",
       "originalText": "prometheus",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "wNEt08uQBWnmb9JgfWCiL",
@@ -2566,8 +2546,7 @@
       "containerId": "q-bgFafxCiVP4q5cbSJ3j",
       "originalText": "grafana",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "L0-yPdPjzw214RGV5d_MN",
@@ -2666,8 +2645,7 @@
       "containerId": "L0-yPdPjzw214RGV5d_MN",
       "originalText": "visualized by",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "vHgHCGQKHCljQXy_nX_CE",
@@ -2734,8 +2712,7 @@
       "containerId": null,
       "originalText": "Service",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "GkRwB_ujlezlyAbewgXda",
@@ -2810,8 +2787,7 @@
       "containerId": "GkRwB_ujlezlyAbewgXda",
       "originalText": "opentelemetry",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "Qvb7Of_pjRjZ3WYH6Qnys",
@@ -2890,8 +2866,7 @@
       "containerId": "Qvb7Of_pjRjZ3WYH6Qnys",
       "originalText": "DB 1",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "mmpd38R6DDDHxJ28tzfCo",
@@ -3024,8 +2999,7 @@
       "containerId": "faUfL6n9u0bgOQAU-YIFi",
       "originalText": "DB 2",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "ZicUjL6iY8-s843yvvaVv",
@@ -3158,8 +3132,7 @@
       "containerId": "sWUo-Ow79w2tTXw_BvC6f",
       "originalText": "minIO",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "f42tvDdYOhXvecMbGPqD0",
@@ -3258,8 +3231,7 @@
       "containerId": "f42tvDdYOhXvecMbGPqD0",
       "originalText": "store",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
+      "lineHeight": 1.25
     },
     {
       "id": "aH-vfAQQXUd5LdYnKRsyi",
@@ -3334,137 +3306,14 @@
       "containerId": "aH-vfAQQXUd5LdYnKRsyi",
       "originalText": "alloy",
       "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": ""
-    },
-    {
-      "id": "ai-related-note-box",
-      "type": "rectangle",
-      "x": -365.5085960267068,
-      "y": 123.41196537183635,
-      "width": 330,
-      "height": 64,
-      "angle": 0,
-      "strokeColor": "#364fc7",
-      "backgroundColor": "#edf2ff",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "z073a",
-      "roundness": {
-        "type": 3
-      },
-      "seed": 900001,
-      "version": 1,
-      "versionNonce": 910001,
-      "isDeleted": false,
-      "boundElements": [
-        {
-          "type": "text",
-          "id": "ai-related-note-text"
-        }
-      ],
-      "updated": 1778394081025,
-      "link": "[[03-Engineering/Patterns/Engineering-Patterns]]",
-      "locked": false,
-      "customData": {
-        "aiRelatedNote": "03-Engineering/Patterns/Engineering-Patterns"
-      }
-    },
-    {
-      "id": "ai-related-note-text",
-      "type": "text",
-      "x": -341.5085960267068,
-      "y": 131.41196537183635,
-      "width": 282,
-      "height": 48,
-      "angle": 0,
-      "strokeColor": "#364fc7",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "z073b",
-      "roundness": null,
-      "seed": 900002,
-      "version": 1,
-      "versionNonce": 910002,
-      "isDeleted": false,
-      "boundElements": [],
-      "updated": 1778394081025,
-      "link": "[[03-Engineering/Patterns/Engineering-Patterns]]",
-      "locked": false,
-      "text": "Related note\nEngineering-Patterns",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "textAlign": "center",
-      "verticalAlign": "middle",
-      "containerId": "ai-related-note-box",
-      "originalText": "Related note\nEngineering-Patterns",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": "",
-      "customData": {
-        "aiRelatedNote": "03-Engineering/Patterns/Engineering-Patterns"
-      }
+      "lineHeight": 1.25
     }
   ],
   "appState": {
-    "theme": "dark",
-    "viewBackgroundColor": "#ffffff",
-    "currentItemStrokeColor": "#1e1e1e",
-    "currentItemBackgroundColor": "transparent",
-    "currentItemFillStyle": "solid",
-    "currentItemStrokeWidth": 2,
-    "currentItemStrokeStyle": "solid",
-    "currentItemRoughness": 1,
-    "currentItemOpacity": 100,
-    "currentItemFontFamily": 5,
-    "currentItemFontSize": 20,
-    "currentItemTextAlign": "left",
-    "currentItemStartArrowhead": null,
-    "currentItemEndArrowhead": "arrow",
-    "currentItemArrowType": "round",
-    "currentItemFrameRole": null,
-    "scrollX": 711.7820784151921,
-    "scrollY": 364.6947649216621,
-    "zoom": {
-      "value": 0.487511
-    },
-    "currentItemRoundness": "round",
     "gridSize": 20,
     "gridStep": 5,
     "gridModeEnabled": false,
-    "gridColor": {
-      "Bold": "rgba(217, 217, 217, 0.5)",
-      "Regular": "rgba(230, 230, 230, 0.5)"
-    },
-    "currentStrokeOptions": null,
-    "frameRendering": {
-      "enabled": true,
-      "clip": true,
-      "name": true,
-      "outline": true,
-      "markerName": true,
-      "markerEnabled": true
-    },
-    "objectsSnapModeEnabled": false,
-    "activeTool": {
-      "type": "selection",
-      "customType": null,
-      "locked": false,
-      "fromSelection": false,
-      "lastActiveTool": null
-    },
-    "disableContextMenu": false
+    "viewBackgroundColor": "#ffffff"
   },
   "files": {}
 }

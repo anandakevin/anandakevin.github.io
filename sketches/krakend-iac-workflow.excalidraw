@@ -1,7 +1,7 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://excalidraw.com",
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
   "elements": [
     {
       "id": "5fmijCHqeTLlFWS8uO9C8",
@@ -3287,94 +3287,13 @@
       "originalText": "stored to",
       "autoResize": true,
       "lineHeight": 1.25
-    },
-    {
-      "id": "ai-related-note-box",
-      "type": "rectangle",
-      "x": -289,
-      "y": -229.96825396825398,
-      "width": 330,
-      "height": 64,
-      "angle": 0,
-      "strokeColor": "#364fc7",
-      "backgroundColor": "#edf2ff",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "z075a",
-      "roundness": {
-        "type": 3
-      },
-      "seed": 900001,
-      "version": 1,
-      "versionNonce": 910001,
-      "isDeleted": false,
-      "boundElements": [
-        {
-          "type": "text",
-          "id": "ai-related-note-text"
-        }
-      ],
-      "updated": 1778394081025,
-      "link": "[[02-Work/InfinID/KrakenD-and-API-Gateway-Platform-Work]]",
-      "locked": false,
-      "customData": {
-        "aiRelatedNote": "02-Work/InfinID/KrakenD-and-API-Gateway-Platform-Work"
-      }
-    },
-    {
-      "id": "ai-related-note-text",
-      "type": "text",
-      "x": -265,
-      "y": -221.96825396825398,
-      "width": 282,
-      "height": 48,
-      "angle": 0,
-      "strokeColor": "#364fc7",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "z075b",
-      "roundness": null,
-      "seed": 900002,
-      "version": 1,
-      "versionNonce": 910002,
-      "isDeleted": false,
-      "boundElements": [],
-      "updated": 1778394081025,
-      "link": "[[02-Work/InfinID/KrakenD-and-API-Gateway-Platform-Work]]",
-      "locked": false,
-      "text": "Related note\nKrakenD-and-API-Gateway-Platform-Work",
-      "fontSize": 18,
-      "fontFamily": 5,
-      "textAlign": "center",
-      "verticalAlign": "middle",
-      "containerId": "ai-related-note-box",
-      "originalText": "Related note\nKrakenD-and-API-Gateway-Platform-Work",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "rawText": "",
-      "customData": {
-        "aiRelatedNote": "02-Work/InfinID/KrakenD-and-API-Gateway-Platform-Work"
-      }
     }
   ],
   "appState": {
     "gridSize": 20,
     "gridStep": 5,
     "gridModeEnabled": false,
-    "viewBackgroundColor": "#ffffff",
-    "lockedMultiSelections": {}
+    "viewBackgroundColor": "#ffffff"
   },
   "files": {}
 }
-
