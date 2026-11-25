@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageCrumb from '../../../components/PageCrumb.astro';
 import { externalWritingConfig } from '../../../data/external-writing';
 ---
 
 <BaseLayout title="Read on DEV" description="A self-authored DEV article, read on this portfolio.">
   <section class="page-hero">
     <div class="shell">
-      <p class="page-crumb">Writing / DEV</p>
+      <PageCrumb icon="writing">Writing / DEV</PageCrumb>
       <h1 class="display" data-dev-reader-title>
         Loading a DEV article…
       </h1>

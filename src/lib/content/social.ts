@@ -1,5 +1,5 @@
 import { getCollection } from 'astro:content';
-import { isFixtureMode } from './publication';
+import { isFixtureMode, isPublicIdApproved } from './publication';
 import type { PublicMedia } from '../public-contract';
 
 export type SocialPostRecord = {
@@ -17,7 +17,9 @@ export type SocialPostRecord = {
 
 export async function getSocialPosts(): Promise<SocialPostRecord[]> {
   if (isFixtureMode) return [];
-  const records = await getCollection('social');
+  const records = (await getCollection('social')).filter((entry) =>
+    isPublicIdApproved(entry.data.id),
+  );
   return records.map((record) => ({
     id: record.data.id,
     title: record.data.title,

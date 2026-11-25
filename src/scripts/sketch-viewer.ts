@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Excalidraw } from '@excalidraw/excalidraw';
-import '@excalidraw/excalidraw/index.css';
+import type * as React from 'react';
+
+type ExcalidrawComponent = typeof import('@excalidraw/excalidraw').Excalidraw;
 
 type SketchViewerRoot = HTMLElement & {
   dataset: DOMStringMap & {
@@ -11,7 +10,7 @@ type SketchViewerRoot = HTMLElement & {
 };
 
 type SketchApi = Parameters<
-  NonNullable<React.ComponentProps<typeof Excalidraw>['excalidrawAPI']>
+  NonNullable<React.ComponentProps<ExcalidrawComponent>['excalidrawAPI']>
 >[0];
 const getSiteTheme = (): 'light' | 'dark' =>
   document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
@@ -124,12 +123,17 @@ function mountSketchViewer(root: SketchViewerRoot) {
   document.addEventListener('fullscreenchange', handleFullscreenChange);
   syncFullscreenButton();
 
-  fetch(source)
-    .then((response) => {
+  Promise.all([
+    import('react'),
+    import('react-dom/client'),
+    import('@excalidraw/excalidraw'),
+    import('@excalidraw/excalidraw/index.css'),
+    fetch(source).then((response) => {
       if (!response.ok) throw new Error(`Sketch source failed: ${response.status}`);
       return response.json();
-    })
-    .then((scene) => {
+    }),
+  ])
+    .then(([React, ReactDOM, { Excalidraw }, , scene]) => {
       const theme = getSiteTheme();
       const component = React.createElement(Excalidraw, {
         initialData: {
@@ -160,7 +164,7 @@ function mountSketchViewer(root: SketchViewerRoot) {
         },
       });
 
-      createRoot(canvas).render(component);
+      ReactDOM.createRoot(canvas).render(component);
       loading?.remove();
       schedulePreviewChromeSync();
       if (root.dataset.sketchMode === 'preview') {

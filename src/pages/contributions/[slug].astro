@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
 import MarkdownBody from '../../components/MarkdownBody.astro';
 import PublicLinks from '../../components/PublicLinks.astro';
 import PublicMedia from '../../components/PublicMedia.astro';
@@ -64,7 +65,7 @@ const embeddedSketches = sketchesUsedIn([...byId.values()], entry.data.id);
   <section class="page-hero">
     <div class="shell work-detail-hero-grid">
       <div>
-        <p class="page-crumb">Contributions / {roleLabel}</p>
+        <PageCrumb icon="contribution">Contributions / {roleLabel}</PageCrumb>
         {contributionContext && <p class="contribution-context">{contributionContext}</p>}
         <h1 class="display">{item.title}</h1>
         <p class="lede">{item.description}</p>

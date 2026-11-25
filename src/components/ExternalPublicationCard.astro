@@ -15,6 +15,8 @@ export type ExternalFeedItem = {
   readerHref?: string;
 };
 
+import SemanticIcon from './SemanticIcon.astro';
+
 const providerLabels: Record<string, string> = {
   medium: 'Medium',
   devto: 'DEV',
@@ -45,7 +47,8 @@ const publishedLabel = item.publishedAt
 {variant === 'index' ? (
   <article class="writing-index-row" data-feed-kind={feedKind} data-provider={providerKey}>
     <p class="writing-index-row-type">
-      {providerLabel}
+      <SemanticIcon name="writing" />
+      <span>{providerLabel}</span>
       {publishedLabel && ` · ${publishedLabel}`}
     </p>
     <div class="writing-index-row-main">
@@ -76,7 +79,10 @@ const publishedLabel = item.publishedAt
     <div class="feed-accent" aria-hidden="true"></div>
     <div class="feed-body">
       <div class="feed-meta">
-        <span>{providerLabel}</span>
+        <span class="feed-meta-kind">
+          <SemanticIcon name="writing" />
+          <span>{providerLabel}</span>
+        </span>
         {publishedLabel && <span>{publishedLabel}</span>}
       </div>
       <h3>{item.title}</h3>

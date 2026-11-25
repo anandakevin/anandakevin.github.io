@@ -10,10 +10,20 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      PORTFOLIO_SOURCE_ROOT: .private/portfolio-fixture
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Create empty fixture source
+        run: |
+          mkdir -p "$PORTFOLIO_SOURCE_ROOT/records" "$PORTFOLIO_SOURCE_ROOT/public"
+          for collection in pages work projects contributions credentials writing sketches knowledge social; do
+            mkdir -p "$PORTFOLIO_SOURCE_ROOT/records/$collection"
+          done
+          printf '[]\n' > "$PORTFOLIO_SOURCE_ROOT/published.json"
 
       - name: Setup Node.js
         uses: actions/setup-node@v3

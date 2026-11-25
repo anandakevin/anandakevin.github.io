@@ -1,6 +1,8 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import { fixtureWriting } from '../../data/fixtures';
 import MarkdownBody from '../../components/MarkdownBody.astro';
 import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
@@ -58,7 +60,7 @@ if (fixture) {
 <BaseLayout title={title} description={description}>
   <section class="page-hero">
     <div class="shell">
-      <p class="page-crumb">Writing / case study{isFixtureMode ? ' fixture' : ''}</p>
+      <PageCrumb icon="case-study">Writing / case study{isFixtureMode ? ' fixture' : ''}</PageCrumb>
       <h1 class="display">{title}</h1>
       <p class="lede">{description}</p>
     </div>
@@ -70,7 +72,10 @@ if (fixture) {
           <div class="detail-row">
             <small>Context</small>
             <div>
-              <h3>Fixture content is visibly isolated.</h3>
+              <div class="content-item-title">
+                <SemanticIcon name="case-study" />
+                <h3>Fixture content is visibly isolated.</h3>
+              </div>
               <p>No prototype example has been promoted to a factual case study.</p>
             </div>
             <a href="/writing">Writing ↗</a>
@@ -78,7 +83,10 @@ if (fixture) {
           <div class="detail-row">
             <small>Reasoning</small>
             <div>
-              <h3>The public contract precedes public claims.</h3>
+              <div class="content-item-title">
+                <SemanticIcon name="case-study" />
+                <h3>The public contract precedes public claims.</h3>
+              </div>
               <p>
                 The final Case Study must arrive from reviewed public-site content, with sanitized
                 evidence and explicit source relationships.

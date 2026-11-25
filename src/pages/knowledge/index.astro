@@ -1,12 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
 import { knowledgeKindLabel, knowledgePathLabel } from '../../data/knowledge';
 import {
   getCuratedKnowledgeStartHere,
   getKnowledgeDomainItems,
   getKnowledgeItems,
+  getPageEntryById,
   isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
 } from '../../lib/content';
 
 const domains = (await getKnowledgeDomainItems()).sort((left, right) =>
@@ -14,66 +20,71 @@ const domains = (await getKnowledgeDomainItems()).sort((left, right) =>
 );
 const pages = await getKnowledgeItems();
 const startHere = await getCuratedKnowledgeStartHere();
+const page = await getPageEntryById('pages/knowledge');
+const hero = pageHeroFromEntry(page);
 const domainTitleById = new Map(domains.map((domain) => [domain.knowledge_domain, domain.title]));
 const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pages'}`;
 ---
 
 <BaseLayout
-  title="Knowledge"
+  title={page?.data.title ?? 'Knowledge'}
   description={
     isFixtureMode
       ? 'Fixture reference library for testing domains, reading paths, and Knowledge navigation.'
-      : 'A public reference library for reusable explanations, concepts, guides, and playbooks.'
+      : (page?.data.description ??
+        'A public reference library for reusable explanations, concepts, guides, and playbooks.')
   }
 >
   <KnowledgeSearch />
   <section class="page-hero knowledge-hero">
     <div class="shell">
-      <p class="page-crumb">Knowledge / public reference library</p>
-      <h1 class="display">
-        Ideas arranged for <em>reuse.</em>
-      </h1>
+      <PageCrumb icon="knowledge">Knowledge / public reference library</PageCrumb>
+      {hero ? (
+        <h1 class="display">
+          {hero.headline_before} <em>{hero.emphasis}</em>
+          {hero.headline_after}
+        </h1>
+      ) : (
+        <h1 class="display">
+          Ideas arranged for <em>reuse.</em>
+        </h1>
+      )}
       <p class="lede">
-        A growing library of explanations, concepts, guides, and references. Browse by domain when
-        you want a map, or search directly for a page.
+        {pageLedeFromEntry(
+          page,
+          'A growing library of explanations, concepts, guides, and references. Browse by domain when you want a map, or search directly for a page.',
+        )}
       </p>
-      <form class="knowledge-global-search" action="/knowledge/all" method="get">
+      <div class="knowledge-global-search" aria-label="Knowledge search">
         <span class="knowledge-global-search-label">Search Knowledge</span>
-        <div>
-          <input
-            id="knowledge-home-search"
-            name="q"
-            type="text"
-            placeholder="Search titles, topics, or descriptions"
-            autocomplete="off"
-            readonly
-            data-knowledge-search-trigger
-          />
-          <button type="button" data-knowledge-search-trigger>
-            Search ↗
-          </button>
-        </div>
+        <button
+          type="button"
+          class="knowledge-search-launcher"
+          data-knowledge-search-trigger
+          aria-haspopup="dialog"
+          aria-controls="knowledge-search-dialog"
+          aria-expanded="false"
+          aria-keyshortcuts="Meta+K Control+K"
+        >
+          <span>Search Knowledge…</span>
+          <kbd>⌘K</kbd>
+        </button>
         <small>
           Search is global. Press <kbd>⌘K</kbd> or <kbd>Ctrl K</kbd> from any Knowledge page.
         </small>
-      </form>
+      </div>
     </div>
   </section>
 
   <section class="section knowledge-section" id="knowledge-domains">
     <div class="shell">
-      <div class="section-header">
-        <p class="section-index">01 / Browse</p>
-        <div>
-          <h2>
-            Explore by <em>domain.</em>
-          </h2>
-          <p>
-            Domains provide the broad map. They are editorial navigation, not a mirror of folders or
-            a permanent URL hierarchy.
-          </p>
-        </div>
-      </div>
+      <SectionHeader
+        index="01 / Browse"
+        title="Explore by"
+        emphasis="domain."
+        icon="knowledge"
+        description="Domains provide the broad map. They are editorial navigation, not a mirror of folders or a permanent URL hierarchy."
+      />
       <div class="knowledge-domain-grid">
         {domains.map((domain) => {
           const domainPages = pages.filter(
@@ -86,7 +97,10 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
               <span class="knowledge-card-arrow" aria-hidden="true">
                 ↗
               </span>
-              <h3>{domain.title}</h3>
+              <div class="content-item-title">
+                <SemanticIcon name="knowledge" />
+                <h3>{domain.title}</h3>
+              </div>
               <p>{domain.description}</p>
               <span class="knowledge-card-meta">
                 {areaLabels.map((label) => (
@@ -102,15 +116,13 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
 
   <section class="section knowledge-section knowledge-start-section">
     <div class="shell">
-      <div class="section-header">
-        <p class="section-index">02 / Start here</p>
-        <div>
-          <h2>
-            Good entry <em>points.</em>
-          </h2>
-          <p>Manually curated starting points for readers who want a useful first page.</p>
-        </div>
-      </div>
+      <SectionHeader
+        index="02 / Start here"
+        title="Good entry"
+        emphasis="points."
+        icon="knowledge"
+        description="Manually curated starting points for readers who want a useful first page."
+      />
       <div class="knowledge-start-grid">
         {startHere.map((item) => (
           <a class="knowledge-start-card" href={item.slug}>
@@ -118,7 +130,10 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
               {knowledgeKindLabel(item.knowledge_kind)} ·{' '}
               {domainTitleById.get(item.knowledge_domain)}
             </span>
-            <h3>{item.title}</h3>
+            <div class="content-item-title">
+              <SemanticIcon name="knowledge" />
+              <h3>{item.title}</h3>
+            </div>
             <p>{item.description}</p>
             <small>{knowledgePathLabel(item.knowledge_area ?? [])}</small>
           </a>
@@ -130,9 +145,12 @@ const pageCountLabel = (count: number) => `${count} ${count === 1 ? 'page' : 'pa
   <section class="section knowledge-section">
     <div class="shell">
       <a class="knowledge-explore-all" href="/knowledge/all">
-        <span>
-          <strong>Browse all Knowledge</strong>
-          <small>Search, filter by domain or kind, and sort across every reference page.</small>
+        <span class="knowledge-explore-all-copy">
+          <SemanticIcon name="knowledge" />
+          <span>
+            <strong>Browse all Knowledge</strong>
+            <small>Search, filter by domain or kind, and sort across every reference page.</small>
+          </span>
         </span>
         <span aria-hidden="true">→</span>
       </a>

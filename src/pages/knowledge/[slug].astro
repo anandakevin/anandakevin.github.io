@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
 import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
 import KnowledgeReadingLink from '../../components/KnowledgeReadingLink.astro';
@@ -189,6 +190,7 @@ const atlasRecords = [...byId.values()];
 
           <header class="knowledge-reader-header">
             <p class="knowledge-document-kind">
+              <SemanticIcon name="knowledge" />
               <a href={`/knowledge/all/?kind=${encodeURIComponent(record.knowledge_kind ?? '')}`}>
                 {knowledgeKindLabel(record.knowledge_kind)}
               </a>
@@ -217,9 +219,12 @@ const atlasRecords = [...byId.values()];
             {references.length > 0 && (
               <section class="knowledge-references" aria-labelledby="knowledge-references-title">
                 <p class="section-index">References and sources</p>
-                <h2 id="knowledge-references-title">
-                  Further <em>reading.</em>
-                </h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="knowledge" />
+                  <h2 id="knowledge-references-title">
+                    Further <em>reading.</em>
+                  </h2>
+                </div>
                 <ul>
                   {references.map((reference) => (
                     <li>

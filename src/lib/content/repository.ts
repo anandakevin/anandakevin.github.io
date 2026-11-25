@@ -2,7 +2,7 @@ import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import type { ContributionDuration, ContributionSignal, PublicContent } from '../public-contract';
 import { entryToPublicContent, type PublicCollection } from './mappers';
-import { isFixtureMode, isRecordVisible } from './publication';
+import { isFixtureMode, isPublicIdApproved, isRecordVisible } from './publication';
 import { fixtureContent } from '../../data/fixtures';
 
 const COLLECTION_NAMES: PublicCollection[] = [
@@ -231,11 +231,11 @@ export async function getCollectionEntries<C extends PublicCollection>(
 ): Promise<CollectionEntry<C>[]> {
   const entries = await getCollection(name);
   if (isFixtureMode) return entries;
-  return name === 'writing' || name === 'knowledge'
-    ? entries.filter((entry) =>
-        isRecordVisible(entry.data as Pick<PublicContent, 'publication_status'>),
-      )
-    : entries;
+  return entries.filter(
+    (entry) =>
+      isPublicIdApproved(entry.data.id) &&
+      isRecordVisible(entry.data as Pick<PublicContent, 'publication_status'>),
+  );
 }
 
 export async function loadPublicRecords(): Promise<PublicContent[]> {
@@ -244,7 +244,9 @@ export async function loadPublicRecords(): Promise<PublicContent[]> {
     const entries = await getCollectionEntries(name);
     records.push(...entries.map(entryToPublicContent));
   }
-  const socialPosts = isFixtureMode ? [] : await getCollection('social');
+  const socialPosts = isFixtureMode
+    ? []
+    : (await getCollection('social')).filter((entry) => isPublicIdApproved(entry.data.id));
   return deriveContributionSignals(deriveReverseRelations(attachSocialLinks(records, socialPosts)));
 }
 

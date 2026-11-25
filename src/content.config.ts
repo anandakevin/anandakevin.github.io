@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { resolve } from 'node:path';
 import {
   contributionMetricsSchema,
   contributionSignalSchema,
@@ -23,6 +24,11 @@ import {
   fieldNoteSectionSchema,
   writingModeSchema,
 } from './lib/public-contract';
+
+const portfolioRecordsRoot = resolve(
+  process.env.PORTFOLIO_SOURCE_ROOT ?? '../second-brain/80-Public-Portfolio',
+  'records',
+);
 
 /** YAML loaders may parse bare ISO dates as Date objects. */
 const isoDateField = z.preprocess((value) => {
@@ -50,7 +56,13 @@ const authoredRecord = z.object({
   project_destination: projectDestinationSchema.optional(),
   project_group: projectGroupSchema.optional(),
   project_order: z.number().int().nonnegative().optional(),
+  project_start: isoDateField.optional(),
+  project_end: isoDateField.optional(),
   map: mapMetadataSchema.optional(),
+  /** Parent-owned artifact IDs; currently consumed as Work children. */
+  children: z.array(publicIdSchema).default([]),
+  /** Optional ownership pointer for a child artifact's navigation/provenance. */
+  parent_work: publicIdSchema.optional(),
   public_relations: z.array(publicRelationSchema).default([]),
   curation: z
     .object({
@@ -96,9 +108,10 @@ const authoredRecord = z.object({
 });
 
 const pages = defineCollection({
-  loader: glob({ base: './src/content/public/pages', pattern: '**/*.md' }),
+  loader: glob({ base: resolve(portfolioRecordsRoot, 'pages'), pattern: '**/*.md' }),
   schema: authoredRecord.extend({
     page_hero: pageHeroSchema.optional(),
+    page_lede: z.string().min(1).optional(),
     page_principles: z.array(pagePrincipleSchema).optional(),
     contribution_signal: contributionSignalSchema.optional(),
   }),
@@ -106,12 +119,12 @@ const pages = defineCollection({
 
 const authored = (directory: string) =>
   defineCollection({
-    loader: glob({ base: `./src/content/public/${directory}`, pattern: '**/*.md' }),
+    loader: glob({ base: resolve(portfolioRecordsRoot, directory), pattern: '**/*.md' }),
     schema: authoredRecord,
   });
 
 const sketches = defineCollection({
-  loader: glob({ base: './src/content/public/sketches', pattern: '**/*.md' }),
+  loader: glob({ base: resolve(portfolioRecordsRoot, 'sketches'), pattern: '**/*.md' }),
   schema: authoredRecord.extend({
     content_kind: z.literal('sketch'),
     sketch_source: z.string().regex(/^\/sketches\/[a-z0-9][a-z0-9_-]*\.excalidraw$/),
@@ -126,7 +139,7 @@ const sketches = defineCollection({
 });
 
 const writing = defineCollection({
-  loader: glob({ base: './src/content/public/writing', pattern: '**/*.md' }),
+  loader: glob({ base: resolve(portfolioRecordsRoot, 'writing'), pattern: '**/*.md' }),
   schema: authoredRecord
     .extend({
       publication_status: z.enum(['draft', 'review', 'ready', 'published']),
@@ -166,7 +179,7 @@ const writing = defineCollection({
 });
 
 const knowledge = defineCollection({
-  loader: glob({ base: './src/content/public/knowledge', pattern: '**/*.md' }),
+  loader: glob({ base: resolve(portfolioRecordsRoot, 'knowledge'), pattern: '**/*.md' }),
   schema: authoredRecord.extend({
     content_kind: z.enum(['knowledge', 'knowledge_domain']),
     publication_status: z.enum(['draft', 'review', 'ready', 'published']),
@@ -183,7 +196,7 @@ const knowledge = defineCollection({
 });
 
 const social = defineCollection({
-  loader: glob({ base: './src/content/public/social', pattern: '**/*.md' }),
+  loader: glob({ base: resolve(portfolioRecordsRoot, 'social'), pattern: '**/*.md' }),
   schema: z.object({
     id: publicIdSchema,
     title: z.string().min(1),

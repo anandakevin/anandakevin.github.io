@@ -626,6 +626,66 @@
   pointer-events: none;
 }
 
+.atlas-first-use-hint {
+  position: absolute;
+  z-index: 26;
+  bottom: 14px;
+  left: 50%;
+  display: flex;
+  max-width: min(490px, calc(100% - 116px));
+  align-items: center;
+  gap: 10px;
+  padding: 8px 9px 8px 12px;
+  border: 1px solid #36545c;
+  color: #c5d2d3;
+  background: rgba(8, 29, 36, 0.9);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  font: 10px/1.35 var(--mono);
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms ease;
+}
+
+.atlas-first-use-hint > span {
+  min-width: 0;
+}
+
+.atlas-hint-separator {
+  margin-inline: 0.35em;
+}
+
+.atlas-first-use-hint button {
+  flex: none;
+  padding: 0;
+  border: 0;
+  color: #71878c;
+  background: none;
+  cursor: pointer;
+  font: 16px/1 var(--sans);
+  pointer-events: auto;
+}
+
+.atlas-first-use-hint button:hover,
+.atlas-first-use-hint button:focus-visible {
+  color: #fff;
+}
+
+.atlas-first-use-hint button:focus-visible {
+  outline: 1px solid #8cddff;
+  outline-offset: 3px;
+}
+
+.atlas-first-use-hint.atlas-first-use-dismissed {
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  pointer-events: none;
+}
+
 .atlas-structural-edge {
   fill: none;
   stroke: #849ba0;
@@ -1261,6 +1321,19 @@
 
   .atlas-zoom-action {
     display: grid;
+  }
+
+  .atlas-first-use-hint {
+    right: 16px;
+    bottom: 14px;
+    left: 16px;
+    max-width: none;
+    justify-content: center;
+    transform: none;
+  }
+
+  .atlas-first-use-hint.atlas-first-use-dismissed {
+    transform: translateY(8px);
   }
 
   .atlas-hover-preview {

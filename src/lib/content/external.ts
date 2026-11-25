@@ -36,15 +36,18 @@ async function getMediumProviderItems(): Promise<ExternalWritingProviderItem[]> 
 export async function getMediumWriting(): Promise<ExternalWritingItem[]> {
   if (isFixtureMode) return [];
   const recordsById = await getRecordsById();
-  for (const [key, curation] of Object.entries(externalWritingOverlay)) {
-    for (const target of curation.relatedRecords ?? []) {
-      if (!recordsById.has(target))
-        throw new Error(`External-writing overlay ${key} references missing record ${target}.`);
-    }
-  }
+  const visibleOverlay = Object.fromEntries(
+    Object.entries(externalWritingOverlay).map(([key, curation]) => [
+      key,
+      {
+        ...curation,
+        relatedRecords: (curation.relatedRecords ?? []).filter((target) => recordsById.has(target)),
+      },
+    ]),
+  );
   try {
     const providerItems = await getMediumProviderItems();
-    const result = applyExternalWritingOverlay(providerItems, externalWritingOverlay);
+    const result = applyExternalWritingOverlay(providerItems, visibleOverlay);
     if (result.staleKeys.length)
       console.warn(`[external-writing] stale overlay keys: ${result.staleKeys.join(', ')}`);
     return result.items;

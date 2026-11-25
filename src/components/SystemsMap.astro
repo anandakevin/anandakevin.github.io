@@ -183,7 +183,7 @@ const payload = JSON.stringify(graph);
       data-atlas-map
       viewBox="0 0 1800 1200"
       role="img"
-      aria-label="Interactive semantic atlas of published work, projects, writing, contributions, and Knowledge"
+      aria-label="Interactive semantic atlas of published work, projects, credentials, writing, contributions, and Knowledge"
     >
       <defs>
         <filter id="atlas-neon-blur" x="-500%" y="-500%" width="1000%" height="1000%">
@@ -206,6 +206,29 @@ const payload = JSON.stringify(graph);
     <div class="atlas-hover-preview" data-atlas-hover-preview></div>
     {mode === 'full' && (
       <aside class="atlas-inspector" data-atlas-inspector aria-live="polite"></aside>
+    )}
+    {mode === 'full' && (
+      <div class="atlas-first-use-hint" data-atlas-first-use role="status">
+        <span>
+          Drag to pan{' '}
+          <span class="atlas-hint-separator" aria-hidden="true">
+            ·
+          </span>{' '}
+          Scroll or pinch to zoom{' '}
+          <span class="atlas-hint-separator" aria-hidden="true">
+            ·
+          </span>{' '}
+          Select a territory or artifact
+        </span>
+        <button
+          type="button"
+          data-atlas-first-use-dismiss
+          aria-label="Dismiss Atlas guidance"
+          title="Dismiss Atlas guidance"
+        >
+          ×
+        </button>
+      </div>
     )}
     <div class="atlas-zoom-readout" data-atlas-zoom>
       overview · 72%
@@ -249,11 +272,35 @@ const payload = JSON.stringify(graph);
     const artifactsLayer = root.querySelector<SVGGElement>('[data-atlas-artifacts]');
     const inspector = root.querySelector<HTMLElement>('[data-atlas-inspector]');
     const hoverPreview = root.querySelector<HTMLElement>('[data-atlas-hover-preview]');
+    const firstUseHint = root.querySelector<HTMLElement>('[data-atlas-first-use]');
+    const firstUseDismiss = root.querySelector<HTMLButtonElement>('[data-atlas-first-use-dismiss]');
     const search = root.querySelector<HTMLInputElement>('[data-atlas-search]');
     const zoomReadout = root.querySelector<HTMLElement>('[data-atlas-zoom]');
     const sidebarToggle = root.querySelector<HTMLButtonElement>('[data-atlas-sidebar-toggle]');
     const initialFocusId = root.dataset.atlasFocus ?? null;
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let firstUseHintVisible = Boolean(firstUseHint);
+    const isFirstUseHintTarget = (target: EventTarget | null) =>
+      target instanceof Element && Boolean(target.closest('[data-atlas-first-use]'));
+    const dismissFirstUseHint = () => {
+      if (!firstUseHint || !firstUseHintVisible) return;
+      firstUseHintVisible = false;
+      firstUseHint.classList.add('atlas-first-use-dismissed');
+      firstUseHint.setAttribute('aria-hidden', 'true');
+    };
+    firstUseDismiss?.addEventListener('click', dismissFirstUseHint);
+    root.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (!isFirstUseHintTarget(event.target)) dismissFirstUseHint();
+      },
+      { capture: true },
+    );
+    root.addEventListener('focusin', (event) => {
+      if (!isFirstUseHintTarget(event.target)) dismissFirstUseHint();
+    });
+    root.addEventListener('wheel', dismissFirstUseHint, { passive: true });
 
     let sidebarPinned = true;
     try {
@@ -923,12 +970,7 @@ const payload = JSON.stringify(graph);
         y: point.y,
       };
     };
-    const zoomAt = (
-      clientX: number,
-      clientY: number,
-      nextScale: number,
-      deferRender = false,
-    ) => {
+    const zoomAt = (clientX: number, clientY: number, nextScale: number, deferRender = false) => {
       const point = clientToMap(clientX, clientY);
       if (!point) return;
       const boundedScale = clampScale(nextScale);
@@ -1278,7 +1320,16 @@ const payload = JSON.stringify(graph);
       const kindFilters = root.querySelector<HTMLElement>('[data-atlas-kind-filters]');
       if (kindFilters) {
         (
-          ['All', 'Work', 'Project', 'Writing', 'Contribution', 'Sketch', 'Knowledge'] as const
+          [
+            'All',
+            'Work',
+            'Project',
+            'Credential',
+            'Writing',
+            'Contribution',
+            'Sketch',
+            'Knowledge',
+          ] as const
         ).forEach((kind) => {
           const button = document.createElement('button');
           button.type = 'button';
@@ -1572,7 +1623,7 @@ const payload = JSON.stringify(graph);
       );
     const validKind = (value: unknown): value is MapArtifactKind | 'All' =>
       value === 'All' ||
-      ['Work', 'Project', 'Writing', 'Contribution', 'Sketch', 'Knowledge'].includes(
+      ['Work', 'Project', 'Credential', 'Writing', 'Contribution', 'Sketch', 'Knowledge'].includes(
         value as string,
       );
     const restoreStoredState = (state: Partial<AtlasHistoryState>) => {

@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import { knowledgeKindLabel, knowledgePathLabel } from '../data/knowledge';
 import { knowledgeSearchText } from '../lib/knowledge-index';
 
@@ -31,7 +32,10 @@ const searchable = knowledgeSearchText([
 >
   <span class="knowledge-index-kind">{knowledgeKindLabel(item.knowledge_kind)}</span>
   <span class="knowledge-index-title-group">
-    <strong>{item.title}</strong>
+    <span class="content-item-title">
+      <SemanticIcon name="knowledge" />
+      <strong>{item.title}</strong>
+    </span>
     <small>{item.description}</small>
   </span>
   <span class="knowledge-index-path">

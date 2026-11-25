@@ -84,6 +84,7 @@ export {
 export { getSocialPosts, type SocialPostRecord } from './social';
 export {
   pageHeroFromEntry,
+  pageLedeFromEntry,
   pagePrinciplesFromEntry,
   type PageHero,
   type PagePrinciple,

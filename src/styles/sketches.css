@@ -19,8 +19,15 @@
 }
 
 .sketch-index-intro h2 {
-  margin: 12px 0 0;
   font-size: clamp(30px, 4vw, 52px);
+}
+
+.sketch-index-intro .content-item-title {
+  margin-top: 12px;
+}
+
+.sketch-index-intro .content-item-title h2 {
+  margin: 0;
 }
 
 .sketch-index-intro p:last-child {
@@ -108,6 +115,10 @@
   margin: 0 0 8px;
   font-size: clamp(24px, 2.8vw, 34px);
   line-height: 1.05;
+}
+
+.sketch-card .content-item-title h2 {
+  margin: 0;
 }
 
 .sketch-card h2 a {

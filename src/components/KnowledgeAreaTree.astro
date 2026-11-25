@@ -1,6 +1,7 @@
 ---
 import type { KnowledgeArea, PublicContent } from '../lib/public-contract';
 import KnowledgeAreaTree from './KnowledgeAreaTree.astro';
+import SemanticIcon from './SemanticIcon.astro';
 
 interface Props {
   area: KnowledgeArea;
@@ -24,6 +25,7 @@ const areaHref = `/knowledge/domain/${domain}/${path.join('/')}`;
   <div class="knowledge-area-heading">
     <div>
       <h3>
+        <SemanticIcon name="knowledge" />
         <a href={areaHref}>{area.title}</a>
       </h3>
       <p>{area.description}</p>

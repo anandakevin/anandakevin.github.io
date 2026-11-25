@@ -1,27 +1,46 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageCrumb from '../../../components/PageCrumb.astro';
 import FieldNoteList from '../../../components/FieldNoteList.astro';
-import { getFieldNoteItems, isFixtureMode } from '../../../lib/content';
+import {
+  getFieldNoteItems,
+  getPageEntryById,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+} from '../../../lib/content';
 import { fieldNoteSections } from '../../../data/writing-sections';
 
 const fieldNotes = await getFieldNoteItems();
+const page = await getPageEntryById('pages/writing-notes');
+const hero = pageHeroFromEntry(page);
 ---
 
 <BaseLayout
-  title="Field Notes"
+  title={page?.data.title ?? 'Field Notes'}
   description={
     isFixtureMode
       ? 'Implementation fixture Field Notes surface.'
-      : 'Reviewed technical notes on engineering systems, learning, and practice.'
+      : (page?.data.description ??
+        'Reviewed technical notes on engineering systems, learning, and practice.')
   }
 >
   <section class="page-hero field-notes-hero">
     <div class="shell">
-      <p class="page-crumb">Writing / Field Notes</p>
-      <h1 class="display">
-        Field <em>Notes.</em>
-      </h1>
-      <p class="lede">Reviewed notes on engineering systems, learning, and practice.</p>
+      <PageCrumb icon="writing">Writing / Field Notes</PageCrumb>
+      {hero ? (
+        <h1 class="display">
+          {hero.headline_before} <em>{hero.emphasis}</em>
+          {hero.headline_after}
+        </h1>
+      ) : (
+        <h1 class="display">
+          Field <em>Notes.</em>
+        </h1>
+      )}
+      <p class="lede">
+        {pageLedeFromEntry(page, 'Reviewed notes on engineering systems, learning, and practice.')}
+      </p>
       <div class="field-note-nav" aria-label="Field Note sections">
         <a href="#field-notes">Browse all notes</a>
       </div>

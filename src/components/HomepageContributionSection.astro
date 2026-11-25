@@ -1,5 +1,6 @@
 ---
 import SectionHeader from './SectionHeader.astro';
+import SemanticIcon from './SemanticIcon.astro';
 import ContributionSignalBlock from './ContributionSignalBlock.astro';
 import type { ContributionSignal, PublicContent } from '../lib/public-contract';
 import { contributionRoleLabel } from '../lib/contribution-type';
@@ -19,18 +20,21 @@ const rolePlaceholders = [
     title: 'Instruction and mentoring',
     description:
       'Explaining technical ideas clearly, giving useful feedback, and helping people build confidence through practice.',
+    icon: 'teaching',
   },
   {
     type: 'Community',
     title: 'Community and career support',
     description:
       'Peer support, volunteering, and conversations that help other people navigate technical work and learning.',
+    icon: 'community',
   },
   {
     type: 'Knowledge transfer',
     title: 'Knowledge transfer',
     description:
       'Turning complicated ideas into models, exercises, and conversations people can reuse.',
+    icon: 'knowledge',
   },
 ];
 
@@ -39,6 +43,16 @@ const curatedCards = contributions.map((item) => ({
   title: item.title,
   description: item.description,
   href: hrefForPublicRecord(item),
+  icon:
+    (
+      {
+        instructor: 'teaching',
+        facilitator: 'teaching',
+        mentor: 'mentoring',
+        'curriculum-lead': 'teaching',
+        reviewer: 'community',
+      } as Record<string, string>
+    )[item.contribution_type?.[0] ?? ''] ?? 'contribution',
 }));
 
 const displayCards = fixtureMode
@@ -51,9 +65,10 @@ const displayCards = fixtureMode
 <section class="section">
   <div class="shell">
     <SectionHeader
-      index="06 / Contribution"
+      index="05 / Contribution"
       title="I also spend time teaching, mentoring, and reviewing"
       emphasis="technical work."
+      icon="contribution"
       description="Courses, capstone teams, curriculum work, code reviews, and community programs alongside engineering."
     />
     {fixtureMode && (
@@ -78,7 +93,10 @@ const displayCards = fixtureMode
               <span class="role-open" aria-hidden="true">
                 ↗
               </span>
-              <span class="role-type">{role.type}</span>
+              <span class="role-type-line">
+                <SemanticIcon name={role.icon} />
+                <span class="role-type">{role.type}</span>
+              </span>
               <h3>{role.title}</h3>
               <p>{role.description}</p>
             </a>
@@ -95,7 +113,10 @@ const displayCards = fixtureMode
               <span class="role-open" aria-hidden="true">
                 ↗
               </span>
-              <span class="role-type">{role.type}</span>
+              <span class="role-type-line">
+                <SemanticIcon name={role.icon} />
+                <span class="role-type">{role.type}</span>
+              </span>
               <h3>{role.title}</h3>
               <p>{role.description}</p>
             </a>
@@ -111,7 +132,10 @@ const displayCards = fixtureMode
               <span class="role-open" aria-hidden="true">
                 ↗
               </span>
-              <span class="role-type">{role.type}</span>
+              <span class="role-type-line">
+                <SemanticIcon name={role.icon} />
+                <span class="role-type">{role.type}</span>
+              </span>
               <h3>{role.title}</h3>
               <p>{role.description}</p>
             </a>

@@ -40,6 +40,8 @@ export function entryToPublicContent(entry: PublicEntry): PublicContent {
     project_destination: data.project_destination,
     project_group: data.project_group,
     project_order: data.project_order,
+    project_start: data.project_start,
+    project_end: data.project_end,
     map: data.map,
     knowledge_kind: entry.collection === 'knowledge' ? entry.data.knowledge_kind : undefined,
     knowledge_domain: entry.collection === 'knowledge' ? entry.data.knowledge_domain : undefined,

@@ -1,16 +1,19 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import { hrefForPublicRecord, slugTail } from '../lib/content';
 import { projectCategoryLabel } from '../lib/project-category';
+import { formatProjectPeriod } from '../lib/project-period';
 
 interface Props {
   item: PublicContent;
   fixtureMode?: boolean;
   surface?: 'home' | 'projects';
   id?: string;
+  iconKey?: string;
 }
 
-const { item, fixtureMode = false, surface = 'home', id } = Astro.props;
+const { item, fixtureMode = false, surface = 'home', id, iconKey = 'project' } = Astro.props;
 
 function capFor(item: PublicContent): string {
   if (fixtureMode) return 'Project / fixture';
@@ -39,6 +42,7 @@ const footerLabel = isExternalProject
       ? 'Related case study ↗'
       : 'Open project ↗'
     : 'Open project ↗';
+const projectPeriod = formatProjectPeriod(item);
 ---
 
 <article
@@ -47,8 +51,12 @@ const footerLabel = isExternalProject
   data-project-categories={item.project_categories?.join(' ') ?? ''}
 >
   <span class="project-cap">{capFor(item)}</span>
-  <h3>{item.title}</h3>
+  <div class="content-item-title">
+    <SemanticIcon name={iconKey} />
+    <h3>{item.title}</h3>
+  </div>
   <p>{item.description}</p>
+  {projectPeriod && <span class="project-period">{projectPeriod}</span>}
   <div class="stack-pills">
     {item.tags.map((tag) => (
       <span>{tag}</span>

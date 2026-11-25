@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import type { pageHeroSchema, pagePrincipleSchema } from '../public-contract';
+import { pageHeroSchema, pagePrincipleSchema } from '../public-contract';
 import type { z } from 'astro/zod';
 
 type PageEntry = CollectionEntry<'pages'>;
@@ -13,4 +13,8 @@ export function pageHeroFromEntry(entry: PageEntry | undefined): PageHero | unde
 
 export function pagePrinciplesFromEntry(entry: PageEntry | undefined): PagePrinciple[] {
   return entry?.data.page_principles ?? [];
+}
+
+export function pageLedeFromEntry(entry: PageEntry | undefined, fallback: string): string {
+  return entry?.data.page_lede ?? fallback;
 }

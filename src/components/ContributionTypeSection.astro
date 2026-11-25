@@ -12,7 +12,12 @@ const indexLabel = String(index).padStart(2, '0');
 ---
 
 <section class="contribution-type-section">
-  <SectionHeader index={`${indexLabel} / ${label}`} title={label} description={description} />
+  <SectionHeader
+    index={`${indexLabel} / ${label}`}
+    title={label}
+    icon="contribution"
+    description={description}
+  />
   <div class="detail-list contribution-type-list">
     <slot />
   </div>

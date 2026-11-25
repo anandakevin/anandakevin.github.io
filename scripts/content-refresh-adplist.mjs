@@ -4,7 +4,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse, stringify } from 'yaml';
 
-const recordPath = resolve('src/content/public/contributions/global-one-on-one-mentoring.md');
+const recordPath = resolve(
+  process.env.PORTFOLIO_SOURCE_ROOT ?? '../second-brain/80-Public-Portfolio',
+  'records/contributions/global-one-on-one-mentoring.md',
+);
 const sessionsUrl = 'https://api2.adplist.org/core/user-community-statistics/?identity_id=995999';
 const ratingsUrl =
   'https://api.adplist.org/users/statistics?userId=1e56107a83615364eee80c21ad671027&type=mentor';

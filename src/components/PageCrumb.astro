@@ -1,0 +1,16 @@
+---
+import SemanticIcon from './SemanticIcon.astro';
+
+interface Props {
+  icon: string;
+}
+
+const { icon } = Astro.props;
+---
+
+<p class="page-crumb">
+  <SemanticIcon name={icon} />
+  <span>
+    <slot />
+  </span>
+</p>

@@ -1,6 +1,8 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import MarkdownBody from '../../components/MarkdownBody.astro';
 import PublicLinks from '../../components/PublicLinks.astro';
@@ -58,7 +60,7 @@ const hasEvidence = item.media.length > 0 || item.public_links.length > 0 || ite
   <section class="page-hero work-detail-hero">
     <div class="shell work-detail-hero-grid">
       <div class="work-detail-hero-copy">
-        <p class="page-crumb">Work / {item.title}</p>
+        <PageCrumb icon="work">Work / {item.title}</PageCrumb>
         <h1 class="display">{item.title}</h1>
         <p class="lede">{item.description}</p>
         <div class="detail-pills">
@@ -106,7 +108,10 @@ const hasEvidence = item.media.length > 0 || item.public_links.length > 0 || ite
             <>
               <header class="work-detail-section-intro">
                 <p class="section-index">01 / Scope</p>
-                <h2>Scope</h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="work" />
+                  <h2>Scope</h2>
+                </div>
               </header>
               <MarkdownBody class="work-detail-body">
                 <Content />
@@ -161,6 +166,7 @@ const hasEvidence = item.media.length > 0 || item.public_links.length > 0 || ite
           index="02 / Related case studies"
           title="Related"
           emphasis="case studies."
+          icon="case-study"
           description="These case studies unpack some of the problems and decisions behind this work."
         />
         <div class="feed-grid">

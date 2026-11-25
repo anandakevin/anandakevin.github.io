@@ -174,7 +174,7 @@
   padding: 20px;
 }
 
-.about-principle-cap {
+.about-side-cap {
   font: 700 9px/1 var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -245,6 +245,8 @@
 }
 
 .profile-card {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
@@ -263,6 +265,14 @@
   margin: 11px 0 7px;
 }
 
+.profile-card .content-item-title {
+  margin: 11px 0 7px;
+}
+
+.profile-card .content-item-title h3 {
+  margin: 0;
+}
+
 .profile-card p {
   color: var(--muted);
   font-size: 12px;
@@ -271,6 +281,10 @@
 }
 
 .profile-card a {
+  display: inline-flex;
+  align-items: baseline;
+  align-self: flex-start;
+  margin-top: auto;
   font-size: 11px;
   font-weight: 750;
   color: var(--rust);
@@ -459,7 +473,7 @@
 
 .footer-directory {
   display: grid;
-  grid-template-columns: 1.25fr repeat(3, 0.75fr);
+  grid-template-columns: 1.25fr repeat(4, 0.75fr);
   gap: 34px;
   margin-top: 40px;
   padding-top: 26px;

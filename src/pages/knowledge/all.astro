@@ -1,14 +1,24 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
 import KnowledgeSearch from '../../components/KnowledgeSearch.astro';
 import { knowledgeKindLabel } from '../../data/knowledge';
-import { getKnowledgeDomainItems, getKnowledgeItems, isFixtureMode } from '../../lib/content';
+import {
+  getKnowledgeDomainItems,
+  getKnowledgeItems,
+  getPageEntryById,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+} from '../../lib/content';
 import { flattenKnowledgeAreas } from '../../lib/knowledge-navigation';
 
 const knowledgeIndexPageSize = 40;
 const knowledgeIndexUrl = `${import.meta.env.BASE_URL}knowledge/search-index.json`;
 const pages = await getKnowledgeItems();
 const domains = await getKnowledgeDomainItems();
+const page = await getPageEntryById('pages/knowledge-all');
+const hero = pageHeroFromEntry(page);
 const kinds = [...new Set(pages.map((page) => page.knowledge_kind).filter(Boolean))].sort();
 const areaNodes = domains.flatMap((domain) => flattenKnowledgeAreas(domain));
 const areaOptions = areaNodes.filter((node) => node.path.length === 1);
@@ -16,21 +26,35 @@ const subareaOptions = areaNodes.filter((node) => node.path.length >= 2);
 ---
 
 <BaseLayout
-  title="Browse all Knowledge"
+  title={page?.data.title ?? 'Browse all Knowledge'}
   description={
     isFixtureMode
       ? 'Fixture index for searching and filtering the Knowledge architecture.'
-      : 'Search and browse the complete public Knowledge reference library.'
+      : (page?.data.description ??
+        'Search and browse the complete public Knowledge reference library.')
   }
 >
   <KnowledgeSearch />
   <section class="page-hero knowledge-index-hero">
     <div class="shell">
-      <p class="page-crumb">Knowledge / Browse all</p>
-      <h1 class="display">
-        Browse all <em>Knowledge.</em>
-      </h1>
-      <p class="lede">The complete reference index, independent of chronology.</p>
+      <PageCrumb icon="knowledge">
+        <a href="/knowledge">Knowledge</a>
+        <span aria-hidden="true"> / </span>
+        All
+      </PageCrumb>
+      {hero ? (
+        <h1 class="display">
+          {hero.headline_before} <em>{hero.emphasis}</em>
+          {hero.headline_after}
+        </h1>
+      ) : (
+        <h1 class="display">
+          Browse all <em>Knowledge.</em>
+        </h1>
+      )}
+      <p class="lede">
+        {pageLedeFromEntry(page, 'The complete reference index, independent of chronology.')}
+      </p>
     </div>
   </section>
 
