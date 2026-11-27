@@ -7,6 +7,11 @@ on:
     - cron: '17 3 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: portfolio-production-deploy
+  cancel-in-progress: false
+  queue: max
+
 permissions:
   contents: write
   pages: write
