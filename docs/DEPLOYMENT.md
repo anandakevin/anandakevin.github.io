@@ -14,14 +14,32 @@ media and sketches. The list starts empty until editorial release is approved.
 ## Production (GitHub Pages)
 
 - **Workflow:** `.github/workflows/build-prod.yml` on push to `main` and daily at 03:17 UTC.
+- **Content dispatch:** the Second Brain can dispatch this workflow on `main` when `80-Public-Portfolio/records/**`, `80-Public-Portfolio/public/**`, or `80-Public-Portfolio/published.json` changes. The dispatcher is disabled until this production architecture is promoted and its owner provisions the credential. It uses the native `workflow_dispatch` API; the portfolio workflow still retrieves and validates the source, renders, selects assets, and deploys.
+- **Concurrency:** production runs share one queue (`portfolio-production-deploy`); they do not cancel an active deployment or replace queued builds.
 - **Build:** private sparse checkout → `npm run lint` → `npm run content:check` → `npm test` → `npm run type-check` → `npm run build`.
 - **Artifact:** static `dist/` deployed via GitHub Pages (`deploy-pages`).
 
 The daily schedule picks up approved Second Brain content changes without a
-public-site code commit. For an immediate release, manually run the production
-workflow on `main`. Only the trusted `main` workflow receives the private
+public-site code commit and refreshes external content such as Medium. Content
+dispatches provide an immediate build after relevant source changes. For
+manual recovery or an intentional rebuild, run the production workflow on
+`main`. Only the trusted `main` workflow receives the private
 checkout key. Do not pass it to pull-request workflows.
 Treat the static artifact and build logs as disclosure surfaces.
+
+### Second Brain dispatch credential
+
+The notifier in `anandakevin/second-brain` calls this workflow through GitHub's
+native workflow dispatch endpoint. Provision a fine-grained personal access
+token restricted to this repository with **Actions: write** only;
+the endpoint does not require contents-write permission. Store it in the
+Second Brain Actions secrets as `PORTFOLIO_DISPATCH_TOKEN`. The independent
+`PORTFOLIO_VAULT_READ_KEY` remains read-only and is used only to retrieve the
+private portfolio source. Set the Second Brain Actions variable
+`PORTFOLIO_DISPATCH_ENABLED` to `true` only after this architecture is on
+`main`; rotate by updating the secret before revoking the old token, and keep
+the variable disabled until an authorized verification. The dispatch step
+fails visibly with GitHub's API error when a request is rejected.
 
 ### Local commands
 
