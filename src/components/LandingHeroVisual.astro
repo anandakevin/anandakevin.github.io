@@ -1,0 +1,52 @@
+---
+interface Props {
+  kind: 'home' | 'portfolio' | 'corpus';
+}
+
+const { kind } = Astro.props;
+---
+
+<div class:list={['landing-hero-visual', `landing-hero-visual--${kind}`]}>
+  <svg viewBox="0 0 420 285" role="img" aria-label={`${kind} editorial illustration`}>
+    {kind === 'home' && (
+      <>
+        <path
+          class="landing-visual-soft"
+          d="M-12 230 72 126l56 51 77-94 70 91 58-57 111 113v55H-12z"
+        />
+        <path class="landing-visual-ink" d="m0 232 72-106 56 51 77-94 70 91 58-57 97 99" />
+        <path class="landing-visual-accent" d="M72 126h82M205 83h70M263 174h70" />
+        <circle class="landing-visual-node" cx="72" cy="126" r="7" />
+        <circle class="landing-visual-node" cx="205" cy="83" r="7" />
+        <circle class="landing-visual-node" cx="333" cy="117" r="7" />
+      </>
+    )}
+    {kind === 'portfolio' && (
+      <>
+        <path
+          class="landing-visual-soft"
+          d="M-8 242 80 102l55 66 77-112 68 105 53-56 106 104v45H-8z"
+        />
+        <path class="landing-visual-ink" d="m0 244 80-142 55 66 77-112 68 105 53-56 98 96" />
+        <path class="landing-visual-accent" d="M80 102 212 72l68 105 53-56M135 168l145 9" />
+        <rect class="landing-visual-soft" x="178" y="171" width="62" height="43" rx="5" />
+        <path class="landing-visual-ink" d="M190 184h38M190 193h27M190 202h31" />
+      </>
+    )}
+    {kind === 'corpus' && (
+      <>
+        <path
+          class="landing-visual-soft"
+          d="M-8 242 84 114l52 62 77-100 68 97 54-46 103 99v32H-8z"
+        />
+        <path class="landing-visual-ink" d="m0 244 84-130 52 62 77-100 68 97 54-46 99 94" />
+        <circle class="landing-visual-node" cx="84" cy="114" r="7" />
+        <circle class="landing-visual-node" cx="213" cy="76" r="7" />
+        <circle class="landing-visual-node" cx="335" cy="127" r="7" />
+        <path class="landing-visual-accent" d="M84 114 213 76l122 51M84 114l120 82 131-69" />
+        <rect class="landing-visual-soft" x="184" y="183" width="51" height="39" rx="5" />
+        <path class="landing-visual-ink" d="M195 195h28M195 204h20M195 213h25" />
+      </>
+    )}
+  </svg>
+</div>

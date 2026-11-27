@@ -1,0 +1,117 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageCrumb from '../components/PageCrumb.astro';
+import MarkdownBody from '../components/MarkdownBody.astro';
+import PageHeroHeadline from '../components/PageHeroHeadline.astro';
+import {
+  getPageEntryById,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+  pagePrinciplesFromEntry,
+} from '../lib/content';
+import {
+  siteAboutFallbackParagraphs,
+  siteAboutHero,
+  siteAboutLede,
+} from '../data/site-core-content';
+
+const aboutEntry = await getPageEntryById('pages/about');
+const rendered = aboutEntry ? await render(aboutEntry) : null;
+const Content = rendered?.Content;
+
+const pageTitle = aboutEntry?.data.title ?? 'About';
+const pageDescription = aboutEntry?.data.description ?? siteAboutLede;
+const hero = pageHeroFromEntry(aboutEntry);
+const principles = pagePrinciplesFromEntry(aboutEntry);
+
+const fixtureHero = siteAboutHero;
+const fixturePrinciples = [
+  {
+    cap: 'Principle',
+    title: 'Separate what changes from what stays the same',
+    description:
+      'Make the differences that affect behavior visible instead of burying them in special cases.',
+  },
+  {
+    cap: 'Principle',
+    title: 'Make change repeatable',
+    description:
+      'Turn one-off delivery steps into something people can understand, test, and repeat.',
+  },
+  {
+    cap: 'Principle',
+    title: 'Keep boundaries and ownership clear',
+    description:
+      'Make interfaces, responsibilities, and operational boundaries easier to reason about.',
+  },
+];
+
+const heroLede = isFixtureMode
+  ? "I'm a software engineer who tends to look for the system around the task: where boundaries blur, where change becomes risky, where knowledge gets trapped, and where a little structure can make the next change easier."
+  : pageLedeFromEntry(aboutEntry, siteAboutLede);
+const displayHero = isFixtureMode ? fixtureHero : (hero ?? siteAboutHero);
+const displayPrinciples = isFixtureMode ? fixturePrinciples : principles;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="page-hero">
+    <div class="shell about-hero-grid">
+      <div>
+        <PageCrumb icon="about">About</PageCrumb>
+        <PageHeroHeadline hero={displayHero} />
+        <p class="lede">{heroLede}</p>
+      </div>
+      <!-- Portrait treatment: "cutout" for transparent assets; "framed" for opaque assets. -->
+      <figure class="about-hero-photo" data-portrait-treatment="cutout">
+        <img
+          src="/assets/profile-portrait.png"
+          alt="Ananda Kevin Refaldo Sariputra"
+          width="420"
+          height="420"
+        />
+      </figure>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell about-grid">
+      <div class="about-copy">
+        {isFixtureMode ? (
+          <>
+            <p>
+              <strong>Systems before tasks.</strong> I look for where boundaries blur, where change
+              is risky, and where a small amount of structure makes good work easier to repeat.
+            </p>
+            <p>
+              <strong>Explanation is part of the deliverable.</strong> Models, tests, and runbooks
+              should reduce tribal knowledge — not relocate it behind a single expert.
+            </p>
+            <p>
+              In teaching and collaboration, complicated technical ideas become models people can
+              inspect, question, and reuse — a diagram, a test, a runbook, or a conversation at a
+              whiteboard.
+            </p>
+          </>
+        ) : Content ? (
+          <MarkdownBody class="about-markdown">
+            <Content />
+          </MarkdownBody>
+        ) : (
+          siteAboutFallbackParagraphs.map((paragraph) => <p>{paragraph}</p>)
+        )}
+      </div>
+      {displayPrinciples.length > 0 && (
+        <div class="about-side">
+          <span class="about-side-cap">How I tend to work</span>
+          {displayPrinciples.map((principle) => (
+            <article class="about-principle">
+              <h3>{principle.title}</h3>
+              <p>{principle.description}</p>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

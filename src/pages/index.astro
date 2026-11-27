@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LandingContentCard from '../components/LandingContentCard.astro';
+import LandingHeroVisual from '../components/LandingHeroVisual.astro';
+import SemanticIcon from '../components/SemanticIcon.astro';
+import HomepageContributionSection from '../components/HomepageContributionSection.astro';
+import { portfolioCuration } from '../data/landing-curation';
+import {
+  getCatalogRecords,
+  getContributionsHomeSignal,
+  getPageEntryById,
+  isFixtureMode,
+  pageLedeFromEntry,
+} from '../lib/content';
+import { latestEntriesFor } from '../lib/content/landing';
+
+const homePage = await getPageEntryById('pages/home');
+const records = await getCatalogRecords();
+const recordsById = new Map(records.map((record) => [record.id, record]));
+const contributionHighlights = portfolioCuration.contributions
+  .map((id) => recordsById.get(id))
+  .filter((record): record is (typeof records)[number] => Boolean(record));
+const contributionSignal = await getContributionsHomeSignal();
+const latest = latestEntriesFor(
+  records,
+  [
+    'work',
+    'case-study',
+    'project',
+    'contribution',
+    'credential',
+    'writing',
+    'knowledge',
+    'sketches',
+  ],
+  3,
+);
+const homeLede = pageLedeFromEntry(
+  homePage,
+  'I work on backend systems, integrations, and automation. Much of the job is tracing how services interact, finding where a fix affects another path, and making those changes easier to review.',
+);
+---
+
+<BaseLayout
+  title={homePage?.data.title ?? 'Ananda Kevin'}
+  description={
+    homePage?.data.description ??
+    'Software engineer working on backend services, integrations, and automation.'
+  }
+>
+  <section class="landing-hero landing-home-hero">
+    <div class="shell landing-hero-grid">
+      <div>
+        <p class="eyebrow">
+          <SemanticIcon name="about" />
+          <span>Home / Ananda Kevin</span>
+        </p>
+        <h1 class="display">
+          I build software by figuring out how the pieces <em>fit together.</em>
+        </h1>
+        <p class="lede">{homeLede}</p>
+        <div class="actions">
+          <a class="button" href="/portfolio/">
+            Enter the Portfolio ↗
+          </a>
+          <a class="button alt" href="/corpus/">
+            Browse the Corpus ↗
+          </a>
+        </div>
+      </div>
+      <LandingHeroVisual kind="home" />
+    </div>
+  </section>
+
+  <section class="section landing-section landing-gateway-section landing-home-hub">
+    <div class="shell">
+      <div class="landing-home-hub-intro">
+        <p class="section-index">01 / Orientation</p>
+        <div>
+          <div class="content-item-title">
+            <SemanticIcon name="atlas" />
+            <h2>
+              Two ways into the <em>site.</em>
+            </h2>
+          </div>
+          <p>
+            A record of the work I’ve done, and a growing collection of the things I’ve worked out,
+            explained, and kept returning to.
+          </p>
+        </div>
+      </div>
+      <div class="landing-gateway-grid">
+        <a class="landing-gateway-card landing-gateway-card--portfolio" href="/portfolio/">
+          <div class="landing-content-card-head">
+            <SemanticIcon name="portfolio" />
+            <span>Portfolio</span>
+          </div>
+          <h2>
+            What I’ve <em>worked on.</em>
+          </h2>
+          <p>Selected work, case studies, projects, contributions, and credentials.</p>
+          <span class="landing-card-link">
+            Explore Portfolio <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+        <a class="landing-gateway-card landing-gateway-card--corpus" href="/corpus/">
+          <div class="landing-content-card-head">
+            <SemanticIcon name="corpus" />
+            <span>Corpus</span>
+          </div>
+          <h2>
+            What I’ve <em>worked out.</em>
+          </h2>
+          <p>Writing, maintained knowledge, sketches, and explanations worth returning to.</p>
+          <span class="landing-card-link">
+            Explore Corpus <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+      </div>
+      <div class="landing-atlas-card landing-home-atlas-card">
+        <div>
+          <div class="landing-content-card-head">
+            <SemanticIcon name="atlas" />
+            <span>Atlas</span>
+          </div>
+          <h2>
+            Follow the <em>connections.</em>
+          </h2>
+          <p>
+            A relationship-based view across the portfolio and corpus: work, writing, knowledge,
+            sketches, projects, contributions, and credentials.
+          </p>
+        </div>
+        <a class="button alt" href="/explore">
+          Open Atlas →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section landing-latest-section">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <div>
+          <div class="content-item-title">
+            <SemanticIcon name="writing" />
+            <div>
+              <p class="section-index">02 / Latest</p>
+              <h2>
+                Recent <em>additions.</em>
+              </h2>
+            </div>
+          </div>
+          <p>Automatically surfaced from meaningful publish and update dates across the site.</p>
+        </div>
+        <a class="landing-view-all" href="/explore">
+          Explore the Atlas <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="landing-card-grid landing-card-grid--three">
+        {latest.map((item) => (
+          <LandingContentCard item={item} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <HomepageContributionSection
+    fixtureMode={isFixtureMode}
+    contributions={contributionHighlights}
+    signal={contributionSignal}
+  />
+
+  <section class="section landing-contact">
+    <div class="shell landing-contact-inner">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>Want to talk?</h2>
+        <p>If something here overlaps with what you’re working on, feel free to get in touch.</p>
+      </div>
+      <a class="button alt" href="mailto:ananda.kevin.rs@gmail.com">
+        Email me ↗
+      </a>
+    </div>
+  </section>
+</BaseLayout>

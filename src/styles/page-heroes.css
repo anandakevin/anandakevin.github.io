@@ -1,0 +1,629 @@
+/* Projects index hero: a quiet visual counterweight for the editorial headline. */
+.projects-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.projects-hero-grid .lede {
+  max-width: 720px;
+}
+
+.projects-hero-visual {
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
+  color: var(--muted);
+}
+
+.projects-hero-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.projects-hero-frame {
+  fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.projects-hero-grid-line {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.projects-hero-path {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 1.7;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.projects-hero-path--quiet {
+  stroke: var(--blue);
+  opacity: 0.48;
+}
+
+.projects-hero-node circle {
+  fill: var(--bg);
+  stroke: var(--rust);
+  stroke-width: 2;
+}
+
+.projects-hero-node--build circle {
+  fill: var(--rust);
+}
+
+.projects-hero-node--result circle {
+  stroke: var(--teal);
+}
+
+.projects-hero-node text,
+.projects-hero-caption {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.projects-hero-node-detail {
+  fill: var(--ink-2) !important;
+  font: 500 10px/1 var(--sans) !important;
+  letter-spacing: 0 !important;
+}
+
+.projects-hero-card rect {
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.projects-hero-card path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.projects-hero-card circle {
+  fill: var(--rust);
+}
+
+.projects-hero-visual-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 650 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 850px) {
+  .projects-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .projects-hero-visual {
+    justify-self: start;
+    max-width: 560px;
+  }
+}
+
+/* Writing index hero: a working stack for drafting, reviewing, and sharing ideas. */
+.writing-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.writing-hero-grid .lede {
+  max-width: 720px;
+}
+
+.writing-hero-visual {
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
+  color: var(--muted);
+}
+
+.writing-hero-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.writing-hero-frame {
+  fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.writing-hero-grid-line {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.writing-hero-path {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 1.7;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.writing-hero-path--quiet {
+  stroke: var(--blue);
+  opacity: 0.48;
+}
+
+.writing-hero-sheet rect {
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.writing-hero-sheet path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.76;
+}
+
+.writing-hero-sheet text,
+.writing-hero-caption {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.writing-hero-sheet circle {
+  fill: var(--teal);
+}
+
+.writing-hero-sheet--front rect {
+  fill: color-mix(in srgb, var(--surface) 88%, var(--teal));
+}
+
+.writing-hero-mark circle {
+  fill: var(--bg);
+  stroke: var(--teal);
+  stroke-width: 2;
+}
+
+.writing-hero-mark--right circle {
+  fill: var(--teal);
+}
+
+.writing-hero-mark text {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.writing-hero-mark-detail {
+  fill: var(--ink-2) !important;
+  font: 500 10px/1 var(--sans) !important;
+  letter-spacing: 0 !important;
+}
+
+.writing-hero-visual-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 650 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 850px) {
+  .writing-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .writing-hero-visual {
+    justify-self: start;
+    max-width: 560px;
+  }
+}
+
+/* Work index hero: a decision trace for context, constraints, and outcomes. */
+.work-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.work-hero-grid .lede {
+  max-width: 720px;
+}
+
+.work-hero-visual {
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
+  color: var(--muted);
+}
+
+.work-hero-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.work-hero-frame {
+  fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.work-hero-grid-line {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.work-hero-path {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 1.7;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.work-hero-path--quiet {
+  stroke: var(--blue);
+  opacity: 0.48;
+}
+
+.work-hero-node circle {
+  fill: var(--bg);
+  stroke: var(--rust);
+  stroke-width: 2;
+}
+
+.work-hero-node--decision circle {
+  fill: var(--rust);
+}
+
+.work-hero-node--outcome circle {
+  stroke: var(--teal);
+}
+
+.work-hero-node text,
+.work-hero-caption {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.work-hero-node-detail {
+  fill: var(--ink-2) !important;
+  font: 500 10px/1 var(--sans) !important;
+  letter-spacing: 0 !important;
+}
+
+.work-hero-card rect {
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.work-hero-card path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.work-hero-card circle {
+  fill: var(--rust);
+}
+
+.work-hero-visual-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 650 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 850px) {
+  .work-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .work-hero-visual {
+    justify-self: start;
+    max-width: 560px;
+  }
+}
+
+/* Contributions index hero: a connected visual for teaching, mentoring, and review. */
+.contributions-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.contributions-hero-grid .lede {
+  max-width: 720px;
+}
+
+.contributions-hero-visual {
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
+  color: var(--muted);
+}
+
+.contributions-hero-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.contributions-hero-frame {
+  fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.contributions-hero-grid-line {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.contributions-hero-path {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 1.7;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.contributions-hero-path--quiet {
+  stroke: var(--blue);
+  opacity: 0.48;
+}
+
+.contributions-hero-path--soft {
+  stroke: var(--teal);
+  opacity: 0.48;
+}
+
+.contributions-hero-center circle:first-child {
+  fill: color-mix(in srgb, var(--teal) 14%, var(--surface));
+  stroke: var(--teal);
+  stroke-width: 1;
+}
+
+.contributions-hero-center circle:last-of-type {
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.contributions-hero-center text,
+.contributions-hero-caption {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.contributions-hero-node circle {
+  fill: var(--bg);
+  stroke: var(--rust);
+  stroke-width: 2;
+}
+
+.contributions-hero-node--mentor circle {
+  stroke: var(--blue);
+}
+
+.contributions-hero-node--review circle {
+  stroke: var(--teal);
+}
+
+.contributions-hero-node--community circle {
+  fill: var(--teal);
+  stroke: var(--teal);
+}
+
+.contributions-hero-node text {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.contributions-hero-node-detail {
+  fill: var(--ink-2) !important;
+  font: 500 10px/1 var(--sans) !important;
+  letter-spacing: 0 !important;
+}
+
+.contributions-hero-visual-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 650 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 850px) {
+  .contributions-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .contributions-hero-visual {
+    justify-self: start;
+    max-width: 560px;
+  }
+}
+
+/* Credentials index hero: a verification trail across the public record. */
+.credentials-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.credentials-hero-grid .lede {
+  max-width: 720px;
+}
+
+.credentials-hero-visual {
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
+  color: var(--muted);
+}
+
+.credentials-hero-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.credentials-hero-frame {
+  fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.credentials-hero-grid-line {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.credentials-hero-path {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 1.7;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.credentials-hero-path--quiet {
+  stroke: var(--blue);
+  opacity: 0.48;
+}
+
+.credentials-hero-record rect {
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.credentials-hero-record path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.76;
+}
+
+.credentials-hero-record circle {
+  fill: color-mix(in srgb, var(--teal) 16%, var(--surface));
+  stroke: var(--teal);
+  stroke-width: 1.5;
+}
+
+.credentials-hero-record text,
+.credentials-hero-caption {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.credentials-hero-node circle {
+  fill: var(--bg);
+  stroke: var(--rust);
+  stroke-width: 2;
+}
+
+.credentials-hero-node--research circle {
+  stroke: var(--blue);
+}
+
+.credentials-hero-node--recognition circle {
+  stroke: var(--teal);
+}
+
+.credentials-hero-node--verify circle {
+  fill: var(--teal);
+  stroke: var(--teal);
+}
+
+.credentials-hero-node text {
+  fill: var(--muted);
+  font: 700 9px/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.credentials-hero-node-detail {
+  fill: var(--ink-2) !important;
+  font: 500 10px/1 var(--sans) !important;
+  letter-spacing: 0 !important;
+}
+
+.credentials-hero-visual-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 650 9px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 850px) {
+  .credentials-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .credentials-hero-visual {
+    justify-self: start;
+    max-width: 560px;
+  }
+}

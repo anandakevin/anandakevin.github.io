@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LandingContentCard from '../../components/LandingContentCard.astro';
+import LandingHeroVisual from '../../components/LandingHeroVisual.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
+import { iconOverrides, portfolioCuration } from '../../data/landing-curation';
+import { getCatalogRecords, isFixtureMode, hrefForCredentialCard } from '../../lib/content';
+import { resolveLandingEntries } from '../../lib/content/landing';
+
+const records = await getCatalogRecords();
+const byId = new Map(records.map((record) => [record.id, record]));
+const recordsFor = (ids: readonly string[]) =>
+  ids
+    .map((id) => byId.get(id))
+    .filter((record): record is (typeof records)[number] => Boolean(record));
+const work = recordsFor(portfolioCuration.work);
+const projects = recordsFor(portfolioCuration.projects);
+const contributionEntries = resolveLandingEntries(
+  portfolioCuration.contributions,
+  records,
+  iconOverrides,
+);
+const caseStudyEntries = resolveLandingEntries(
+  portfolioCuration.caseStudies,
+  records,
+  iconOverrides,
+);
+const credentialEntries = resolveLandingEntries(
+  portfolioCuration.credentials,
+  records,
+  iconOverrides,
+);
+---
+
+<BaseLayout
+  title="Portfolio"
+  description="Selected work, case studies, projects, contributions, and credentials."
+>
+  <section class="landing-hero">
+    <div class="shell landing-hero-grid">
+      <div>
+        <p class="eyebrow">
+          <SemanticIcon name="portfolio" />
+          <span>Portfolio</span>
+        </p>
+        <h1 class="display">
+          What I’ve worked on, <em>in context.</em>
+        </h1>
+        <p class="lede">
+          Engineering work, independent projects, teaching, and the credentials that give the work
+          its shape.
+        </p>
+      </div>
+      <LandingHeroVisual kind="portfolio" />
+    </div>
+  </section>
+
+  <section class="section landing-section" id="portfolio-work">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <SectionHeader
+          index="01 / Selected work"
+          title="Work"
+          emphasis="in context."
+          icon="work"
+          description="Engineering roles and systems work across backend, platform, and data-heavy environments."
+        />
+        <a class="landing-view-all" href="/work">
+          View all work <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="work-list landing-work-list">
+        {work.map((item) => (
+          <WorkCard item={item} records={records} fixtureMode={isFixtureMode} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section" id="portfolio-case-studies">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <SectionHeader
+          index="02 / Selected case studies"
+          title="Problems worth"
+          emphasis="unpacking."
+          icon="case-study"
+          description="Writing that records constraints, decisions, implementation choices, and lessons from the work."
+        />
+        <a class="landing-view-all" href="/case-studies/">
+          View all case studies <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="landing-card-grid landing-card-grid--three">
+        {caseStudyEntries.map((item) => (
+          <LandingContentCard item={item} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section">
+    <div class="shell">
+      <div class="landing-split-grid">
+        <article class="landing-split-panel" id="portfolio-projects">
+          <div class="landing-split-panel-heading">
+            <div>
+              <div class="landing-split-panel-title">
+                <SemanticIcon name="project" />
+                <h2>Independent projects</h2>
+              </div>
+              <p>Tools, applications, research, and experiments built outside a single role.</p>
+            </div>
+            <a class="landing-view-all" href="/projects">
+              Browse all <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="landing-split-list project-grid">
+            {projects.map((item) => (
+              <ProjectCard item={item} fixtureMode={isFixtureMode} surface="home" />
+            ))}
+          </div>
+        </article>
+
+        <article class="landing-split-panel" id="portfolio-contributions">
+          <div class="landing-split-panel-heading">
+            <div>
+              <div class="landing-split-panel-title">
+                <SemanticIcon name="contribution" />
+                <h2>Contributions</h2>
+              </div>
+              <p>
+                Teaching, mentoring, facilitation, and technical contribution across programs and
+                communities.
+              </p>
+            </div>
+            <a class="landing-view-all" href="/contributions">
+              Browse all <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="landing-split-list landing-card-grid">
+            {contributionEntries.map((item) => (
+              <LandingContentCard item={item} />
+            ))}
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section" id="portfolio-credentials">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <SectionHeader
+          index="05 / Credentials"
+          title="Evidence and"
+          emphasis="recognition."
+          icon="credential"
+          description="Formal education, research, and selected credentials supporting the work."
+        />
+        <a class="landing-view-all" href="/credentials">
+          View all credentials <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="landing-card-grid landing-card-grid--three">
+        {credentialEntries.map((item) => {
+          const record = byId.get(item.id);
+          const href = record ? hrefForCredentialCard(record) : item.href;
+          return (
+            <article class="landing-content-card">
+              <div class="landing-content-card-head">
+                <SemanticIcon name={item.iconKey ?? 'credential'} />
+                <span>Credentials</span>
+              </div>
+              <h3>
+                <a href={href}>{item.title}</a>
+              </h3>
+              <p>{item.summary}</p>
+              <div class="landing-content-card-foot">
+                <a href={href}>
+                  Open record <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-contact">
+    <div class="shell landing-contact-inner">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>
+          Have a system to make <em>clearer?</em>
+        </h2>
+        <p>If something here overlaps with what you’re working on, feel free to get in touch.</p>
+      </div>
+      <a class="button" href="mailto:ananda.kevin.rs@gmail.com">
+        Email me ↗
+      </a>
+    </div>
+  </section>
+</BaseLayout>

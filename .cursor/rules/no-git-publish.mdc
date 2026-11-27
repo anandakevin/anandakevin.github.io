@@ -1,0 +1,11 @@
+---
+description: Never commit or push without explicit user request
+alwaysApply: true
+---
+
+# Git — manual only
+
+- Do NOT run `git commit`, `git push`, `git tag`, or change remotes unless the user explicitly asks in the current message.
+- Do NOT use `git commit --amend`, `git reset`, or force-push unless explicitly requested.
+- Staging (`git add`) is allowed only when the user asks to prepare a commit; otherwise leave changes unstaged.
+- If preservation or “save state” is needed, report `git status` / diff and tell the user what to run; do not commit for them.

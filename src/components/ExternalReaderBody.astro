@@ -1,0 +1,42 @@
+---
+interface Props {
+  bodyHtml?: string;
+  originalUrl: string;
+  fallback: string;
+}
+
+const { bodyHtml, originalUrl, fallback } = Astro.props;
+const encodedBody = bodyHtml ? Buffer.from(bodyHtml, 'utf8').toString('base64') : undefined;
+---
+
+<div
+  class="content-body external-reader-body"
+  data-external-reader-body
+  data-body={encodedBody}
+  data-base-url={originalUrl}
+>
+  <p>{fallback}</p>
+</div>
+<noscript>
+  <p class="external-reader-fallback">{fallback}</p>
+</noscript>
+
+<script>
+  import { renderSanitizedExternalHtml } from '../lib/external-reader';
+
+  function decodeBody(value: string): string {
+    const bytes = Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-external-reader-body]').forEach((body) => {
+    const encoded = body.dataset.body;
+    const baseUrl = body.dataset.baseUrl;
+    if (!encoded || !baseUrl) return;
+    try {
+      renderSanitizedExternalHtml(body, decodeBody(encoded), baseUrl);
+    } catch {
+      // The server-rendered fallback and original provider link remain available.
+    }
+  });
+</script>

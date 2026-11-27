@@ -1,0 +1,31 @@
+---
+interface Props {
+  index: string;
+  title: string;
+  emphasis?: string;
+  description?: string;
+  icon?: string;
+}
+import SemanticIcon from './SemanticIcon.astro';
+
+const { index, title, emphasis, description, icon } = Astro.props;
+---
+
+<header class="section-header">
+  <p class="section-index">{index}</p>
+  <div>
+    <div class="section-header-title">
+      {icon && <SemanticIcon name={icon} />}
+      <h2>
+        {title}
+        {emphasis && (
+          <>
+            {' '}
+            <em>{emphasis}</em>
+          </>
+        )}
+      </h2>
+    </div>
+    {description && <p>{description}</p>}
+  </div>
+</header>

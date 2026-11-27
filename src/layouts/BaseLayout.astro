@@ -1,0 +1,166 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { contentVisibilityMode, isFixtureMode } from '../lib/content/publication';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+}
+const { title, description = 'Software engineering portfolio.', canonicalUrl } = Astro.props;
+const fixtureMode = isFixtureMode;
+const previewVisibility = contentVisibilityMode() === 'preview';
+const documentTitle =
+  title === 'Ananda Kevin'
+    ? 'Ananda Kevin — Backend & Platform Engineer'
+    : `${title} · Ananda Kevin`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{documentTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">
+      Skip to content
+    </a>
+    <SiteHeader currentPath={Astro.url.pathname} />
+    {fixtureMode && (
+      <aside class="fixture-notice" aria-label="Fixture mode">
+        Implementation fixture mode — no reviewed public content is present.
+      </aside>
+    )}
+    {previewVisibility && !fixtureMode && (
+      <aside class="fixture-notice" aria-label="Preview visibility">
+        Preview visibility — includes draft and review records hidden in production.
+      </aside>
+    )}
+    <main id="main-content">
+      <slot />
+    </main>
+    <SiteFooter />
+    <script is:inline>
+      const root = document.documentElement;
+      const themeButtons = document.querySelectorAll('[data-theme-button]');
+      const syncThemeIcon = () => {
+        const dark = root.dataset.theme === 'dark';
+        themeButtons.forEach((button) => {
+          button.textContent = dark ? '☀' : '☾';
+          button.setAttribute(
+            'aria-label',
+            dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+          );
+          button.setAttribute(
+            'title',
+            dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+          );
+        });
+      };
+      const stored = localStorage.getItem('portfolio-theme');
+      root.dataset.theme =
+        stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      syncThemeIcon();
+      const enhanceArrowLinks = () => {
+        document.querySelectorAll('a').forEach((link) => {
+          if (link.querySelector('.link-arrow')) return;
+          const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+          textNodes.forEach((node) => {
+            const value = node.nodeValue ?? '';
+            if (!value.includes('↗')) return;
+            const parts = value.split('↗');
+            const fragment = document.createDocumentFragment();
+            parts.forEach((part, index) => {
+              if (part) fragment.append(document.createTextNode(part));
+              if (index < parts.length - 1) {
+                const arrow = document.createElement('span');
+                arrow.className = 'link-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                arrow.textContent = '↗';
+                fragment.append(arrow);
+              }
+            });
+            node.replaceWith(fragment);
+          });
+        });
+      };
+      enhanceArrowLinks();
+      document.addEventListener('astro:page-load', enhanceArrowLinks);
+      const siteScrollbarThumb = document.createElement('div');
+      siteScrollbarThumb.className = 'site-scrollbar-thumb';
+      siteScrollbarThumb.setAttribute('aria-hidden', 'true');
+      document.body.append(siteScrollbarThumb);
+      root.classList.add('has-site-scrollbar');
+      const syncSiteScrollbar = () => {
+        const viewport = document.documentElement;
+        const viewportHeight = window.innerHeight;
+        const scrollHeight = Math.max(viewport.scrollHeight, document.body.scrollHeight);
+        const maxScroll = scrollHeight - viewportHeight;
+        if (maxScroll <= 0) {
+          siteScrollbarThumb.hidden = true;
+          return;
+        }
+        const nativeScrollbarWidth = window.innerWidth - viewport.clientWidth;
+        const scrollbarWidth = Math.max(8, nativeScrollbarWidth || 12);
+        const thumbHeight = Math.min(
+          viewportHeight,
+          Math.max(44, (viewportHeight * viewportHeight) / scrollHeight),
+        );
+        const thumbTop = (window.scrollY / maxScroll) * (viewportHeight - thumbHeight);
+        siteScrollbarThumb.hidden = false;
+        siteScrollbarThumb.style.right = `${nativeScrollbarWidth > 0 ? -nativeScrollbarWidth : 0}px`;
+        siteScrollbarThumb.style.width = `${scrollbarWidth}px`;
+        siteScrollbarThumb.style.height = `${thumbHeight}px`;
+        siteScrollbarThumb.style.transform = `translate3d(0, ${thumbTop}px, 0)`;
+      };
+      let siteScrollbarFrame = 0;
+      const scheduleSiteScrollbarSync = () => {
+        if (siteScrollbarFrame) return;
+        siteScrollbarFrame = requestAnimationFrame(() => {
+          siteScrollbarFrame = 0;
+          syncSiteScrollbar();
+        });
+      };
+      syncSiteScrollbar();
+      window.addEventListener('scroll', scheduleSiteScrollbarSync, { passive: true });
+      window.addEventListener('resize', scheduleSiteScrollbarSync);
+      document.addEventListener('astro:page-load', scheduleSiteScrollbarSync);
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(scheduleSiteScrollbarSync).observe(document.body);
+      }
+      themeButtons.forEach((button) =>
+        button.addEventListener('click', () => {
+          const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          localStorage.setItem('portfolio-theme', next);
+          syncThemeIcon();
+        }),
+      );
+      const legacy = {
+        '#about': '/about',
+        '#exp': '/work',
+        '#projects': '/projects',
+        '#awards': '/credentials',
+        '#scholarships': '/credentials',
+        '#edu': '/about',
+        '#tools': '/work',
+      };
+      if (legacy[location.hash]) location.replace(legacy[location.hash]);
+    </script>
+  </body>
+</html>

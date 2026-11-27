@@ -1,0 +1,75 @@
+---
+interface Props {
+  name?: string;
+  label?: string;
+  class?: string;
+}
+
+const { name = 'corpus', label, class: className = '' } = Astro.props;
+const title = label ?? name.replaceAll('-', ' ');
+---
+
+<svg
+  class:list={['semantic-icon', className]}
+  viewBox="0 0 24 24"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  {label && <title>{title}</title>}
+  {name === 'portfolio' && <path d="M4 6.5h16v13H4z M8 6.5V4h8v2.5M7 11h10M10 15h4" />}
+  {name === 'corpus' && <path d="M5 5.5h14v13H5z M8 8.5h8M8 12h6M8 15.5h4" />}
+  {name === 'atlas' && <path d="M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Z M9 3v15 M15 6v15" />}
+  {name === 'about' && <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0" />}
+  {name === 'work' && <path d="M4 7h16v13H4z M8 7V4h8v3M4 12h16M10 12v2h4v-2" />}
+  {name === 'case-study' && <path d="M5 4h14v16H5z M8 8h8M8 12h8M8 16h5" />}
+  {name === 'project' && (
+    <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z M4.5 7.8 12 12l7.5-4.2M12 12v9" />
+  )}
+  {name === 'contribution' && (
+    <path d="M12 20s-7-3.7-7-9.3A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 7 2.7C19 16.3 12 20 12 20Z M8 4v3M6.5 5.5h3M16 4v3M14.5 5.5h3" />
+  )}
+  {name === 'credential' && (
+    <path d="m12 3 7 3v5c0 4.7-3.1 7.8-7 10-3.9-2.2-7-5.3-7-10V6l7-3Z M9 11.5l2 2 4-4" />
+  )}
+  {name === 'writing' && <path d="M5 4h14v16H5z M8 8h8M8 12h6M8 16h5" />}
+  {name === 'knowledge' && (
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z M7 8h2M15 8h2" />
+  )}
+  {name === 'sketches' && (
+    <path d="m5 18 2.2-6.6L16.5 4l3.5 3.5-7.4 9.3L5 18Z M13.5 6.9l3.6 3.6M5 18l-.7 2.7L7 20" />
+  )}
+  {name === 'publishing' && <path d="M5 5h14v14H5z M8 8h8M8 12h8M8 16h5" />}
+  {name === 'network' && (
+    <path d="M12 4v5M6 18l4-5M18 18l-4-5M4 19h4v-3H4zM10 10h4v3h-4zM16 19h4v-3h-4z" />
+  )}
+  {name === 'research' && <path d="m14.5 14.5 5 5M11 16a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z" />}
+  {name === 'teaching' && <path d="m3 9 9-4 9 4-9 4-9-4ZM7 12v4c2.5 2 7.5 2 10 0v-4M21 9v6" />}
+  {name === 'mentoring' && (
+    <path d="M5 18v-5a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v5M8 6.5a3 3 0 1 0 0 6M16 6.5a3 3 0 1 1 0 6" />
+  )}
+  {name === 'community' && (
+    <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 19a5 5 0 0 1 10 0M11 19a5 5 0 0 1 10 0" />
+  )}
+  {![
+    'portfolio',
+    'corpus',
+    'atlas',
+    'about',
+    'work',
+    'case-study',
+    'project',
+    'contribution',
+    'credential',
+    'writing',
+    'knowledge',
+    'sketches',
+    'publishing',
+    'network',
+    'research',
+    'teaching',
+    'mentoring',
+    'community',
+  ].includes(name) && <circle cx="12" cy="12" r="7" />}
+</svg>

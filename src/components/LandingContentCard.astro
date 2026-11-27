@@ -1,0 +1,39 @@
+---
+import type { LandingContentEntry } from '../lib/content/landing';
+import { labelForLandingType } from '../lib/content/landing';
+import SemanticIcon from './SemanticIcon.astro';
+
+interface Props {
+  item: LandingContentEntry;
+  hidden?: boolean;
+}
+
+const { item, hidden = false } = Astro.props;
+const iconKey = item.iconKey ?? (item.type === 'case-study' ? 'case-study' : item.type);
+const date = item.updatedAt ?? item.publishedAt;
+const dateLabel = date
+  ? new Intl.DateTimeFormat('en', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${date}T00:00:00Z`))
+  : undefined;
+---
+
+<article class="landing-content-card" data-landing-entry-type={item.type} hidden={hidden}>
+  <div class="landing-content-card-head">
+    <SemanticIcon name={iconKey} />
+    <span>{labelForLandingType(item.type)}</span>
+  </div>
+  <h3>
+    <a href={item.href}>{item.title}</a>
+  </h3>
+  <p>{item.summary}</p>
+  <div class="landing-content-card-foot">
+    {dateLabel && <time datetime={date}>Updated {dateLabel}</time>}
+    <a href={item.href}>
+      Open <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</article>

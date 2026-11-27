@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageCrumb from '../components/PageCrumb.astro';
+import SystemsMap from '../components/SystemsMap.astro';
+import {
+  getCatalogRecords,
+  getPageEntryById,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+} from '../lib/content';
+
+const records = await getCatalogRecords();
+const page = await getPageEntryById('pages/systems-map');
+const hero = pageHeroFromEntry(page);
+const enabled = records.some((record) =>
+  [
+    'work',
+    'project',
+    'proof',
+    'contribution',
+    'article',
+    'case_study',
+    'note',
+    'sketch',
+    'knowledge',
+    'knowledge_domain',
+  ].includes(record.content_kind),
+);
+---
+
+<BaseLayout
+  title={page?.data.title ?? 'Semantic Atlas'}
+  description={
+    page?.data.description ??
+    'Explore the public corpus by territory, subject, and meaningful relationships.'
+  }
+>
+  <section class="page-hero">
+    <div class="shell">
+      <PageCrumb icon="atlas">Explore / Semantic Atlas</PageCrumb>
+      {hero ? (
+        <h1 class="display">
+          {hero.headline_before} <em>{hero.emphasis}</em>
+          {hero.headline_after}
+        </h1>
+      ) : (
+        <h1 class="display">
+          Explore the public <em>corpus.</em>
+        </h1>
+      )}
+      <p class="lede">
+        {pageLedeFromEntry(
+          page,
+          'Published work, projects, credentials, writing, contributions, and Knowledge arranged by subject territory and meaningful relationships.',
+        )}
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="shell">
+      {enabled ? (
+        <SystemsMap records={records} />
+      ) : (
+        <p class="lede">
+          The atlas will populate as more work and writing is published on the site.
+        </p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

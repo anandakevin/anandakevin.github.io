@@ -1,0 +1,24 @@
+---
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+  index: number;
+  label: string;
+  description: string;
+}
+
+const { index, label, description } = Astro.props;
+const indexLabel = String(index).padStart(2, '0');
+---
+
+<section class="contribution-type-section">
+  <SectionHeader
+    index={`${indexLabel} / ${label}`}
+    title={label}
+    icon="contribution"
+    description={description}
+  />
+  <div class="detail-list contribution-type-list">
+    <slot />
+  </div>
+</section>
