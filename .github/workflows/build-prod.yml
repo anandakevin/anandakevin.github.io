@@ -2,10 +2,15 @@ name: Build and Deploy (Production)
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
+    branches: ['main']
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: portfolio-production-deploy
+  cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: write
@@ -15,37 +20,57 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      PORTFOLIO_SOURCE_ROOT: .private/second-brain/80-Public-Portfolio
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Checkout private portfolio source
+        uses: actions/checkout@v4
+        with:
+          repository: anandakevin/second-brain
+          path: .private/second-brain
+          ssh-key: ${{ secrets.PORTFOLIO_VAULT_READ_KEY }}
+          persist-credentials: false
+          sparse-checkout: 80-Public-Portfolio
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
 
-    - name: Lint
-      run: npm run lint
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build
-      run: npm run build
+      - name: Lint
+        run: npm run lint
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
+      - name: Validate public-content boundary
+        run: npm run content:check
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './dist'
+      - name: Test public-content contracts
+        run: npm test
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Type check
+        run: npm run type-check
+
+      - name: Production build with external writing refresh
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

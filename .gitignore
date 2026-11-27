@@ -29,6 +29,21 @@ node_modules
 .idea/
 
 dist
+.astro/
+.cache/medium-writing.json
+public/media/
+public/sketches/
+src/content/public/
+.private/
 
 # macOS files
 **/.DS_Store
+
+# Local evidence/media pending migration to Second Brain
+/bangkit-2024-h2-certificate.jpg
+/batch 1 meet 3.jpeg
+/public/assets/profile-portrait-with-bg.png
+
+# Syncthing metadata
+.stfolder/
+.stignore

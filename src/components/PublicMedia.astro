@@ -1,0 +1,42 @@
+---
+import type { PublicMedia } from '../lib/public-contract';
+
+interface Props {
+  media: PublicMedia[];
+}
+
+const { media } = Astro.props;
+const isPdf = (path: string) => /\.pdf$/i.test(path);
+---
+
+{media.length > 0 && (
+  <section class="public-media" aria-label="Related media">
+    {media.map((item) => (
+      <figure class={`public-media-item public-media-${item.kind}`}>
+        {isPdf(item.path) ? (
+          <div class="public-media-document">
+            <object data={item.path} type="application/pdf" aria-label={item.alt}>
+              <div class="public-media-document-fallback">
+                <p>Preview unavailable in this browser.</p>
+                <a class="button alt" href={item.path}>
+                  Open certificate ↗
+                </a>
+              </div>
+            </object>
+            <a class="public-media-open" href={item.path}>
+              Open certificate in a new tab ↗
+            </a>
+          </div>
+        ) : (
+          <img src={item.path} alt={item.alt} loading="lazy" decoding="async" />
+        )}
+        {(item.caption || item.credit) && (
+          <figcaption>
+            {item.caption && <span>{item.caption}</span>}
+            {item.credit && <small>{item.credit}</small>}
+          </figcaption>
+        )}
+      </figure>
+    ))}
+  </section>
+)}

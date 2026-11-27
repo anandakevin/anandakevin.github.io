@@ -1,0 +1,420 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+import { corpusNavigation, portfolioNavigation } from '../data/site-navigation';
+import SemanticIcon from './SemanticIcon.astro';
+
+const { currentPath } = Astro.props;
+
+function isActive(href: string): boolean {
+  const route = href.split('#')[0].replace(/\/$/, '') || '/';
+  if (route === '/') return currentPath === '/' || currentPath === '';
+  return currentPath === route || currentPath.startsWith(`${route}/`);
+}
+
+const portfolioActive = portfolioNavigation.some(([, href]) => isActive(href));
+const corpusActive = corpusNavigation.some(([, href]) => isActive(href));
+const initialCategory = corpusActive ? 'corpus' : portfolioActive ? 'portfolio' : null;
+
+function subnavIcon(label: string, category: 'portfolio' | 'corpus'): string {
+  const icons: Record<string, string> = {
+    overview: category,
+    work: 'work',
+    'case studies': 'case-study',
+    projects: 'project',
+    contributions: 'contribution',
+    credentials: 'credential',
+    writing: 'writing',
+    knowledge: 'knowledge',
+    sketches: 'sketches',
+  };
+
+  return icons[label.toLowerCase()] ?? category;
+}
+---
+
+<header class="site-header" data-site-header data-initial-category={initialCategory ?? ''}>
+  <div class="shell header-primary">
+    <a class="brand" href="/" aria-label="Ananda Kevin home">
+      <img class="brand-logo" src="/favicon.svg" width="33" height="33" alt="" />
+      <span>
+        <strong>Ananda Kevin</strong>
+        <small>system · software · explanation</small>
+      </span>
+    </a>
+
+    <nav class="category-switches" aria-label="Main navigation">
+      <a
+        class="category-switch"
+        href="/portfolio/"
+        data-category="portfolio"
+        data-active={initialCategory === 'portfolio' ? 'true' : 'false'}
+        aria-current={isActive('/portfolio/') ? 'page' : undefined}
+      >
+        <SemanticIcon name="portfolio" />
+        <span>Portfolio</span>
+      </a>
+      <a
+        class="category-switch"
+        href="/corpus/"
+        data-category="corpus"
+        data-active={initialCategory === 'corpus' ? 'true' : 'false'}
+        aria-current={isActive('/corpus/') ? 'page' : undefined}
+      >
+        <SemanticIcon name="corpus" />
+        <span>Corpus</span>
+      </a>
+    </nav>
+
+    <div class="top-links">
+      <a
+        class="top-link"
+        href="/about"
+        data-route="/about"
+        data-active={isActive('/about') ? 'true' : 'false'}
+        aria-current={isActive('/about') ? 'page' : undefined}
+      >
+        <SemanticIcon name="about" />
+        <span>About</span>
+      </a>
+      <span class="top-divider" aria-hidden="true"></span>
+      <a
+        class="atlas-link"
+        href="/explore"
+        data-route="/explore"
+        data-active={isActive('/explore') ? 'true' : 'false'}
+        aria-current={isActive('/explore') ? 'page' : undefined}
+      >
+        <span class="map-icon">
+          <SemanticIcon name="atlas" />
+        </span>
+        <span>Atlas</span>
+      </a>
+    </div>
+
+    <div class="mobile-actions">
+      <button
+        type="button"
+        class="menu-button"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls="mobile-navigation"
+      >
+        Menu
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="secondary-wrap"
+    id="secondary-navigation"
+    data-secondary-wrap
+    data-visible={initialCategory ? 'true' : 'false'}
+  >
+    <nav class="header-secondary" aria-label="Context navigation">
+      <div
+        class="secondary-group"
+        data-secondary="portfolio"
+        data-visible={initialCategory === 'portfolio' ? 'true' : 'false'}
+        aria-hidden={initialCategory === 'portfolio' ? 'false' : 'true'}
+      >
+        {portfolioNavigation.map(([label, href]) => (
+          <a
+            class="secondary-link"
+            href={href}
+            data-route={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            <SemanticIcon name={subnavIcon(label, 'portfolio')} />
+            {label}
+          </a>
+        ))}
+      </div>
+      <div
+        class="secondary-group"
+        data-secondary="corpus"
+        data-visible={initialCategory === 'corpus' ? 'true' : 'false'}
+        aria-hidden={initialCategory === 'corpus' ? 'false' : 'true'}
+      >
+        {corpusNavigation.map(([label, href]) => (
+          <a
+            class="secondary-link"
+            href={href}
+            data-route={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            <SemanticIcon name={subnavIcon(label, 'corpus')} />
+            {label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+</header>
+
+<aside
+  id="mobile-navigation"
+  class="mobile-sheet"
+  data-mobile-sheet
+  data-open="false"
+  aria-hidden="true"
+  aria-label="Mobile navigation"
+>
+  <div class="mobile-sheet-inner">
+    <div class="mobile-sheet-head">
+      <a class="brand" href="/" aria-label="Ananda Kevin home">
+        <img class="brand-logo" src="/favicon.svg" width="33" height="33" alt="" />
+        <span>
+          <strong>Ananda Kevin</strong>
+        </span>
+      </a>
+      <button
+        class="mobile-theme"
+        type="button"
+        data-theme-button
+        aria-label="Switch to dark colour theme"
+        title="Switch to dark colour theme"
+      >
+        ☾
+      </button>
+      <button type="button" class="close-menu" data-menu-close>
+        Close
+      </button>
+    </div>
+
+    <nav class="mobile-tree" aria-label="Mobile navigation links">
+      <section class="mobile-group" aria-labelledby="mobile-portfolio-label">
+        <h2 class="mobile-label" id="mobile-portfolio-label">
+          <SemanticIcon name="portfolio" />
+          Portfolio
+        </h2>
+        {portfolioNavigation.map(([label, href]) => (
+          <a
+            class="mobile-nav-link"
+            href={href}
+            data-route={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            <span class="mobile-nav-label">
+              <SemanticIcon name={subnavIcon(label, 'portfolio')} />
+              <span>{label}</span>
+            </span>
+            <span class="mobile-arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        ))}
+      </section>
+
+      <section class="mobile-group" aria-labelledby="mobile-corpus-label">
+        <h2 class="mobile-label" id="mobile-corpus-label">
+          <SemanticIcon name="corpus" />
+          Corpus
+        </h2>
+        {corpusNavigation.map(([label, href]) => (
+          <a
+            class="mobile-nav-link"
+            href={href}
+            data-route={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            <span class="mobile-nav-label">
+              <SemanticIcon name={subnavIcon(label, 'corpus')} />
+              <span>{label}</span>
+            </span>
+            <span class="mobile-arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        ))}
+      </section>
+
+      <section class="mobile-group">
+        <a
+          class="mobile-nav-link"
+          href="/explore"
+          data-route="/explore"
+          aria-current={isActive('/explore') ? 'page' : undefined}
+        >
+          <span class="mobile-atlas">
+            <span class="map-icon">
+              <SemanticIcon name="atlas" />
+            </span>
+            Atlas
+          </span>
+          <span class="mobile-arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </section>
+
+      <section class="mobile-group">
+        <a
+          class="mobile-nav-link"
+          href="/about"
+          data-route="/about"
+          aria-current={isActive('/about') ? 'page' : undefined}
+        >
+          <span class="mobile-nav-label">
+            <SemanticIcon name="about" />
+            <span>About</span>
+          </span>
+          <span class="mobile-arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </section>
+    </nav>
+  </div>
+</aside>
+
+<button
+  class="floating-theme"
+  type="button"
+  data-theme-button
+  aria-label="Switch to dark colour theme"
+  title="Switch to dark colour theme"
+>
+  ☾
+</button>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const menuOpen = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const menuClose = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+  const mobileSheet = document.querySelector<HTMLElement>('[data-mobile-sheet]');
+  const categoryButtons = [...document.querySelectorAll<HTMLAnchorElement>('[data-category]')];
+  const secondaryWrap = document.querySelector<HTMLElement>('[data-secondary-wrap]');
+  const secondaryGroups = [...document.querySelectorAll<HTMLElement>('[data-secondary]')];
+
+  const pageRegions = [
+    document.querySelector<HTMLElement>('main'),
+    document.querySelector<HTMLElement>('footer'),
+  ].filter((region): region is HTMLElement => Boolean(region));
+
+  const setPageInteraction = (disabled: boolean) => {
+    document.body.classList.toggle('is-nav-open', disabled);
+    pageRegions.forEach((region) => {
+      if (disabled) region.setAttribute('inert', '');
+      else region.removeAttribute('inert');
+    });
+  };
+
+  const restoreCategory = header?.dataset.initialCategory || null;
+  let previewTimer: number | undefined;
+
+  const setCategory = (category: string | null, animate = true) => {
+    const visible = category === 'portfolio' || category === 'corpus';
+    if (secondaryWrap) secondaryWrap.dataset.visible = visible ? 'true' : 'false';
+
+    categoryButtons.forEach((button) => {
+      const active = visible && button.dataset.category === category;
+      button.dataset.active = active ? 'true' : 'false';
+    });
+
+    secondaryGroups.forEach((group) => {
+      const active = visible && group.dataset.secondary === category;
+      group.dataset.visible = active ? 'true' : 'false';
+      group.setAttribute('aria-hidden', active ? 'false' : 'true');
+      if (!animate && active) {
+        group.style.animation = 'none';
+        group.style.opacity = '1';
+        group.style.transform = 'translateY(0)';
+      } else {
+        group.style.animation = '';
+        group.style.opacity = '';
+        group.style.transform = '';
+      }
+    });
+  };
+
+  const closeMenu = (restoreFocus = false) => {
+    if (!mobileSheet || mobileSheet.dataset.open !== 'true') return;
+    mobileSheet.dataset.open = 'false';
+    mobileSheet.setAttribute('aria-hidden', 'true');
+    mobileSheet.inert = true;
+    document.body.style.overflow = '';
+    setPageInteraction(false);
+    menuOpen?.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) menuOpen?.focus();
+  };
+
+  const openMenu = () => {
+    if (!mobileSheet) return;
+    mobileSheet.dataset.open = 'true';
+    mobileSheet.setAttribute('aria-hidden', 'false');
+    mobileSheet.inert = false;
+    document.body.style.overflow = 'hidden';
+    setPageInteraction(true);
+    menuOpen?.setAttribute('aria-expanded', 'true');
+    window.setTimeout(() => menuClose?.focus(), 0);
+  };
+
+  menuOpen?.addEventListener('click', () => {
+    if (mobileSheet?.dataset.open === 'true') closeMenu();
+    else openMenu();
+  });
+  menuClose?.addEventListener('click', () => closeMenu(true));
+
+  mobileSheet?.querySelectorAll<HTMLAnchorElement>('a[data-route]').forEach((link) => {
+    link.addEventListener('click', () => closeMenu());
+  });
+
+  const restoreActiveCategory = () => {
+    previewTimer = undefined;
+    setCategory(restoreCategory);
+  };
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener('mouseenter', () => {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+      window.clearTimeout(previewTimer);
+      setCategory(button.dataset.category ?? null);
+    });
+    button.addEventListener('mouseleave', () => {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+      previewTimer = window.setTimeout(restoreActiveCategory, 220);
+    });
+    button.addEventListener('focus', () => setCategory(button.dataset.category ?? null));
+    button.addEventListener('blur', () => {
+      if (window.matchMedia('(hover: hover)').matches) restoreActiveCategory();
+    });
+  });
+
+  secondaryWrap?.addEventListener('mouseenter', () => window.clearTimeout(previewTimer));
+  secondaryWrap?.addEventListener('mouseleave', () => {
+    if (window.matchMedia('(hover: hover)').matches) {
+      previewTimer = window.setTimeout(restoreActiveCategory, 220);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && mobileSheet?.dataset.open === 'true') {
+      event.preventDefault();
+      closeMenu(true);
+      return;
+    }
+
+    if (event.key !== 'Tab' || mobileSheet?.dataset.open !== 'true' || !mobileSheet) return;
+    const focusable = Array.from(
+      mobileSheet.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ) as HTMLElement[];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  setCategory(header?.dataset.initialCategory || null, false);
+  if (mobileSheet) mobileSheet.inert = true;
+</script>

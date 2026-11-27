@@ -1,0 +1,23 @@
+---
+import type {
+  KnowledgePathStep as KnowledgePathStepData,
+  PublicContent,
+} from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
+
+interface Props {
+  step: Omit<KnowledgePathStepData, 'page'> & { page: PublicContent };
+  index: number;
+}
+
+const { step, index } = Astro.props;
+---
+
+<a class="knowledge-path-step" href={step.page.slug}>
+  <span>{String(index + 1).padStart(2, '0')}</span>
+  <span class="content-item-title">
+    <SemanticIcon name="knowledge" />
+    <strong>{step.label ?? step.page.title}</strong>
+  </span>
+  <small>{step.page.description}</small>
+</a>

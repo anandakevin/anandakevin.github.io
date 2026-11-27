@@ -1,0 +1,169 @@
+<div class="system-trace workbench" data-system-trace-root aria-labelledby="trace-title">
+  <div class="trace-sheet trace-back"></div>
+  <div class="trace-sheet trace-main">
+    <span class="trace-tape" aria-hidden="true"></span>
+    <div class="trace-head">
+      <span id="trace-title">Working note / delivery trace</span>
+      <span>reviewable</span>
+    </div>
+    <div class="trace-canvas" data-trace>
+      <svg aria-hidden="true" data-trace-svg>
+        <path data-edge="product" />
+        <path data-edge="platform" />
+        <path data-edge="tests" />
+        <path data-edge="ops" />
+        <path data-edge="knowledge" />
+      </svg>
+      <button type="button" class="trace-node node-product is-selected" data-node="product">
+        <b>Product</b> constraints
+      </button>
+      <button type="button" class="trace-node node-platform" data-node="platform">
+        <b>Platform</b> runtime
+      </button>
+      <button type="button" class="trace-node node-tests" data-node="tests">
+        <b>Tests</b> safe changes
+      </button>
+      <button type="button" class="trace-node node-ops" data-node="ops">
+        <b>Ops</b> release safety
+      </button>
+      <button type="button" class="trace-node node-system" data-node="all">
+        <b>Service</b> decision
+      </button>
+      <button type="button" class="trace-node node-reusable" data-node="knowledge">
+        <b>Shared</b> notes
+      </button>
+    </div>
+    <div class="trace-foot sheetfoot">
+      <span>
+        <em>follow the work from problem to release →</em>
+        <br />
+        keep the important decisions recorded.
+      </span>
+      <span>
+        problem → constraints
+        <br />→ decision → documentation
+      </span>
+    </div>
+  </div>
+</div>
+<script>
+  type TracePoint = { x: number; y: number };
+  type TraceRect = TracePoint & { w: number; h: number; cx: number; cy: number };
+
+  const TRACE_EDGES = [
+    { id: 'product', from: 'product', to: 'all' },
+    { id: 'platform', from: 'platform', to: 'all' },
+    { id: 'tests', from: 'tests', to: 'all' },
+    { id: 'ops', from: 'ops', to: 'all' },
+    { id: 'knowledge', from: 'all', to: 'knowledge' },
+  ];
+
+  const traceNodeRect = (node: Element, canvas: HTMLElement): TraceRect => {
+    const canvasBox = canvas.getBoundingClientRect();
+    const box = node.getBoundingClientRect();
+    const x = box.left - canvasBox.left;
+    const y = box.top - canvasBox.top;
+    return {
+      x,
+      y,
+      w: box.width,
+      h: box.height,
+      cx: x + box.width / 2,
+      cy: y + box.height / 2,
+    };
+  };
+
+  const traceBorderPoint = (rect: TraceRect, targetX: number, targetY: number): TracePoint => {
+    const dx = targetX - rect.cx;
+    const dy = targetY - rect.cy;
+    if (dx === 0 && dy === 0) return { x: rect.cx, y: rect.cy };
+    const halfW = rect.w / 2;
+    const halfH = rect.h / 2;
+    const scale =
+      Math.abs(dx) * halfH > Math.abs(dy) * halfW ? halfW / Math.abs(dx) : halfH / Math.abs(dy);
+    return { x: rect.cx + dx * scale, y: rect.cy + dy * scale };
+  };
+
+  const traceEdgePath = (from: TracePoint, to: TracePoint): string => {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const bend = Math.min(42, dist * 0.28);
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const midX = (from.x + to.x) / 2;
+    const midY = (from.y + to.y) / 2;
+    const c1 = {
+      x: from.x + dx * 0.38 + nx * bend * 0.35,
+      y: from.y + dy * 0.12 + ny * bend * 0.35,
+    };
+    const c2 = {
+      x: midX + nx * bend,
+      y: midY + ny * bend,
+    };
+    return `M ${from.x.toFixed(1)} ${from.y.toFixed(1)} C ${c1.x.toFixed(1)} ${c1.y.toFixed(1)} ${c2.x.toFixed(1)} ${c2.y.toFixed(1)} ${to.x.toFixed(1)} ${to.y.toFixed(1)}`;
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-system-trace-root]').forEach((root) => {
+    const trace = root.querySelector<HTMLElement>('[data-trace]');
+    if (!trace) return;
+    const svg = trace.querySelector<SVGSVGElement>('[data-trace-svg]');
+    const nodes = [...trace.querySelectorAll<HTMLElement>('[data-node]')];
+    const edges = [...trace.querySelectorAll<SVGPathElement>('[data-edge]')];
+    const nodeByKey = new Map(nodes.map((node) => [node.dataset.node ?? '', node]));
+    let pinned = 'product';
+
+    const layoutEdges = () => {
+      if (!svg) return;
+      const width = trace.clientWidth;
+      const height = trace.clientHeight;
+      if (!width || !height) return;
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+      TRACE_EDGES.forEach(({ id, from, to }) => {
+        const fromEl = nodeByKey.get(from);
+        const toEl = nodeByKey.get(to);
+        const path = edges.find((edge) => edge.dataset.edge === id);
+        if (!fromEl || !toEl || !path) return;
+
+        const fromRect = traceNodeRect(fromEl, trace);
+        const toRect = traceNodeRect(toEl, trace);
+        const start = traceBorderPoint(fromRect, toRect.cx, toRect.cy);
+        const end = traceBorderPoint(toRect, fromRect.cx, fromRect.cy);
+        path.setAttribute('d', traceEdgePath(start, end));
+      });
+    };
+
+    const render = (key: string) => {
+      nodes.forEach((node) => {
+        node.classList.toggle('is-selected', node.dataset.node === key);
+      });
+      edges.forEach((edge) => {
+        edge.classList.toggle('is-active', key === 'all' || edge.dataset.edge === key);
+      });
+      requestAnimationFrame(layoutEdges);
+    };
+
+    nodes.forEach((node) => {
+      const key = node.dataset.node ?? '';
+      node.addEventListener('mouseenter', () => render(key));
+      node.addEventListener('mouseleave', () => render(pinned));
+      node.addEventListener('focus', () => render(key));
+      node.addEventListener('blur', () => render(pinned));
+      node.addEventListener('click', () => {
+        pinned = key;
+        render(pinned);
+      });
+    });
+
+    render(pinned);
+    layoutEdges();
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(() => layoutEdges());
+      observer.observe(trace);
+    } else {
+      window.addEventListener('resize', layoutEdges);
+    }
+    document.fonts?.ready.then(layoutEdges);
+  });
+</script>

@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LandingContentCard from '../../components/LandingContentCard.astro';
+import LandingHeroVisual from '../../components/LandingHeroVisual.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
+import { iconOverrides } from '../../data/landing-curation';
+import { getCaseStudyItems, isFixtureMode } from '../../lib/content';
+import { landingEntryFor } from '../../lib/content/landing';
+
+const caseStudies = await getCaseStudyItems();
+const entries = caseStudies
+  .map((item) => landingEntryFor(item, iconOverrides[item.id]))
+  .filter((item): item is NonNullable<typeof item> => Boolean(item));
+---
+
+<BaseLayout
+  title="Case Studies"
+  description="Engineering case studies about constraints, decisions, and implementation choices."
+>
+  <section class="landing-hero">
+    <div class="shell landing-hero-grid">
+      <div>
+        <p class="eyebrow">
+          <SemanticIcon name="case-study" />
+          <span>Portfolio / Case Studies</span>
+        </p>
+        <h1 class="display">
+          Problems worth <em>unpacking.</em>
+        </h1>
+        <p class="lede">
+          The constraints, trade-offs, implementation choices, and lessons behind selected
+          engineering work.
+        </p>
+      </div>
+      <LandingHeroVisual kind="portfolio" />
+    </div>
+  </section>
+  <section class="section landing-section">
+    <div class="shell">
+      <SectionHeader
+        index="01 / Library"
+        title="Selected"
+        emphasis="case studies."
+        icon="case-study"
+        description="Writing from the work, presented as a distinct route while remaining part of the broader Corpus."
+      />
+      <div class="landing-card-grid landing-card-grid--three">
+        {entries.map((item) => (
+          <LandingContentCard item={item} />
+        ))}
+      </div>
+      {isFixtureMode && (
+        <p class="landing-empty">Fixture case studies are available for layout validation.</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,210 @@
+---
+import ExternalPublicationCard from './ExternalPublicationCard.astro';
+import type { ExternalFeedItem } from './ExternalPublicationCard.astro';
+import WritingFeedCard from './WritingFeedCard.astro';
+import type { PublicContent } from '../lib/public-contract';
+import { externalReaderHref, type ExternalWritingItem } from '../lib/external-writing';
+
+interface Props {
+  items: PublicContent[];
+  externalItems?: ExternalWritingItem[];
+  devtoUsername?: string;
+  devtoApiUrl?: string;
+  externalOverlay?: Record<string, { note?: string; hidden?: boolean }>;
+  fixtureMode?: boolean;
+}
+
+const {
+  items,
+  externalItems = [],
+  devtoUsername,
+  devtoApiUrl,
+  externalOverlay = {},
+  fixtureMode = false,
+} = Astro.props;
+
+const externalFeedItems: ExternalFeedItem[] = externalItems.map((item) => ({
+  id: item.sourceId,
+  sourceId: item.sourceId,
+  title: item.title,
+  description: item.description,
+  provider: item.source,
+  url: item.url,
+  canonicalUrl: item.canonicalUrl,
+  publishedAt: item.publishedAt,
+  tags: item.tags,
+  authorship: item.authorship,
+  featured: item.featured,
+  readerHref: externalReaderHref(item),
+}));
+---
+
+<div
+  class="home-writing-more"
+  data-home-writing-feed
+  data-dev-username={fixtureMode ? undefined : devtoUsername}
+  data-dev-api-url={fixtureMode ? undefined : devtoApiUrl}
+  data-external-overlay={
+    fixtureMode
+      ? undefined
+      : JSON.stringify(
+          Object.fromEntries(
+            Object.entries(externalOverlay).map(([sourceId, curation]) => [
+              sourceId,
+              { note: curation.note, hidden: curation.hidden },
+            ]),
+          ),
+        )
+  }
+>
+  <div class="home-writing-more-head">
+    <div>
+      <p class="home-writing-more-label">More writing</p>
+      <p class="home-writing-more-description">
+        Shorter notes and external publications from the edges of the work.
+      </p>
+    </div>
+    <a class="button alt" href="/writing">
+      Open writing ↗
+    </a>
+  </div>
+  {!fixtureMode && devtoUsername && (
+    <p class="feed-provider-status" data-home-dev-loading aria-live="polite">
+      Loading external writing…
+    </p>
+  )}
+  <div class="feed-grid writing-home-grid">
+    {items.map((item) => (
+      <WritingFeedCard item={item} fixtureMode={fixtureMode} />
+    ))}
+    {externalFeedItems.map((item) => (
+      <ExternalPublicationCard item={item} />
+    ))}
+  </div>
+</div>
+<script>
+  import { devtoReaderHref } from '../lib/external-writing';
+
+  const root = document.querySelector<HTMLElement>('[data-home-writing-feed]');
+  if (root && root.dataset.devLoaded !== 'true') {
+    const username = root.getAttribute('data-dev-username');
+    const apiUrl = root.getAttribute('data-dev-api-url');
+    const loading = root.querySelector<HTMLElement>('[data-home-dev-loading]');
+    const overlay = JSON.parse(root.getAttribute('data-external-overlay') ?? '{}') as Record<
+      string,
+      { note?: string; hidden?: boolean }
+    >;
+
+    if (username && apiUrl) {
+      root.dataset.devLoaded = 'true';
+      const timeout = new AbortController();
+      const timer = window.setTimeout(() => timeout.abort(), 5000);
+      fetch(`${apiUrl}?username=${encodeURIComponent(username)}&per_page=100`, {
+        signal: timeout.signal,
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error(`DEV feed failed: ${response.status}`);
+          return response.json();
+        })
+        .then((payload: unknown) => {
+          if (!Array.isArray(payload)) throw new Error('DEV response must be an array.');
+          const grid = root.querySelector<HTMLElement>('.writing-home-grid');
+          if (!grid) return;
+          payload.forEach((raw) => {
+            if (!raw || typeof raw !== 'object') return;
+            const article = raw as Record<string, unknown>;
+            const id = article.id;
+            const title = typeof article.title === 'string' ? article.title.trim() : '';
+            const url = typeof article.url === 'string' ? article.url : '';
+            if (
+              (!Number.isInteger(id) && typeof id !== 'string') ||
+              !title ||
+              !/^https?:\/\//.test(url)
+            )
+              return;
+            const sourceId = `devto:${String(id)}`;
+            const curation = overlay[sourceId];
+            if (curation?.hidden) return;
+
+            const card = document.createElement('article');
+            card.className = 'feed-card';
+            card.dataset.feedKind = 'external_publication';
+            card.dataset.provider = 'devto';
+            const accent = document.createElement('div');
+            accent.className = 'feed-accent';
+            accent.setAttribute('aria-hidden', 'true');
+            const body = document.createElement('div');
+            body.className = 'feed-body';
+            const meta = document.createElement('div');
+            meta.className = 'feed-meta';
+            const provider = document.createElement('span');
+            provider.textContent = 'DEV';
+            meta.append(provider);
+            if (typeof article.published_at === 'string') {
+              const date = document.createElement('span');
+              const parsedDate = new Date(`${article.published_at.slice(0, 10)}T00:00:00Z`);
+              date.textContent = Number.isNaN(parsedDate.valueOf())
+                ? article.published_at.slice(0, 10)
+                : new Intl.DateTimeFormat('en', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    timeZone: 'UTC',
+                  }).format(parsedDate);
+              meta.append(date);
+            }
+            const heading = document.createElement('h3');
+            heading.textContent = title;
+            const description = document.createElement('p');
+            const suppliedDescription =
+              typeof article.description === 'string'
+                ? article.description
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                : '';
+            description.textContent =
+              curation?.note || suppliedDescription || `Originally published on DEV — ${title}`;
+            const foot = document.createElement('div');
+            foot.className = 'feed-foot';
+            const reference = document.createElement('span');
+            reference.className = 'feed-ref';
+            reference.textContent = 'Canonical on provider';
+            const actions = document.createElement('div');
+            actions.className = 'feed-actions';
+            const original = document.createElement('a');
+            original.href = url;
+            original.target = '_blank';
+            original.rel = 'noopener noreferrer';
+            original.textContent = 'Original';
+            actions.append(original);
+            const readerHref = devtoReaderHref(sourceId, url);
+            if (readerHref) {
+              const reader = document.createElement('a');
+              reader.href = readerHref;
+              reader.textContent = 'Read here';
+              actions.insertBefore(reader, original);
+            }
+            actions.querySelectorAll('a').forEach((action) => {
+              const arrow = document.createElement('span');
+              arrow.className = 'link-arrow';
+              arrow.setAttribute('aria-hidden', 'true');
+              arrow.textContent = '↗';
+              action.append(' ', arrow);
+            });
+            foot.append(reference, actions);
+            body.append(meta, heading, description, foot);
+            card.append(accent, body);
+            grid.append(card);
+          });
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          window.clearTimeout(timer);
+          loading?.remove();
+        });
+    } else {
+      loading?.remove();
+    }
+  }
+</script>

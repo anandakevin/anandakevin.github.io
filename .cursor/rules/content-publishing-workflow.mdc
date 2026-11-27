@@ -1,0 +1,55 @@
+---
+description: Publish portfolio content broadly, commit it selectively after manual review
+alwaysApply: true
+---
+
+# Portfolio content publishing
+
+This rule applies to every content-based section of the portfolio, including Work, Projects, Writing, Field Notes, Sketches, Knowledge, Contributions, About, Credentials, and future content sections.
+
+## Core principle
+
+Publish broadly, commit selectively.
+
+- A page may be deployed before it has passed final manual review.
+- Git history is a durable record of content that has passed the author's review bar and is considered canonical.
+- `published != committed`.
+- `uncommitted != private`.
+- Anything deployed publicly must be treated as public and potentially indexable, cached, archived, or copied.
+
+## Content lifecycle
+
+Real content generally moves through this lifecycle:
+
+1. Existing source, note, or draft.
+2. Restructure, sanitize, and adapt it for the public site.
+3. Publish it to the live site.
+4. Continue reviewing, editing, and improving it.
+5. Commit it to canonical Git history only after it passes manual review.
+
+AI-assisted rewriting, migration, restructuring, and cleanup do not count as approval.
+
+## Git policy
+
+- Do not automatically commit newly created, migrated, or AI-assisted real content.
+- Before committing real content, confirm that it has been manually reviewed, meets the author's quality bar, and has had sensitive, private, confidential, or inappropriate material removed.
+- Commit only versions the author is comfortable preserving in durable Git history.
+- Do not bulk-commit generated or migrated content merely because it is already live.
+- If approval is unclear, leave the content uncommitted and flag it for review.
+- Do not automatically stage content changes. Do not commit or push unless the user explicitly requests that action.
+
+This restriction applies to real content, not ordinary engineering changes. Layouts, components, styles, routes, schemas, loaders, configuration, search, Atlas integration, build/deployment tooling, tests, fixture/demo content, repository rules, and refactors may be committed normally when requested.
+
+## Deployment policy
+
+The site architecture must allow deployed content and canonical committed content to remain separate. Do not require a content file to enter Git history before it can appear on the deployed site.
+
+Deployment is performed manually from the local working tree. A deployed artifact may therefore include uncommitted content; deployment does not imply manual approval or canonical Git status. The deployment process must not automatically stage or commit content.
+
+When working on real content, preserve the separation between live deployment and canonical Git history. Content may remain live while it is being reviewed and remains uncommitted.
+
+## Visitor-facing behavior
+
+Editorial states are internal workflow concerns. Do not expose states such as `working`, `reviewed`, `approved`, `canonical`, `committed`, or `ready-for-Git` to visitors unless explicitly requested.
+
+Visitors should not see different behavior solely because a page has or has not been committed.
