@@ -7,7 +7,7 @@ import test from 'node:test';
 
 const checker = resolve(new URL('./check-public-content.mjs', import.meta.url).pathname);
 
-function fixture(files) {
+function fixture(files, { defaultStatus = true } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'portfolio-public-content-'));
   const source = join(root, '80-Public-Portfolio');
   mkdirSync(source, { recursive: true });
@@ -18,7 +18,11 @@ function fixture(files) {
       .replace(/^public\//, '80-Public-Portfolio/public/');
     const target = join(root, sourcePath);
     mkdirSync(resolve(target, '..'), { recursive: true });
-    writeFileSync(target, content);
+    const normalized =
+      defaultStatus && !/^publication_status:/m.test(content)
+        ? content.replace(/^---\n/, '---\npublication_status: ready\n')
+        : content;
+    writeFileSync(target, normalized);
   }
   return root;
 }
@@ -121,20 +125,22 @@ media:
   }
 });
 
-test('rejects publication status outside portfolio-authored writing', () => {
-  const root = fixture({
-    'src/content/public/pages/home.md': `---
+test('rejects a record without publication status', () => {
+  const root = fixture(
+    {
+      'src/content/public/pages/home.md': `---
 id: pages/home
 slug: home
-publication_status: ready
 title: Home
 ---
 `,
-  });
+    },
+    { defaultStatus: false },
+  );
   try {
     const result = run(root);
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /only valid on writing records/);
+    assert.match(result.stderr, /valid publication status/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

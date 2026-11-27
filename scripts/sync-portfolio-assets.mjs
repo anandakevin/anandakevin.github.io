@@ -61,10 +61,7 @@ for (const path of walk(recordsRoot).filter((path) => path.endsWith('.md'))) {
 for (const id of published) {
   const record = records.get(id);
   if (!record) throw new Error(`Published record does not exist: ${id}`);
-  if (
-    (id.startsWith('writing/') || id.startsWith('knowledge/')) &&
-    !['ready', 'published'].includes(record.publication_status)
-  ) {
+  if (!['ready', 'published'].includes(record.publication_status)) {
     throw new Error(`Published record is not ready: ${id}`);
   }
 }
@@ -73,12 +70,7 @@ const assetPaths = new Set();
 for (const [id, meta] of records) {
   if (mode === 'fixtures') continue;
   if (mode === 'production' && !published.has(id)) continue;
-  if (
-    mode === 'production' &&
-    (id.startsWith('writing/') || id.startsWith('knowledge/')) &&
-    !['ready', 'published'].includes(meta.publication_status)
-  )
-    continue;
+  if (mode === 'production' && !['ready', 'published'].includes(meta.publication_status)) continue;
   for (const media of meta.media ?? []) assetPaths.add(media.path);
   if (meta.sketch_source) assetPaths.add(meta.sketch_source);
 }

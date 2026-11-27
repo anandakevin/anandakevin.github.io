@@ -18,7 +18,7 @@ test('production stages only media referenced by approved records', () => {
   for (const id of ['approved', 'private']) {
     writeFileSync(
       join(records, `${id}.md`),
-      `---\nid: projects/${id}\nmedia:\n  - path: /media/projects/${id}.jpg\n---\n`,
+      `---\nid: projects/${id}\npublication_status: ${id === 'approved' ? 'ready' : 'draft'}\nmedia:\n  - path: /media/projects/${id}.jpg\n---\n`,
     );
     writeFileSync(join(media, `${id}.jpg`), id);
   }

@@ -61,8 +61,9 @@ export function isRecordVisible<T extends { publication_status?: PublicPublicati
   record: T,
 ): boolean {
   if (isFixtureMode) return true;
-  if (!record.publication_status) return true;
-  return visibleStatuses().has(record.publication_status);
+  return (
+    record.publication_status !== undefined && visibleStatuses().has(record.publication_status)
+  );
 }
 
 export function filterVisibleRecords<T extends { publication_status?: PublicPublicationStatus }>(

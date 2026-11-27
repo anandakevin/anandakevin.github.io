@@ -32,6 +32,7 @@ const primaryNamespaces = new Set([
   'sketches',
   'knowledge',
 ]);
+const publicationStatuses = new Set(['draft', 'review', 'ready', 'published']);
 const fieldNoteSections = new Set(['engineering-systems', 'learning-practice']);
 const dateFields = [
   'published_at',
@@ -142,10 +143,7 @@ for (const id of publishedList) {
   if (!record) throw new Error(`Published record does not exist: ${id}`);
   if (record.meta.fixture_only === true)
     throw new Error(`Fixture record cannot be published: ${id}`);
-  if (
-    (id.startsWith('writing/') || id.startsWith('knowledge/')) &&
-    !['ready', 'published'].includes(record.meta.publication_status)
-  ) {
+  if (!['ready', 'published'].includes(record.meta.publication_status)) {
     throw new Error(`Published record is not ready: ${id}`);
   }
 }
@@ -246,9 +244,7 @@ for (const record of records.filter((entry) => entry.id.startsWith('knowledge/')
   }
 }
 const productionVisible = (record) =>
-  record.id.startsWith('writing/') || record.id.startsWith('knowledge/')
-    ? ['ready', 'published'].includes(record.meta.publication_status)
-    : true;
+  ['ready', 'published'].includes(record.meta.publication_status);
 
 for (const record of records) {
   assertMarkdownStructure(record);
@@ -314,14 +310,8 @@ for (const record of records) {
   if (ids.has(record.id)) throw new Error(`Duplicate public ID: ${record.id}`);
   ids.add(record.id);
   const namespace = record.id.split('/')[0];
-  if (
-    (namespace === 'writing' || namespace === 'knowledge') &&
-    !['draft', 'review', 'ready', 'published'].includes(record.meta.publication_status)
-  ) {
-    throw new Error(
-      `Knowledge and writing records must have a valid publication status: ${record.id}`,
-    );
-  }
+  if (!publicationStatuses.has(record.meta.publication_status))
+    throw new Error(`Record must have a valid publication status: ${record.id}`);
   if (namespace === 'writing') {
     const mode = record.meta.writing_mode ?? 'editorial';
     if (!['editorial', 'reference'].includes(mode))
@@ -350,13 +340,6 @@ for (const record of records) {
     record.meta.field_note_order !== undefined
   ) {
     throw new Error(`Field note metadata is only valid on writing records: ${record.id}`);
-  }
-  if (
-    namespace !== 'writing' &&
-    namespace !== 'knowledge' &&
-    record.meta.publication_status !== undefined
-  ) {
-    throw new Error(`publication_status is only valid on writing records: ${record.id}`);
   }
   if (namespace === 'social' && !['self', 'third-party'].includes(record.meta.authorship)) {
     throw new Error(`Social record must declare authorship: ${record.id}`);

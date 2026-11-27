@@ -44,6 +44,7 @@ const authoredRecord = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   content_kind: z.string(),
+  publication_status: z.enum(['draft', 'review', 'ready', 'published']),
   writing_mode: writingModeSchema.optional(),
   field_note_section: fieldNoteSectionSchema.optional(),
   field_note_order: z.number().int().nonnegative().optional(),
@@ -142,7 +143,6 @@ const writing = defineCollection({
   loader: glob({ base: resolve(portfolioRecordsRoot, 'writing'), pattern: '**/*.md' }),
   schema: authoredRecord
     .extend({
-      publication_status: z.enum(['draft', 'review', 'ready', 'published']),
       writing_mode: writingModeSchema.default('editorial'),
     })
     .superRefine((record, context) => {
@@ -182,7 +182,6 @@ const knowledge = defineCollection({
   loader: glob({ base: resolve(portfolioRecordsRoot, 'knowledge'), pattern: '**/*.md' }),
   schema: authoredRecord.extend({
     content_kind: z.enum(['knowledge', 'knowledge_domain']),
-    publication_status: z.enum(['draft', 'review', 'ready', 'published']),
     knowledge_kind: z.string().min(1),
     knowledge_domain: z.string().min(1),
     knowledge_area: z.array(z.string().min(1)).default([]),
@@ -202,6 +201,7 @@ const social = defineCollection({
     title: z.string().min(1),
     description: z.string().min(1),
     content_kind: z.literal('social_post'),
+    publication_status: z.enum(['draft', 'review', 'ready', 'published']),
     platform: z.string().min(1),
     external_url: externalUrlField,
     authorship: z.enum(['self', 'third-party']),

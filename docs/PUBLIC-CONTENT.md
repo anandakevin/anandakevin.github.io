@@ -14,18 +14,23 @@ It reads the private source from the sibling
 sparsely checks out only `80-Public-Portfolio` and sets that variable to its
 checkout path. Builds fail when the source or `published.json` is missing.
 
-Every record in the private source is available in local preview. Production
-and manual publish builds include only IDs listed in `published.json`; Writing
-and Knowledge also require `publication_status: ready` or `published`.
+Every record in the private source must declare `publication_status` as
+`draft`, `review`, `ready`, or `published`. Local preview includes every
+status. Production and manual publish builds include only IDs listed in
+`published.json`, and those records must also be `ready` or `published`.
+Private owner notes do not belong in this source folder; keep them in their
+normal Second Brain owners.
 `published.json` starts empty because migration is not editorial approval.
 Production stages only assets referenced by selected records. A preview build
 may include the backlog and its media, so its artifact is for local review.
 
-Private Obsidian owner notes remain separate from this portfolio source. An
-owner may link to an approved public record through an HTTPS `public_sources`
-URL. Review wording, evidence, attribution, permissions, and media before
-adding an ID to `published.json`. Published HTML and assets are public even
-though the content Git repository is private.
+Private Obsidian owner notes remain separate from this portfolio source. When a
+private note becomes a public candidate, extract a public-safe record into this
+folder; do not make the site or CMS read the private owner note. An owner may
+link to an approved public record through an HTTPS `public_sources` URL. Review
+wording, evidence, attribution, permissions, and media before adding an ID to
+`published.json`. Published HTML and assets are public even though the content
+Git repository is private.
 
 External Medium and DEV writing is provider-owned and never copied into this
 directory. The normalized feed adapters live in `src/lib/external-writing.ts`;
