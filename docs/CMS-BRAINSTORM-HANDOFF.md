@@ -20,7 +20,7 @@ Current release boundary:
 - `published.json` is currently empty.
 - Private owner notes remain in their normal Second Brain folders. A public candidate is manually extracted into `80-Public-Portfolio/records/`; private notes are never Astro or CMS inputs.
 
-The public architecture is in draft PR #11: <https://github.com/anandakevin/anandakevin.github.io/pull/11>. Do not merge or publish records as part of the brainstorm.
+The public architecture was merged through PR #11: <https://github.com/anandakevin/anandakevin.github.io/pull/11>. This handoff is the only change in follow-up draft PR #12: <https://github.com/anandakevin/anandakevin.github.io/pull/12>. Do not publish records as part of the brainstorm.
 
 ## Design and boundaries
 
