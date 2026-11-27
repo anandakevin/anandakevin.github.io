@@ -1,5 +1,6 @@
 ---
 import SystemsMap from './SystemsMap.astro';
+import SemanticIcon from './SemanticIcon.astro';
 import type { PublicContent } from '../lib/public-contract';
 import { buildSystemsMapGraph } from '../lib/systems-map-graph';
 
@@ -20,9 +21,12 @@ const atlasFocusHref = `/explore/?focus=${encodeURIComponent(item.id)}`;
       <div class="atlas-neighborhood-heading">
         <div>
           <p class="section-index">Atlas context</p>
-          <h2 id={`atlas-neighborhood-${item.id}`}>
-            Nearby in the <em>public corpus.</em>
-          </h2>
+          <div class="content-item-title">
+            <SemanticIcon name="atlas" />
+            <h2 id={`atlas-neighborhood-${item.id}`}>
+              Nearby in the <em>public corpus.</em>
+            </h2>
+          </div>
           <p class="atlas-neighborhood-description">
             This artifact is highlighted; connected nodes are reviewed relations.
           </p>

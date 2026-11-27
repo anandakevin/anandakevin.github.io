@@ -19,10 +19,6 @@ export function slugTail(slug: string): string {
 export function entryToPublicContent(entry: PublicEntry): PublicContent {
   const { data } = entry;
   const pageData = entry.collection === 'pages' ? entry.data : undefined;
-  const publicationStatus =
-    entry.collection === 'writing' || entry.collection === 'knowledge'
-      ? entry.data.publication_status
-      : undefined;
   return {
     id: data.id,
     title: data.title,
@@ -30,7 +26,7 @@ export function entryToPublicContent(entry: PublicEntry): PublicContent {
     content_kind: data.content_kind as PublicContent['content_kind'],
     featured_label: data.featured_label,
     slug: data.slug,
-    ...(publicationStatus ? { publication_status: publicationStatus } : {}),
+    publication_status: entry.data.publication_status,
     writing_mode:
       entry.collection === 'writing' ? (entry.data.writing_mode ?? 'editorial') : undefined,
     field_note_section: entry.collection === 'writing' ? entry.data.field_note_section : undefined,
@@ -40,6 +36,8 @@ export function entryToPublicContent(entry: PublicEntry): PublicContent {
     project_destination: data.project_destination,
     project_group: data.project_group,
     project_order: data.project_order,
+    project_start: data.project_start,
+    project_end: data.project_end,
     map: data.map,
     knowledge_kind: entry.collection === 'knowledge' ? entry.data.knowledge_kind : undefined,
     knowledge_domain: entry.collection === 'knowledge' ? entry.data.knowledge_domain : undefined,

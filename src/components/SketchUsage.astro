@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import { hrefForPublicRecord } from '../lib/content';
 
 interface Props {
@@ -13,7 +14,10 @@ const { title, links, emptyLabel } = Astro.props;
 
 <section class="sketch-usage" aria-labelledby="sketch-usage-heading">
   <p class="section-index">Provenance</p>
-  <h2 id="sketch-usage-heading">{title}</h2>
+  <div class="content-item-title">
+    <SemanticIcon name="sketches" />
+    <h2 id="sketch-usage-heading">{title}</h2>
+  </div>
   {links.length > 0 ? (
     <div class="sketch-usage-grid">
       {links.map((record) => (

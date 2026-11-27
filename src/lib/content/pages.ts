@@ -1,4 +1,3 @@
-import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { pageCurationSchema } from '../public-contract';
 import { getCollectionEntries } from './repository';
@@ -9,7 +8,7 @@ export async function getHomeCuration() {
 }
 
 export async function getPageCuration(id: string) {
-  const pages = await getCollection('pages');
+  const pages = await getCollectionEntries('pages');
   const page = pages.find((entry) => entry.data.id === id);
   return page?.data.curation ?? pageCurationSchema.parse({});
 }

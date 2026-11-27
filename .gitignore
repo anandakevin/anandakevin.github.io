@@ -31,6 +31,10 @@ node_modules
 dist
 .astro/
 .cache/medium-writing.json
+public/media/
+public/sketches/
+src/content/public/
+.private/
 
 # macOS files
 **/.DS_Store

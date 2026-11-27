@@ -257,12 +257,38 @@
   letter-spacing: -0.03em;
 }
 
+.project-card .content-item-title h3 {
+  margin: 0 0 9px;
+}
+
 .project-card p {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.7;
   flex: 1;
+}
+
+.project-period,
+.project-detail-period {
+  color: var(--muted);
+  font: 600 10px/1.4 var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.project-period {
+  margin-top: 15px;
+}
+
+.project-detail-period {
+  display: flex;
+  gap: 10px;
+  margin: 22px 0 0;
+}
+
+.project-detail-period span {
+  color: var(--rust);
 }
 
 .project-card .stack-pills {
@@ -1038,6 +1064,9 @@
 }
 
 .writing-index-row-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin: 3px 0 0;
   color: var(--writing-index-accent);
   font: 700 9px/1.4 var(--mono);
@@ -1124,6 +1153,19 @@
   color: var(--muted);
   font: 650 9px/1 var(--mono);
   text-transform: uppercase;
+}
+
+.feed-meta-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--feed-accent);
+}
+
+.feed-meta-kind .semantic-icon,
+.writing-index-row-type .semantic-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .feed-card .feed-meta > span:first-child {

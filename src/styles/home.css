@@ -43,6 +43,30 @@
   text-transform: uppercase;
 }
 
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow .semantic-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--rust);
+}
+
+.page-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-crumb .semantic-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--rust);
+}
+
 .contribution-context {
   margin: -4px 0 20px;
   color: var(--ink);
@@ -162,6 +186,19 @@
   grid-template-columns: 180px 1fr;
   gap: 38px;
   margin-bottom: 42px;
+}
+
+.section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-header-title .semantic-icon {
+  width: 28px;
+  height: 28px;
+  margin-top: 0;
+  color: var(--rust);
 }
 
 .section-index {
@@ -537,6 +574,14 @@
   font-size: 26px;
   font-weight: 600;
   line-height: 1.18;
+}
+
+.work-card .content-item-title {
+  align-items: center;
+}
+
+.work-card .content-item-title h3 {
+  margin: 0 0 8px;
 }
 
 .work-card p {

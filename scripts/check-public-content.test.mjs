@@ -7,19 +7,62 @@ import test from 'node:test';
 
 const checker = resolve(new URL('./check-public-content.mjs', import.meta.url).pathname);
 
-function fixture(files) {
+function fixture(files, { defaultStatus = true } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'portfolio-public-content-'));
+  const source = join(root, '80-Public-Portfolio');
+  mkdirSync(source, { recursive: true });
+  writeFileSync(join(source, 'published.json'), '[]\n');
   for (const [path, content] of Object.entries(files)) {
-    const target = join(root, path);
+    const sourcePath = path
+      .replace(/^src\/content\/public\//, '80-Public-Portfolio/records/')
+      .replace(/^public\//, '80-Public-Portfolio/public/');
+    const target = join(root, sourcePath);
     mkdirSync(resolve(target, '..'), { recursive: true });
-    writeFileSync(target, content);
+    const normalized =
+      defaultStatus && !/^publication_status:/m.test(content)
+        ? content.replace(/^---\n/, '---\npublication_status: ready\n')
+        : content;
+    writeFileSync(target, normalized);
   }
   return root;
 }
 
 function run(root) {
-  return spawnSync(process.execPath, [checker], { cwd: root, encoding: 'utf8' });
+  return spawnSync(process.execPath, [checker], {
+    cwd: root,
+    encoding: 'utf8',
+    env: { ...process.env, PORTFOLIO_SOURCE_ROOT: join(root, '80-Public-Portfolio') },
+  });
 }
+
+test('rejects a release list that names a missing private-source record', () => {
+  const root = fixture({
+    'src/content/public/pages/home.md': `---\nid: pages/home\nslug: home\ntitle: Home\n---\n\nPublic copy.\n`,
+  });
+  try {
+    writeFileSync(join(root, '80-Public-Portfolio/published.json'), '["pages/missing"]\n');
+    const result = run(root);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Published record does not exist/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('rejects a published record that links to an unpublished route', () => {
+  const root = fixture({
+    'src/content/public/pages/home.md': `---\nid: pages/home\nslug: home\ntitle: Home\n---\n\n[Other](/projects/other).\n`,
+    'src/content/public/projects/other.md': `---\nid: projects/other\nslug: /projects/other\ntitle: Other\ndescription: Other project\ncontent_kind: project\nproject_group: templates\n---\n`,
+  });
+  try {
+    writeFileSync(join(root, '80-Public-Portfolio/published.json'), '["pages/home"]\n');
+    const result = run(root);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /links to an unpublished route/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
 
 test('accepts a minimal direct public record', () => {
   const root = fixture({
@@ -82,20 +125,22 @@ media:
   }
 });
 
-test('rejects publication status outside portfolio-authored writing', () => {
-  const root = fixture({
-    'src/content/public/pages/home.md': `---
+test('rejects a record without publication status', () => {
+  const root = fixture(
+    {
+      'src/content/public/pages/home.md': `---
 id: pages/home
 slug: home
-publication_status: ready
 title: Home
 ---
 `,
-  });
+    },
+    { defaultStatus: false },
+  );
   try {
     const result = run(root);
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /only valid on writing records/);
+    assert.match(result.stderr, /valid publication status/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -455,7 +500,7 @@ slug: /projects/example
 title: Example project
 description: A small project
 content_kind: project
-project_group: experiments-community
+project_group: templates
 project_destination: external
 public_links:
   - label: GitHub repository

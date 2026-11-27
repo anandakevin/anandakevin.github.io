@@ -1,33 +1,53 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageCrumb from '../components/PageCrumb.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import WorkHeroVisual from '../components/WorkHeroVisual.astro';
 import WorkDetailRow from '../components/WorkDetailRow.astro';
-import { getCatalogRecords, getWorkItems, isFixtureMode } from '../lib/content';
+import {
+  getCatalogRecords,
+  getPageEntryById,
+  getWorkItems,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+} from '../lib/content';
 
 const workItems = await getWorkItems();
 const catalogRecords = await getCatalogRecords();
+const page = await getPageEntryById('pages/work');
+const hero = pageHeroFromEntry(page);
 ---
 
 <BaseLayout
-  title="Work"
+  title={page?.data.title ?? 'Work'}
   description={
     isFixtureMode
       ? 'Implementation fixture work surface.'
-      : 'Engineering work — chronology and case studies.'
+      : (page?.data.description ?? 'Engineering work — chronology and case studies.')
   }
 >
   <section class="page-hero">
     <div class="shell work-hero-grid">
       <div>
-        <p class="page-crumb">Work</p>
-        <h1 class="display">
-          Engineering work, <em>in context.</em>
-        </h1>
+        <PageCrumb icon="work">Work</PageCrumb>
+        {hero ? (
+          <h1 class="display">
+            {hero.headline_before} <em>{hero.emphasis}</em>
+            {hero.headline_after}
+          </h1>
+        ) : (
+          <h1 class="display">
+            Engineering work, <em>in context.</em>
+          </h1>
+        )}
         <p class="lede">
           {isFixtureMode
             ? 'Fixture-only chronology validates the page family. Reviewed public role records will replace it before release.'
-            : 'A chronological view of my engineering work, with case studies for the problems and decisions worth unpacking.'}
+            : pageLedeFromEntry(
+                page,
+                'A chronological view of my engineering work, with case studies for the problems and decisions worth unpacking.',
+              )}
         </p>
       </div>
       <WorkHeroVisual />
@@ -50,6 +70,7 @@ const catalogRecords = await getCatalogRecords();
         index="Case studies"
         title="Case"
         emphasis="studies."
+        icon="case-study"
         description="Some engineering problems make more sense when you can see the constraints, trade-offs, implementation choices, and lessons behind them."
       />
       <div class="actions">

@@ -1,11 +1,16 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionHeader from '../components/SectionHeader.astro';
+import PageCrumb from '../components/PageCrumb.astro';
 import MarkdownBody from '../components/MarkdownBody.astro';
 import PageHeroHeadline from '../components/PageHeroHeadline.astro';
-import { getPageEntryById, isFixtureMode } from '../lib/content';
-import { pageHeroFromEntry, pagePrinciplesFromEntry } from '../lib/content/page-presentation';
+import {
+  getPageEntryById,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+  pagePrinciplesFromEntry,
+} from '../lib/content';
 import {
   siteAboutFallbackParagraphs,
   siteAboutHero,
@@ -17,7 +22,7 @@ const rendered = aboutEntry ? await render(aboutEntry) : null;
 const Content = rendered?.Content;
 
 const pageTitle = aboutEntry?.data.title ?? 'About';
-const pageDescription = siteAboutLede;
+const pageDescription = aboutEntry?.data.description ?? siteAboutLede;
 const hero = pageHeroFromEntry(aboutEntry);
 const principles = pagePrinciplesFromEntry(aboutEntry);
 
@@ -45,7 +50,7 @@ const fixturePrinciples = [
 
 const heroLede = isFixtureMode
   ? "I'm a software engineer who tends to look for the system around the task: where boundaries blur, where change becomes risky, where knowledge gets trapped, and where a little structure can make the next change easier."
-  : siteAboutLede;
+  : pageLedeFromEntry(aboutEntry, siteAboutLede);
 const displayHero = isFixtureMode ? fixtureHero : (hero ?? siteAboutHero);
 const displayPrinciples = isFixtureMode ? fixturePrinciples : principles;
 ---
@@ -54,7 +59,7 @@ const displayPrinciples = isFixtureMode ? fixturePrinciples : principles;
   <section class="page-hero">
     <div class="shell about-hero-grid">
       <div>
-        <p class="page-crumb">About</p>
+        <PageCrumb icon="about">About</PageCrumb>
         <PageHeroHeadline hero={displayHero} />
         <p class="lede">{heroLede}</p>
       </div>
@@ -98,73 +103,15 @@ const displayPrinciples = isFixtureMode ? fixturePrinciples : principles;
       </div>
       {displayPrinciples.length > 0 && (
         <div class="about-side">
+          <span class="about-side-cap">How I tend to work</span>
           {displayPrinciples.map((principle) => (
             <article class="about-principle">
-              <span class="about-principle-cap">{principle.cap ?? 'Principle'}</span>
               <h3>{principle.title}</h3>
               <p>{principle.description}</p>
             </article>
           ))}
         </div>
       )}
-    </div>
-  </section>
-  <section class="section">
-    <div class="shell">
-      <SectionHeader index="Links" title="Explore." />
-      <div class="about-links">
-        <div class="about-link">
-          <b>Work</b>
-          <span class="about-link-description">Engineering history and case studies.</span>
-          <a href="/work">
-            <span>Open Work</span>
-            <span class="about-link-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
-        </div>
-        <div class="about-link">
-          <b>Writing</b>
-          <span class="about-link-description">
-            Case studies, articles, notes, and external writing.
-          </span>
-          <a href="/writing">
-            <span>Open Writing</span>
-            <span class="about-link-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
-        </div>
-        <div class="about-link">
-          <b>Credentials</b>
-          <span class="about-link-description">Certifications, research, and recognition.</span>
-          <a href="/credentials">
-            <span>Open Credentials</span>
-            <span class="about-link-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="shell">
-      <SectionHeader index="Motif" title="An idea that has stayed" emphasis="with me." />
-      <div class="manifesto">
-        <img
-          src="/assets/manifesto-banner.jpeg"
-          alt="Hand-drawn banner reading Build Systems. Create Leverage. Leave Lasting Impact."
-        />
-        <div class="manifesto-caption">
-          <span>The wording has changed over time. The idea hasn't.</span>
-          <span class="motif-tags">
-            <span>build systems</span>
-            <span>leverage</span>
-            <span>lasting impact</span>
-          </span>
-        </div>
-      </div>
     </div>
   </section>
 </BaseLayout>

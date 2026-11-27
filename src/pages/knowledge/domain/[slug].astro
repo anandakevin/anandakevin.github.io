@@ -1,6 +1,8 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageCrumb from '../../../components/PageCrumb.astro';
+import SemanticIcon from '../../../components/SemanticIcon.astro';
 import AtlasNeighborhood from '../../../components/AtlasNeighborhood.astro';
 import KnowledgeAreaTree from '../../../components/KnowledgeAreaTree.astro';
 import KnowledgePathStep from '../../../components/KnowledgePathStep.astro';
@@ -42,12 +44,12 @@ const featured = (record.knowledge_featured_pages ?? [])
   <KnowledgeSearch />
   <section class="page-hero knowledge-domain-hero">
     <div class="shell">
-      <p class="page-crumb">
+      <PageCrumb icon="knowledge">
         <a href="/knowledge">Knowledge</a>
         <span aria-hidden="true"> / </span>
         <a href="/knowledge#knowledge-domains">Domains</a>
         <span aria-hidden="true"> / {record.title}</span>
-      </p>
+      </PageCrumb>
       <h1 class="display">
         {record.title}
         <em>.</em>
@@ -84,9 +86,12 @@ const featured = (record.knowledge_featured_pages ?? [])
           <header class="knowledge-subsection-heading">
             <div>
               <p class="section-index">01 / Map of the field</p>
-              <h2 id="knowledge-hierarchy-title">
-                Areas and <em>subareas.</em>
-              </h2>
+              <div class="content-item-title">
+                <SemanticIcon name="knowledge" />
+                <h2 id="knowledge-hierarchy-title">
+                  Areas and <em>subareas.</em>
+                </h2>
+              </div>
             </div>
             <p>
               Hierarchy provides orientation and can deepen over time without changing a document’s
@@ -111,9 +116,12 @@ const featured = (record.knowledge_featured_pages ?? [])
             <header class="knowledge-subsection-heading">
               <div>
                 <p class="section-index">02 / Optional guided path</p>
-                <h2 id="knowledge-pathway-title">
-                  If you’re new to <em>{record.title}.</em>
-                </h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="knowledge" />
+                  <h2 id="knowledge-pathway-title">
+                    If you’re new to <em>{record.title}.</em>
+                  </h2>
+                </div>
               </div>
               <p>
                 A curated sequence for readers who want progression. It is optional, not a
@@ -133,9 +141,12 @@ const featured = (record.knowledge_featured_pages ?? [])
             <header class="knowledge-subsection-heading">
               <div>
                 <p class="section-index">03 / Entry points</p>
-                <h2 id="knowledge-featured-title">
-                  Useful <em>starting points.</em>
-                </h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="knowledge" />
+                  <h2 id="knowledge-featured-title">
+                    Useful <em>starting points.</em>
+                  </h2>
+                </div>
               </div>
               <p>Manually selected pages for this area, independent of recency or popularity.</p>
             </header>

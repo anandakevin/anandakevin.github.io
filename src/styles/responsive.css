@@ -57,32 +57,6 @@
 }
 
 @media (max-width: 850px) {
-  .nav-toggle {
-    display: inline-flex;
-  }
-
-  .primary-nav {
-    display: none;
-    position: absolute;
-    top: 68px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    padding: 12px 32px 18px;
-    border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(16px);
-    z-index: 45;
-  }
-
-  .site-header {
-    position: relative;
-  }
-
-  .site-header.is-nav-open .primary-nav {
-    display: flex;
-  }
-
   .section-header,
   .about-hero,
   .work-detail-layout {
@@ -256,6 +230,12 @@
 
   .fixture-notice {
     top: 68px;
+  }
+}
+
+@media (max-width: 780px) {
+  .fixture-notice {
+    top: 60px;
   }
 }
 

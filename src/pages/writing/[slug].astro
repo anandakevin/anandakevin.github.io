@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
 import MarkdownBody from '../../components/MarkdownBody.astro';
 import PublicMedia from '../../components/PublicMedia.astro';
 import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
@@ -72,7 +73,9 @@ function formatDate(value?: string) {
   <BaseLayout title={item.title} description={item.description}>
     <section class="field-note-detail-hero">
       <div class="shell">
-        <p class="page-crumb">Writing / Field Notes / {section?.title ?? 'Reference'}</p>
+        <PageCrumb icon="writing">
+          Writing / Field Notes / {section?.title ?? 'Reference'}
+        </PageCrumb>
         <h1 class="display">{item.title}</h1>
         <p class="lede">{item.description}</p>
         <div class="detail-pills field-note-detail-meta">
@@ -201,9 +204,9 @@ function formatDate(value?: string) {
   <BaseLayout title={item.title} description={item.description}>
     <section class="page-hero">
       <div class="shell">
-        <p class="page-crumb">
+        <PageCrumb icon="writing">
           Writing / {kindLabel} / {item.title}
-        </p>
+        </PageCrumb>
         <h1 class="display">{item.title}</h1>
         <p class="lede">{item.description}</p>
         <div class="detail-pills">

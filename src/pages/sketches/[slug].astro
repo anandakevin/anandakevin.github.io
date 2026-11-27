@@ -1,6 +1,8 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import AtlasNeighborhood from '../../components/AtlasNeighborhood.astro';
 import MarkdownBody from '../../components/MarkdownBody.astro';
 import SketchViewer from '../../components/SketchViewer.astro';
@@ -38,7 +40,7 @@ const role = record.sketch_role?.replace('-', ' ') ?? 'visual reasoning artifact
   <section class="page-hero">
     <div class="shell sketch-detail-hero-grid">
       <div>
-        <p class="page-crumb">Sketches / {role}</p>
+        <PageCrumb icon="sketches">Sketches / {role}</PageCrumb>
         <h1 class="display">{record.title}</h1>
         <p class="lede">{record.description}</p>
         <div class="detail-pills">
@@ -74,9 +76,12 @@ const role = record.sketch_role?.replace('-', ' ') ?? 'visual reasoning artifact
       </div>
       <div class="sketch-detail-context">
         <p class="section-index">Context</p>
-        <h2>
-          The drawing carries the <em>visual model.</em>
-        </h2>
+        <div class="content-item-title">
+          <SemanticIcon name="sketches" />
+          <h2>
+            The drawing carries the <em>visual model.</em>
+          </h2>
+        </div>
         <MarkdownBody>
           <Content />
         </MarkdownBody>
@@ -88,7 +93,10 @@ const role = record.sketch_role?.replace('-', ' ') ?? 'visual reasoning artifact
       />
       <section class="sketch-related" aria-labelledby="sketch-related-heading">
         <p class="section-index">Relationships</p>
-        <h2 id="sketch-related-heading">Related artifacts</h2>
+        <div class="content-item-title">
+          <SemanticIcon name="atlas" />
+          <h2 id="sketch-related-heading">Related artifacts</h2>
+        </div>
         {related.length > 0 ? (
           <div class="sketch-related-grid">
             {related.map((item) => (

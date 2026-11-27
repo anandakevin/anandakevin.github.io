@@ -1,15 +1,27 @@
-# Deployment and cutover
+# Deployment and content release
+
+The private `anandakevin/second-brain` repository owns the editable
+`80-Public-Portfolio` source. Locally, check out both repositories as siblings
+or set `PORTFOLIO_SOURCE_ROOT` to that folder. Production CI sparsely checks out the
+folder with a read-only deploy key stored as `PORTFOLIO_VAULT_READ_KEY` in the
+portfolio repository's Actions secrets. The workflow never commits private
+records into the public site repository.
+
+`npm run content:check` validates records, references, and `published.json`.
+The production build includes only IDs listed there and only their referenced
+media and sketches. The list starts empty until editorial release is approved.
 
 ## Production (GitHub Pages)
 
 - **Workflow:** `.github/workflows/build-prod.yml` on push to `main` and daily at 03:17 UTC.
-- **Build:** `npm run lint` → `npm run content:check` → `npm test` → `npm run type-check` → `npm run build` (production-visible direct public collections).
+- **Build:** private sparse checkout → `npm run lint` → `npm run content:check` → `npm test` → `npm run type-check` → `npm run build`.
 - **Artifact:** static `dist/` deployed via GitHub Pages (`deploy-pages`).
 
-The production build reads production-visible `src/content/public/` records. The
-manual review-publish build may read draft and review records from the local
-working tree; CI never reads the private vault and no export or generated-content
-step runs in CI.
+The daily schedule picks up approved Second Brain content changes without a
+public-site code commit. For an immediate release, manually run the production
+workflow on `main`. Only the trusted `main` workflow receives the private
+checkout key. Do not pass it to pull-request workflows.
+Treat the static artifact and build logs as disclosure surfaces.
 
 ### Local commands
 
@@ -18,14 +30,11 @@ step runs in CI.
 | `npm run deploy`  | Same checks and production build as CI; leaves `dist/` on disk. Use before merging to `main` when you want Actions to publish. |
 | `npm run publish` | Runs `deploy:publish`, then pushes `dist/` to the remote **`gh-pages`** branch via the `gh-pages` CLI.                         |
 
-### Manual review publishing
+### Manual publishing
 
-The local publishing path is separate from canonical Git history. `npm run build:publish`
-includes `draft`, `review`, `ready`, and `published` public records from the current working
-tree without staging or committing them. `npm run deploy:publish` runs the checks and produces
-that artifact; `npm run publish` additionally sends `dist/` through the configured `gh-pages`
-publisher. Publishing makes content public and potentially indexable, but does not make it
-canonical in Git.
+`npm run build:publish` uses the same approved IDs and assets as production.
+`npm run deploy:publish` runs checks and produces that artifact; `npm run publish`
+also sends `dist/` through the configured `gh-pages` publisher.
 
 **Default production path:** push/merge to **`main`** so `.github/workflows/build-prod.yml` runs (`deploy-pages`).
 
@@ -33,7 +42,8 @@ canonical in Git.
 
 ## Staging / migration branch
 
-- **Workflow:** `.github/workflows/build-stage.yml` on `develop` runs `build:fixtures` for layout verification without reviewed content.
+- **Workflow:** `.github/workflows/build-stage.yml` on `develop` creates an empty source and runs `build:fixtures` for layout verification without editorial content or vault access.
+- **Local editorial preview:** `npm run preview:staging` includes all records and referenced assets; do not deploy that artifact publicly.
 
 ## Retired legacy site
 
@@ -47,7 +57,7 @@ npm run build
 npm run preview
 ```
 
-Do not use `npm run dev` for launch review — dev defaults to fixture mode.
+Do not use `npm run dev` for launch review — dev includes the editorial backlog.
 
 ## External writing aggregation
 
@@ -56,7 +66,7 @@ providers are supplementary: a refresh or provider failure omits only that provi
 scheduled build refreshes Medium without a portfolio commit; a push-triggered build remains
 available as well.
 
-LinkedIn remains a manually maintained `src/content/public/social/` catalogue. Its records declare
+LinkedIn remains a manually maintained `80-Public-Portfolio/records/social/` catalogue. Its records declare
 `authorship: self` or `authorship: third-party`; only self-authored records appear in Writing, while
 third-party announcements remain relationship evidence on the relevant public record.
 

@@ -1,0 +1,222 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LandingContentCard from '../../components/LandingContentCard.astro';
+import LandingHeroVisual from '../../components/LandingHeroVisual.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
+import { corpusCuration, iconOverrides } from '../../data/landing-curation';
+import { getCatalogRecords } from '../../lib/content';
+import { latestEntriesFor, resolveLandingEntries } from '../../lib/content/landing';
+
+const records = await getCatalogRecords();
+const featured = resolveLandingEntries(corpusCuration.featured, records, iconOverrides);
+const latest = latestEntriesFor(
+  records,
+  ['writing', 'knowledge', 'sketches'],
+  records.length,
+  iconOverrides,
+);
+const kinds = [
+  {
+    icon: 'writing',
+    label: 'Writing',
+    title: 'Arguments and narratives.',
+    description: 'Case studies, essays, and writing where sequence and perspective matter.',
+    href: '/writing',
+  },
+  {
+    icon: 'knowledge',
+    label: 'Knowledge',
+    title: 'Maintained reference material.',
+    description:
+      'Concepts, guides, and structured notes intended to remain useful as understanding evolves.',
+    href: '/knowledge',
+  },
+  {
+    icon: 'sketches',
+    label: 'Sketches',
+    title: 'Thinking visually.',
+    description: 'Diagrams and drawings used to explain systems, relationships, and concepts.',
+    href: '/sketches',
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Corpus"
+  description="Writing, maintained knowledge, sketches, and relationship-based exploration."
+>
+  <section class="landing-hero">
+    <div class="shell landing-hero-grid">
+      <div>
+        <p class="eyebrow">
+          <SemanticIcon name="corpus" />
+          <span>Corpus</span>
+        </p>
+        <h1 class="display">
+          What I’ve worked out, explained, and keep <em>returning to.</em>
+        </h1>
+        <p class="lede">
+          Writing, maintained knowledge, sketches, and other material from engineering and learning.
+        </p>
+      </div>
+      <LandingHeroVisual kind="corpus" />
+    </div>
+  </section>
+
+  <section class="section landing-section">
+    <div class="shell">
+      <SectionHeader
+        index="01 / Editorial roles"
+        title="Three kinds of"
+        emphasis="material."
+        icon="corpus"
+        description="Different formats for different purposes. These distinctions stay stable as individual entries change."
+      />
+      <div class="landing-card-grid landing-card-grid--three">
+        {kinds.map((kind) => (
+          <a class="landing-type-card" href={kind.href}>
+            <div class="landing-type-card-head">
+              <SemanticIcon name={kind.icon} />
+              <span>{kind.label}</span>
+            </div>
+            <h3>{kind.title}</h3>
+            <p>{kind.description}</p>
+            <span class="landing-card-link">
+              Explore <span aria-hidden="true">↗</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section" id="corpus-featured">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <SectionHeader
+          index="02 / Featured from the corpus"
+          title="Featured from the"
+          emphasis="corpus."
+          icon="corpus"
+          description="Representative pieces chosen deliberately rather than driven by recency. The selection can mix Writing, Knowledge, and Sketches without a fixed item cap."
+        />
+      </div>
+      <div class="landing-card-grid landing-card-grid--three">
+        {featured.length > 0 ? (
+          featured.map((item) => <LandingContentCard item={item} />)
+        ) : (
+          <p class="landing-empty">Featured corpus items will appear here once selected.</p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section landing-atlas-section">
+    <div class="shell">
+      <div class="landing-atlas-card">
+        <div>
+          <div class="landing-content-card-head">
+            <SemanticIcon name="atlas" />
+            <span>Atlas</span>
+          </div>
+          <h2>
+            Explore by <em>relationship.</em>
+          </h2>
+          <p>
+            The Atlas cuts across both sides of the site: follow relationships between work,
+            writing, knowledge, sketches, projects, contributions, and credentials.
+          </p>
+        </div>
+        <a class="button alt" href="/explore">
+          Open Atlas →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section landing-section landing-latest-section" id="corpus-latest">
+    <div class="shell">
+      <div class="landing-section-heading">
+        <SectionHeader
+          index="03 / Latest corpus updates"
+          title="Recently published or"
+          emphasis="meaningfully updated."
+          icon="writing"
+          description="Derived from shared content metadata; typo-only or metadata-only churn should not reorder this list."
+        />
+      </div>
+      <div
+        class="landing-corpus-filter feed-controls"
+        role="tablist"
+        aria-label="Latest corpus filters"
+      >
+        <button
+          class="active"
+          type="button"
+          role="tab"
+          data-corpus-filter="all"
+          aria-selected="true"
+        >
+          All
+        </button>
+        <button type="button" role="tab" data-corpus-filter="writing" aria-selected="false">
+          Writing
+        </button>
+        <button type="button" role="tab" data-corpus-filter="knowledge" aria-selected="false">
+          Knowledge
+        </button>
+        <button type="button" role="tab" data-corpus-filter="sketches" aria-selected="false">
+          Sketches
+        </button>
+      </div>
+      <div class="landing-card-grid landing-card-grid--three" data-corpus-latest-feed>
+        {latest.map((item, index) => (
+          <LandingContentCard item={item} hidden={index >= 6} />
+        ))}
+        <p class="landing-empty" data-corpus-latest-empty hidden>
+          No matching entries.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  function initCorpusLatestFilter() {
+    const root = document.querySelector('[data-corpus-latest-feed]');
+    const controls = document.querySelector('.landing-corpus-filter');
+    if (!root || !controls || root.dataset.filterReady === 'true') return;
+    root.dataset.filterReady = 'true';
+    const cards = [...root.querySelectorAll('[data-landing-entry-type]')];
+    const empty = root.querySelector('[data-corpus-latest-empty]');
+
+    const apply = (filter) => {
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const matchesFilter = filter === 'all' || card.dataset.landingEntryType === filter;
+        const visible = matchesFilter && visibleCount < 6;
+        if (matchesFilter) visibleCount += 1;
+        card.toggleAttribute('hidden', !visible);
+      });
+      if (empty) empty.hidden = cards.some((card) => !card.hidden);
+    };
+
+    controls.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest('[data-corpus-filter]');
+      if (!button || !controls.contains(button)) return;
+      const filter = button.dataset.corpusFilter ?? 'all';
+      controls.querySelectorAll('[data-corpus-filter]').forEach((candidate) => {
+        const active = candidate === button;
+        candidate.classList.toggle('active', active);
+        candidate.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      apply(filter);
+    });
+    apply('all');
+  }
+
+  initCorpusLatestFilter();
+  document.addEventListener('astro:page-load', initCorpusLatestFilter);
+</script>

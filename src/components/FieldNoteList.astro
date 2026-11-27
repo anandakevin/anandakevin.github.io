@@ -1,6 +1,7 @@
 ---
 import type { FieldNoteSectionDefinition } from '../data/writing-sections';
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 
 interface Props {
   items: PublicContent[];
@@ -68,7 +69,10 @@ const groups = grouped
               <p class="section-index">{String(sectionIndex + 1).padStart(2, '0')} / Field Notes</p>
             )}
             <div>
-              <h2>{section.title}</h2>
+              <div class="content-item-title">
+                <SemanticIcon name="writing" />
+                <h2>{section.title}</h2>
+              </div>
               {!compact && <p>{section.description}</p>}
             </div>
           </header>
@@ -87,9 +91,12 @@ const groups = grouped
             return variant === 'cards' ? (
               <article class="field-note-card" {...searchAttrs}>
                 <p class="field-note-cap">Field note · {itemSection?.title ?? 'Reference'}</p>
-                <h3>
-                  <a href={item.slug}>{item.title}</a>
-                </h3>
+                <div class="content-item-title">
+                  <SemanticIcon name="writing" />
+                  <h3>
+                    <a href={item.slug}>{item.title}</a>
+                  </h3>
+                </div>
                 <p class="field-note-card-description">{item.description}</p>
                 <div class="stack-pills field-note-tags">
                   {item.tags.map((tag) => (
@@ -109,9 +116,12 @@ const groups = grouped
               <article class="field-note-row" {...searchAttrs}>
                 <div class="field-note-row-main">
                   <p class="field-note-cap">Field note · {itemSection?.title ?? 'Reference'}</p>
-                  <h3>
-                    <a href={item.slug}>{item.title}</a>
-                  </h3>
+                  <div class="content-item-title">
+                    <SemanticIcon name="writing" />
+                    <h3>
+                      <a href={item.slug}>{item.title}</a>
+                    </h3>
+                  </div>
                   <p>{item.description}</p>
                   <div class="stack-pills field-note-tags">
                     {item.tags.map((tag) => (

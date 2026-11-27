@@ -1,0 +1,97 @@
+html {
+  scrollbar-color: var(--rust) transparent;
+  scrollbar-width: thin;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: auto;
+  }
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  min-height: 44px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--rust);
+  background-clip: padding-box;
+  opacity: 0.82;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--rust) 42%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html::-webkit-scrollbar-thumb,
+  .site-scrollbar-thumb {
+    animation: site-scrollbar-breathe 2.2s ease-in-out infinite;
+  }
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  animation: none;
+  opacity: 1;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rust) 42%, transparent);
+}
+
+html::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html.has-site-scrollbar {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: none;
+}
+
+html.has-site-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+html.has-site-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  animation: none;
+}
+
+.site-scrollbar-thumb {
+  position: fixed;
+  z-index: 2147483647;
+  top: 0;
+  right: 0;
+  width: 12px;
+  min-height: 44px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--rust);
+  background-clip: padding-box;
+  opacity: 0.72;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--rust) 0%, transparent);
+}
+
+body.is-nav-open .site-scrollbar-thumb {
+  display: none;
+}
+
+@keyframes site-scrollbar-breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    background-color: var(--rust);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--rust) 0%, transparent);
+  }
+
+  50% {
+    opacity: 1;
+    background-color: color-mix(in srgb, var(--rust) 82%, white 18%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rust) 42%, transparent);
+  }
+}

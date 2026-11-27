@@ -21,7 +21,7 @@ export type MapSubterritory = {
 };
 
 export type MapArtifactKind =
-  'Work' | 'Project' | 'Writing' | 'Contribution' | 'Sketch' | 'Knowledge';
+  'Work' | 'Project' | 'Credential' | 'Writing' | 'Contribution' | 'Sketch' | 'Knowledge';
 export type MapProminence = 'landmark' | 'normal';
 
 export type SystemsMapArtifact = {
@@ -61,6 +61,7 @@ export const MAP_VIEWBOX = { width: 1800, height: 1200 };
 export const MAP_COLORS: Record<MapArtifactKind, string> = {
   Work: '#48c6ff',
   Project: '#4de1a7',
+  Credential: '#f4cf6a',
   Writing: '#aa8cff',
   Contribution: '#ffb45f',
   Sketch: '#466b89',
@@ -121,6 +122,7 @@ function hash(value: string): number {
 
 function fallbackDomainsForRecord(record: PublicContent): MapDomain[] {
   if (record.content_kind === 'contribution') return ['learning-education'];
+  if (record.content_kind === 'proof') return ['learning-education'];
   if (record.content_kind === 'project' || record.content_kind === 'work') {
     return ['engineering/systems-data-reliability'];
   }
@@ -138,6 +140,7 @@ function domainsForRecord(record: PublicContent): MapDomain[] {
 function artifactKindForRecord(record: PublicContent): MapArtifactKind | undefined {
   if (record.content_kind === 'work') return 'Work';
   if (record.content_kind === 'project') return 'Project';
+  if (record.content_kind === 'proof') return 'Credential';
   if (record.content_kind === 'contribution') return 'Contribution';
   if (['article', 'case_study', 'note'].includes(record.content_kind)) return 'Writing';
   if (record.content_kind === 'sketch') return 'Sketch';
@@ -150,6 +153,7 @@ function artifactKindForRecord(record: PublicContent): MapArtifactKind | undefin
 function subtypeForRecord(record: PublicContent): string {
   if (record.content_kind === 'work') return record.work_role ?? 'work';
   if (record.content_kind === 'project') return record.project_categories?.join(' · ') ?? 'project';
+  if (record.content_kind === 'proof') return 'credential';
   if (record.content_kind === 'contribution') {
     return record.contribution_type?.join(' · ') ?? 'contribution';
   }

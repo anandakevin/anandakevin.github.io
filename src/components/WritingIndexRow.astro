@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import { fieldNoteSectionById } from '../data/writing-sections';
 
 interface Props {
@@ -21,6 +22,7 @@ const kindLabel = isFieldNote
   : fixtureMode
     ? `Fixture / ${kindLabels[item.content_kind] ?? item.content_kind}`
     : (kindLabels[item.content_kind] ?? item.content_kind.replaceAll('_', ' '));
+const iconKey = item.content_kind === 'case_study' ? 'case-study' : 'writing';
 
 function formatDate(value?: string) {
   if (!value) return 'Review date not recorded';
@@ -42,9 +44,12 @@ function formatDate(value?: string) {
 >
   <p class="writing-index-row-type">{kindLabel}</p>
   <div class="writing-index-row-main">
-    <h3>
-      <a href={href}>{item.title}</a>
-    </h3>
+    <div class="content-item-title">
+      <SemanticIcon name={iconKey} />
+      <h3>
+        <a href={href}>{item.title}</a>
+      </h3>
+    </div>
     <p>{item.description}</p>
   </div>
   <div class="writing-index-row-meta">

@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PageCrumb from '../../../../components/PageCrumb.astro';
+import SemanticIcon from '../../../../components/SemanticIcon.astro';
 import AtlasNeighborhood from '../../../../components/AtlasNeighborhood.astro';
 import KnowledgeSearch from '../../../../components/KnowledgeSearch.astro';
 import { knowledgeKindLabel } from '../../../../data/knowledge';
@@ -127,10 +129,10 @@ const atlasRecords = [...byId.values()];
 
         <div class="knowledge-area-main">
           <div class="knowledge-area-intro">
-            <p class="section-index">
+            <PageCrumb icon="knowledge">
               Area / {domain.title}
               {labels.slice(0, -1).length > 0 && ` / ${labels.slice(0, -1).join(' / ')}`}
-            </p>
+            </PageCrumb>
             <h1 class="display">
               {area.title}
               <em>.</em>
@@ -149,9 +151,12 @@ const atlasRecords = [...byId.values()];
             <header class="knowledge-subsection-heading">
               <div>
                 <p class="section-index">01 / Map of this area</p>
-                <h2 id="knowledge-area-structure-title">
-                  Local <em>structure.</em>
-                </h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="knowledge" />
+                  <h2 id="knowledge-area-structure-title">
+                    Local <em>structure.</em>
+                  </h2>
+                </div>
               </div>
               <p>
                 {areaPages.length} {areaPages.length === 1 ? 'page' : 'pages'} in this area and its
@@ -193,9 +198,12 @@ const atlasRecords = [...byId.values()];
             <header class="knowledge-subsection-heading">
               <div>
                 <p class="section-index">02 / Pages in this area</p>
-                <h2 id="knowledge-area-pages-title">
-                  Useful pages <em>here.</em>
-                </h2>
+                <div class="content-item-title">
+                  <SemanticIcon name="knowledge" />
+                  <h2 id="knowledge-area-pages-title">
+                    Useful pages <em>here.</em>
+                  </h2>
+                </div>
               </div>
               <p>
                 A small local list for orientation. The full index keeps these filters bookmarkable.

@@ -21,6 +21,15 @@
   line-height: 0.98;
 }
 
+.atlas-neighborhood-heading .content-item-title {
+  margin-top: 12px;
+  align-items: flex-start;
+}
+
+.atlas-neighborhood-heading .content-item-title h2 {
+  margin: 0;
+}
+
 .atlas-neighborhood-heading h2 em {
   font-family: var(--serif);
   font-weight: 500;

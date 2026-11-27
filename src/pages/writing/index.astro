@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import WritingHeroVisual from '../../components/WritingHeroVisual.astro';
 import WritingIndexRow from '../../components/WritingIndexRow.astro';
 import ExternalPublicationCard from '../../components/ExternalPublicationCard.astro';
@@ -8,7 +10,10 @@ import {
   getCuratedFieldNotesForPage,
   getEditorialWritingItems,
   getMediumWriting,
+  getPageEntryById,
   isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
 } from '../../lib/content';
 import { externalWritingConfig, externalWritingOverlay } from '../../data/external-writing';
 import { externalReaderHref, type ExternalWritingItem } from '../../lib/external-writing';
@@ -18,6 +23,8 @@ const caseStudies = writingItems.filter((item) => item.content_kind === 'case_st
 const articles = writingItems.filter((item) => item.content_kind !== 'case_study');
 const fieldNotes = await getCuratedFieldNotesForPage('pages/writing', 3);
 const mediumItems = await getMediumWriting();
+const page = await getPageEntryById('pages/writing');
+const hero = pageHeroFromEntry(page);
 
 const fixtureExternal: ExternalFeedItem[] = isFixtureMode
   ? [
@@ -61,21 +68,30 @@ const writingEmpty =
 ---
 
 <BaseLayout
-  title="Writing"
+  title={page?.data.title ?? 'Writing'}
   description={
     isFixtureMode
       ? 'Implementation fixture writing surface.'
-      : 'Case studies, reusable notes, and external publications.'
+      : (page?.data.description ?? 'Case studies, reusable notes, and external publications.')
   }
 >
   <section class="page-hero">
     <div class="shell writing-hero-grid">
       <div>
-        <p class="page-crumb">Writing</p>
-        <h1 class="display">
-          Writing from the <em>work.</em>
-        </h1>
-        <p class="lede">Case studies, field notes, and writing published elsewhere.</p>
+        <PageCrumb icon="writing">Writing</PageCrumb>
+        {hero ? (
+          <h1 class="display">
+            {hero.headline_before} <em>{hero.emphasis}</em>
+            {hero.headline_after}
+          </h1>
+        ) : (
+          <h1 class="display">
+            Writing from the <em>work.</em>
+          </h1>
+        )}
+        <p class="lede">
+          {pageLedeFromEntry(page, 'Case studies, field notes, and writing published elsewhere.')}
+        </p>
       </div>
       <WritingHeroVisual />
     </div>
@@ -107,7 +123,10 @@ const writingEmpty =
       <div class="writing-index-intro">
         <div>
           <p class="section-index">01 / Library</p>
-          <h2>Browse the library.</h2>
+          <div class="content-item-title">
+            <SemanticIcon name="writing" />
+            <h2>Browse the library.</h2>
+          </div>
         </div>
         <nav class="writing-format-nav" aria-label="Writing sections">
           {caseStudies.length > 0 && <a href="#case-studies">Case studies</a>}
@@ -122,7 +141,10 @@ const writingEmpty =
       {caseStudies.length > 0 && (
         <section class="writing-group" id="case-studies">
           <header class="writing-group-heading">
-            <h2>Case studies</h2>
+            <div class="content-item-title">
+              <SemanticIcon name="case-study" />
+              <h2>Case studies</h2>
+            </div>
           </header>
           <div class="writing-index-list">
             {caseStudies.map((item) => (
@@ -135,7 +157,10 @@ const writingEmpty =
       {fieldNotes.length > 0 && (
         <section class="writing-group" id="field-notes">
           <header class="writing-group-heading">
-            <h2>Field Notes</h2>
+            <div class="content-item-title">
+              <SemanticIcon name="writing" />
+              <h2>Field Notes</h2>
+            </div>
             <a href="/writing/notes">Browse all notes ↗</a>
           </header>
           <div class="writing-index-list">
@@ -149,7 +174,10 @@ const writingEmpty =
       {articles.length > 0 && (
         <section class="writing-group" id="articles">
           <header class="writing-group-heading">
-            <h2>Articles</h2>
+            <div class="content-item-title">
+              <SemanticIcon name="writing" />
+              <h2>Articles</h2>
+            </div>
           </header>
           <div class="writing-index-list">
             {articles.map((item) => (
@@ -162,7 +190,10 @@ const writingEmpty =
       {(externalFeed.length > 0 || externalEnabled) && (
         <section class="writing-group" id="elsewhere">
           <header class="writing-group-heading">
-            <h2>Elsewhere</h2>
+            <div class="content-item-title">
+              <SemanticIcon name="writing" />
+              <h2>Elsewhere</h2>
+            </div>
           </header>
           {!isFixtureMode && externalWritingConfig.devto.username && (
             <p class="writing-index-loading" data-dev-loading aria-live="polite">

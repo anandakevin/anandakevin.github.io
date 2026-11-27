@@ -1,26 +1,47 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageCrumb from '../../components/PageCrumb.astro';
+import SemanticIcon from '../../components/SemanticIcon.astro';
 import SketchCard from '../../components/SketchCard.astro';
-import { getSketchItems, isFixtureMode } from '../../lib/content';
+import {
+  getPageEntryById,
+  getSketchItems,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+} from '../../lib/content';
 
 const sketches = await getSketchItems();
 const tags = [...new Set(sketches.flatMap((sketch) => sketch.tags))].sort();
+const page = await getPageEntryById('pages/sketches');
+const hero = pageHeroFromEntry(page);
 ---
 
 <BaseLayout
-  title="Sketches"
-  description="Interactive architecture models, debugging maps, teaching whiteboards, and visual explanations."
+  title={page?.data.title ?? 'Sketches'}
+  description={
+    page?.data.description ??
+    'Interactive architecture models, debugging maps, teaching whiteboards, and visual explanations.'
+  }
 >
   <section class="page-hero sketch-index-hero">
     <div class="shell">
-      <p class="page-crumb">Sketches</p>
-      <h1 class="display">
-        Thinking made <em>visible.</em>
-      </h1>
+      <PageCrumb icon="sketches">Sketches</PageCrumb>
+      {hero ? (
+        <h1 class="display">
+          {hero.headline_before} <em>{hero.emphasis}</em>
+          {hero.headline_after}
+        </h1>
+      ) : (
+        <h1 class="display">
+          Thinking made <em>visible.</em>
+        </h1>
+      )}
       <p class="lede">
-        Architecture models, debugging maps, teaching whiteboards, and rough visual explanations
-        drawn while figuring out how systems fit together. Each sketch is a canonical artifact that
-        can stand alone here or appear inside work, writing, projects, and contributions.
+        {pageLedeFromEntry(
+          page,
+          'Architecture models, debugging maps, teaching whiteboards, and rough visual explanations drawn while figuring out how systems fit together. Each sketch is a canonical artifact that can stand alone here or appear inside work, writing, projects, and contributions.',
+        )}
       </p>
     </div>
   </section>
@@ -30,7 +51,10 @@ const tags = [...new Set(sketches.flatMap((sketch) => sketch.tags))].sort();
       <div class="sketch-index-intro">
         <div>
           <p class="section-index">01 / Visual library</p>
-          <h2>Browse the sketches.</h2>
+          <div class="content-item-title">
+            <SemanticIcon name="sketches" />
+            <h2>Browse the sketches.</h2>
+          </div>
         </div>
         <p>
           The drawing is the primary artifact. The surrounding text only records enough context to

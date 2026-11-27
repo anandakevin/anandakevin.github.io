@@ -1,5 +1,6 @@
 ---
 import { elsewhereLinksWithHref } from '../data/approved-elsewhere';
+import { corpusNavigation, portfolioNavigation } from '../data/site-navigation';
 ---
 
 <footer class="site-footer">
@@ -8,20 +9,26 @@ import { elsewhereLinksWithHref } from '../data/approved-elsewhere';
       Build <em>Systems.</em> Create <em>Leverage.</em> Leave Lasting <em>Impact.</em>
     </p>
     <div class="footer-directory">
-      <p class="footer-blurb">Engineering work, projects, writing, and teaching.</p>
+      <p class="footer-blurb">
+        Portfolio work, projects, contributions, and credentials alongside a public corpus of
+        writing, knowledge, and sketches.
+      </p>
       <div class="footer-group">
-        <span class="footer-group-label">Explore</span>
-        <a href="/work">Work</a>
-        <a href="/projects">Projects</a>
-        <a href="/writing">Writing</a>
-        <a href="/knowledge">Knowledge</a>
-        <a href="/contributions">Contributions</a>
-        <a href="/about">About</a>
+        <span class="footer-group-label">Portfolio</span>
+        {portfolioNavigation.map(([label, href]) => (
+          <a href={href}>{label}</a>
+        ))}
       </div>
       <div class="footer-group">
-        <span class="footer-group-label">More</span>
-        <a href="/explore">Explore</a>
-        <a href="/credentials">Credentials & Recognition</a>
+        <span class="footer-group-label">Corpus</span>
+        {corpusNavigation.map(([label, href]) => (
+          <a href={href}>{label}</a>
+        ))}
+      </div>
+      <div class="footer-group">
+        <span class="footer-group-label">Navigate</span>
+        <a href="/about">About</a>
+        <a href="/explore">Atlas</a>
       </div>
       <div class="footer-group">
         <span class="footer-group-label">Elsewhere</span>

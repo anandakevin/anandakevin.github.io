@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import {
   relatedCaseStudiesFor,
   workDetailDisplayFor,
@@ -34,7 +35,10 @@ const relatedCaseStudiesHref =
     {detail.periodLine}
   </small>
   <div>
-    <h3>{detail.roleTitle}</h3>
+    <div class="content-item-title">
+      <SemanticIcon name="work" />
+      <h3>{detail.roleTitle}</h3>
+    </div>
     <p>{detail.body}</p>
     <div class="stack-pills detail-tags">
       {detail.tags.map((tag) => (

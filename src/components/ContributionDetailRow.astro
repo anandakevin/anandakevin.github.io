@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import { contributionTypeLabels } from '../lib/contribution-type';
 import { formatProgramEngagementMeta } from '../lib/engagement-period';
 import { hrefForPublicRecord, slugTail } from '../lib/content';
@@ -13,6 +14,16 @@ const { item, fixtureMode = false } = Astro.props;
 const anchor = slugTail(item.slug);
 const engagementMeta = formatProgramEngagementMeta(item);
 const typeLabels = contributionTypeLabels(item.contribution_type);
+const contributionIcon =
+  (
+    {
+      instructor: 'teaching',
+      facilitator: 'teaching',
+      mentor: 'mentoring',
+      'curriculum-lead': 'teaching',
+      reviewer: 'community',
+    } as Record<string, string>
+  )[item.contribution_type?.[0] ?? ''] ?? 'contribution';
 ---
 
 <div
@@ -48,7 +59,10 @@ const typeLabels = contributionTypeLabels(item.contribution_type);
     )}
   </small>
   <div>
-    <h3>{item.title}</h3>
+    <div class="content-item-title">
+      <SemanticIcon name={contributionIcon} />
+      <h3>{item.title}</h3>
+    </div>
     <p>{item.description}</p>
     <div class="stack-pills detail-tags">
       {item.tags.map((tag) => (

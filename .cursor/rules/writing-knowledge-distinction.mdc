@@ -1,0 +1,17 @@
+---
+description: Preserve the distinction between authored Writing and subject-centered Knowledge
+alwaysApply: true
+---
+
+# Writing and Knowledge
+
+Use this rule whenever creating, importing, moving, categorizing, or restructuring site content.
+
+- **Writing** is centered on Kevin's reasoning, experience, argument, interpretation, or narrative. Use it for case studies, Field Notes, essays, reflections, experience-based technical writing, opinionated explanations, and lessons learned.
+- **Knowledge** is centered on reusable understanding of a subject. Use it for concepts, guides, references, overviews, technical explanations, mental models, and other structured domain knowledge.
+- Classify by the artifact's primary reader intent and center of gravity:
+  - Writing: “What has Kevin learned, experienced, argued, or figured out?”
+  - Knowledge: “I want to understand X.”
+- Educational or technical content is not automatically Knowledge, and authored content is not automatically Writing.
+- Do not duplicate one canonical artifact in both sections. Cross-link between them when useful: Writing can reference Knowledge concepts, and Knowledge can use a case study or Field Note as an applied example.
+- Preserve the existing taxonomy and routes. If classification is genuinely ambiguous, choose the section that best represents the primary purpose; do not invent a category or restructure the information architecture.

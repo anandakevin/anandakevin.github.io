@@ -1,13 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageCrumb from '../components/PageCrumb.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ProjectsHeroVisual from '../components/ProjectsHeroVisual.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import { getProjectItems, isFixtureMode, slugTail } from '../lib/content';
+import {
+  getPageEntryById,
+  getProjectItems,
+  isFixtureMode,
+  pageHeroFromEntry,
+  pageLedeFromEntry,
+  slugTail,
+} from '../lib/content';
 import { filterAccentFor } from '../lib/filter-presentation';
 import { PROJECT_CATEGORY_ORDER, projectCategoryLabel } from '../lib/project-category';
 
 const projects = await getProjectItems();
+const page = await getPageEntryById('pages/projects');
+const hero = pageHeroFromEntry(page);
 
 const projectGroupConfig = [
   {
@@ -16,10 +26,15 @@ const projectGroupConfig = [
     description: 'Infrastructure tooling, applied research, and operational automation.',
   },
   {
+    id: 'templates',
+    label: 'Templates & examples',
+    description: 'Reusable service and infrastructure examples.',
+  },
+  {
     id: 'experiments-community',
     label: 'Experiments, open source, and community work',
     description:
-      'Backend examples, infrastructure templates, open-source contributions, and community projects.',
+      'Open-source contributions, community projects, and other independent experiments.',
   },
 ] as const;
 
@@ -57,24 +72,34 @@ const projectFilters = [
 ---
 
 <BaseLayout
-  title="Projects"
+  title={page?.data.title ?? 'Projects'}
   description={
     isFixtureMode
       ? 'Implementation fixture project surface.'
-      : 'Independent projects, tools, and experiments.'
+      : (page?.data.description ?? 'Independent projects, tools, and experiments.')
   }
 >
   <section class="page-hero">
     <div class="shell projects-hero-grid">
       <div>
-        <p class="page-crumb">Projects / independent builds and experiments</p>
-        <h1 class="display">
-          Things I've built, explored, and <em>experimented with.</em>
-        </h1>
+        <PageCrumb icon="project">Projects / independent builds and experiments</PageCrumb>
+        {hero ? (
+          <h1 class="display">
+            {hero.headline_before} <em>{hero.emphasis}</em>
+            {hero.headline_after}
+          </h1>
+        ) : (
+          <h1 class="display">
+            Things I've built, explored, and <em>experimented with.</em>
+          </h1>
+        )}
         <p class="lede">
           {isFixtureMode
             ? 'Fixture cards validate cap, tags, and artifact hierarchy without promoting a launch selection.'
-            : 'Independent projects, tools, and experiments — usually because I wanted to understand something better, automate a repetitive task, or make an existing process less painful.'}
+            : pageLedeFromEntry(
+                page,
+                'Independent projects, tools, and experiments — usually because I wanted to understand something better, automate a repetitive task, or make an existing process less painful.',
+              )}
         </p>
       </div>
       <ProjectsHeroVisual />
@@ -82,7 +107,7 @@ const projectFilters = [
   </section>
   <section class="section">
     <div class="shell" data-projects-feed>
-      <SectionHeader index="01 / Library" title="Selected" emphasis="projects." />
+      <SectionHeader index="01 / Library" title="Selected" emphasis="projects." icon="project" />
       <div class="actions atlas-index-action">
         <a class="button alt" href="/explore">
           Explore these in the atlas →

@@ -1,5 +1,6 @@
 ---
 import type { PublicContent } from '../lib/public-contract';
+import SemanticIcon from './SemanticIcon.astro';
 import SketchViewer from './SketchViewer.astro';
 import { hrefForPublicRecord } from '../lib/content';
 
@@ -18,9 +19,12 @@ const { sketch } = Astro.props;
     <p class="sketch-card-meta">
       {sketch.sketch_role?.replace('-', ' ')} · {sketch.published_at ?? 'undated'}
     </p>
-    <h2>
-      <a href={hrefForPublicRecord(sketch)}>{sketch.title}</a>
-    </h2>
+    <div class="content-item-title">
+      <SemanticIcon name="sketches" />
+      <h2>
+        <a href={hrefForPublicRecord(sketch)}>{sketch.title}</a>
+      </h2>
+    </div>
     <p>{sketch.description}</p>
     <div class="stack-pills">
       {sketch.tags.map((tag) => (

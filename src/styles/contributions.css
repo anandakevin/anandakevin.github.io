@@ -93,6 +93,18 @@
   color: var(--teal);
 }
 
+.role-type-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.role-type-line .semantic-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--teal);
+}
+
 .role-card h3 {
   font-size: 21px;
   margin: 12px 0 7px;
@@ -366,19 +378,4 @@
 .map-page-note {
   margin-top: 24px;
   max-width: 900px;
-}
-
-.nav-toggle {
-  display: none;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 12px;
-  background: var(--surface);
-  color: var(--ink);
-  font: 650 10px/1 var(--mono);
-  cursor: pointer;
-}
-
-.site-header.is-nav-open .primary-nav {
-  display: flex;
 }

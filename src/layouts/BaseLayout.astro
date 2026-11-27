@@ -55,15 +55,20 @@ const documentTitle =
     <SiteFooter />
     <script is:inline>
       const root = document.documentElement;
-      const themeButton = document.querySelector('[data-theme-toggle]');
+      const themeButtons = document.querySelectorAll('[data-theme-button]');
       const syncThemeIcon = () => {
-        if (!themeButton) return;
         const dark = root.dataset.theme === 'dark';
-        themeButton.textContent = dark ? '☀' : '☾';
-        themeButton.setAttribute(
-          'aria-label',
-          dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
-        );
+        themeButtons.forEach((button) => {
+          button.textContent = dark ? '☀' : '☾';
+          button.setAttribute(
+            'aria-label',
+            dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+          );
+          button.setAttribute(
+            'title',
+            dark ? 'Switch to light colour theme' : 'Switch to dark colour theme',
+          );
+        });
       };
       const stored = localStorage.getItem('portfolio-theme');
       root.dataset.theme =
@@ -96,12 +101,56 @@ const documentTitle =
       };
       enhanceArrowLinks();
       document.addEventListener('astro:page-load', enhanceArrowLinks);
-      themeButton?.addEventListener('click', () => {
-        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-        root.dataset.theme = next;
-        localStorage.setItem('portfolio-theme', next);
-        syncThemeIcon();
-      });
+      const siteScrollbarThumb = document.createElement('div');
+      siteScrollbarThumb.className = 'site-scrollbar-thumb';
+      siteScrollbarThumb.setAttribute('aria-hidden', 'true');
+      document.body.append(siteScrollbarThumb);
+      root.classList.add('has-site-scrollbar');
+      const syncSiteScrollbar = () => {
+        const viewport = document.documentElement;
+        const viewportHeight = window.innerHeight;
+        const scrollHeight = Math.max(viewport.scrollHeight, document.body.scrollHeight);
+        const maxScroll = scrollHeight - viewportHeight;
+        if (maxScroll <= 0) {
+          siteScrollbarThumb.hidden = true;
+          return;
+        }
+        const nativeScrollbarWidth = window.innerWidth - viewport.clientWidth;
+        const scrollbarWidth = Math.max(8, nativeScrollbarWidth || 12);
+        const thumbHeight = Math.min(
+          viewportHeight,
+          Math.max(44, (viewportHeight * viewportHeight) / scrollHeight),
+        );
+        const thumbTop = (window.scrollY / maxScroll) * (viewportHeight - thumbHeight);
+        siteScrollbarThumb.hidden = false;
+        siteScrollbarThumb.style.right = `${nativeScrollbarWidth > 0 ? -nativeScrollbarWidth : 0}px`;
+        siteScrollbarThumb.style.width = `${scrollbarWidth}px`;
+        siteScrollbarThumb.style.height = `${thumbHeight}px`;
+        siteScrollbarThumb.style.transform = `translate3d(0, ${thumbTop}px, 0)`;
+      };
+      let siteScrollbarFrame = 0;
+      const scheduleSiteScrollbarSync = () => {
+        if (siteScrollbarFrame) return;
+        siteScrollbarFrame = requestAnimationFrame(() => {
+          siteScrollbarFrame = 0;
+          syncSiteScrollbar();
+        });
+      };
+      syncSiteScrollbar();
+      window.addEventListener('scroll', scheduleSiteScrollbarSync, { passive: true });
+      window.addEventListener('resize', scheduleSiteScrollbarSync);
+      document.addEventListener('astro:page-load', scheduleSiteScrollbarSync);
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(scheduleSiteScrollbarSync).observe(document.body);
+      }
+      themeButtons.forEach((button) =>
+        button.addEventListener('click', () => {
+          const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          localStorage.setItem('portfolio-theme', next);
+          syncThemeIcon();
+        }),
+      );
       const legacy = {
         '#about': '/about',
         '#exp': '/work',

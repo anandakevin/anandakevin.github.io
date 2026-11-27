@@ -47,7 +47,11 @@ export const projectCategorySchema = z.array(projectCategoryValueSchema).min(1);
 export type ProjectCategory = z.infer<typeof projectCategoryValueSchema>;
 
 export const projectDestinationSchema = z.enum(['detail', 'external']);
-export const projectGroupSchema = z.enum(['core-engineering', 'experiments-community']);
+export const projectGroupSchema = z.enum([
+  'core-engineering',
+  'templates',
+  'experiments-community',
+]);
 
 export const mapDomainSchema = z.enum([
   'engineering/backend-platform-delivery',
@@ -314,6 +318,9 @@ export const publicContentSchema = z.object({
   /** Editorial group used to separate primary engineering work from smaller or collaborative work. */
   project_group: projectGroupSchema.optional(),
   project_order: z.number().int().nonnegative().optional(),
+  /** Month-precision project timeline, stored as ISO boundary dates. */
+  project_start: z.iso.date().optional(),
+  project_end: z.iso.date().optional(),
   map: mapMetadataSchema.optional(),
   knowledge_kind: z.string().min(1).optional(),
   knowledge_domain: z.string().min(1).optional(),
@@ -355,6 +362,7 @@ export const publicContentSchema = z.object({
   contribution_signal: contributionSignalSchema.optional(),
   media: z.array(publicMediaSchema).default([]),
   page_hero: pageHeroSchema.optional(),
+  page_lede: z.string().min(1).optional(),
   page_principles: z.array(pagePrincipleSchema).optional(),
   sketch_source: z
     .string()
