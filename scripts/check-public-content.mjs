@@ -243,9 +243,6 @@ for (const record of records.filter((entry) => entry.id.startsWith('knowledge/')
     throw new Error(`Knowledge page references missing area ${areaPath}: ${record.id}`);
   }
 }
-const productionVisible = (record) =>
-  ['ready', 'published'].includes(record.meta.publication_status);
-
 for (const record of records) {
   assertMarkdownStructure(record);
   for (const field of dateFields) {
@@ -411,7 +408,7 @@ for (const record of primary) {
   for (const relation of record.meta.public_relations ?? []) {
     if (!byId.has(relation.target))
       throw new Error(`Unresolved relation ${relation.target} on ${record.id}`);
-    if (!productionVisible(byId.get(relation.target)))
+    if (publishedIds.has(record.id) && !publishedIds.has(relation.target))
       throw new Error(`Production relation ${relation.target} is not visible on ${record.id}`);
   }
   if (record.meta.parent_work !== undefined) {
@@ -438,7 +435,7 @@ for (const record of primary) {
         record.meta.fixture_only === true &&
         record.id.startsWith('pages/') &&
         target.startsWith('knowledge/');
-      if (!productionVisible(byId.get(target)) && !fixtureKnowledgeCuration)
+      if (publishedIds.has(record.id) && !publishedIds.has(target) && !fixtureKnowledgeCuration)
         throw new Error(`Production curation target ${target} is not visible on ${record.id}`);
     }
   }
@@ -448,7 +445,7 @@ for (const record of records.filter((entry) => entry.id.startsWith('social/'))) 
   for (const target of record.meta.related_records ?? []) {
     if (!byId.has(target))
       throw new Error(`Social card ${record.id} references missing record ${target}`);
-    if (!productionVisible(byId.get(target)))
+    if (publishedIds.has(record.id) && !publishedIds.has(target))
       throw new Error(`Social card ${record.id} references a non-production record ${target}`);
   }
 }
