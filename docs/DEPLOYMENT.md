@@ -39,7 +39,7 @@ permission. The independent `PORTFOLIO_VAULT_READ_KEY` remains read-only and is
 used only to retrieve the private portfolio source. Keep
 `PORTFOLIO_DISPATCH_ENABLED` unset or false until this architecture is on
 `main` and the existing token's permission is verified. Do not create, rotate,
-or revoke credentials as part of this change. The dispatch step fails visibly
+expose, or revoke credentials as part of this change. The dispatch step fails visibly
 with GitHub's API error when a request is rejected.
 
 ### Local commands
