@@ -7,6 +7,12 @@ its collection-relative path, for example
 under `public/media/` and `public/sketches/`. Older notes under `drafts/` are
 preserved but are not an Astro input.
 
+Markdown and Git are the canonical content system. Obsidian (including the
+existing `obsidian-git` plugin), GitHub, and existing development tools are
+interchangeable editing interfaces over the same source. No separate CMS or
+content repository is part of the publishing architecture; Sveltia, Decap, and
+a custom CMS are not introduced.
+
 The public site repository owns Astro code, schemas, checks, and deployment.
 It reads the private source from the sibling
 `../second-brain/80-Public-Portfolio` checkout locally. Set
@@ -26,7 +32,8 @@ may include the backlog and its media, so its artifact is for local review.
 
 Private Obsidian owner notes remain separate from this portfolio source. When a
 private note becomes a public candidate, extract a public-safe record into this
-folder; do not make the site or CMS read the private owner note. An owner may
+folder; the site reads only this source folder, never the private owner note.
+An owner may
 link to an approved public record through an HTTPS `public_sources` URL. Review
 wording, evidence, attribution, permissions, and media before adding an ID to
 `published.json`. Published HTML and assets are public even though the content
