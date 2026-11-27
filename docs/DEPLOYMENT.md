@@ -30,16 +30,17 @@ Treat the static artifact and build logs as disclosure surfaces.
 ### Second Brain dispatch credential
 
 The notifier in `anandakevin/second-brain` calls this workflow through GitHub's
-native workflow dispatch endpoint. Provision a fine-grained personal access
-token restricted to this repository with **Actions: write** only;
-the endpoint does not require contents-write permission. Store it in the
-Second Brain Actions secrets as `PORTFOLIO_DISPATCH_TOKEN`. The independent
-`PORTFOLIO_VAULT_READ_KEY` remains read-only and is used only to retrieve the
-private portfolio source. Set the Second Brain Actions variable
-`PORTFOLIO_DISPATCH_ENABLED` to `true` only after this architecture is on
-`main`; rotate by updating the secret before revoking the old token, and keep
-the variable disabled until an authorized verification. The dispatch step
-fails visibly with GitHub's API error when a request is rejected.
+native workflow dispatch endpoint using the existing
+`PORTFOLIO_SYNC_TOKEN` Actions secret from that repository. The token must be
+authorized for **Actions: write** on this portfolio repository; its current
+scope and permissions have not been verified by this implementation. Confirm
+them before enabling dispatch. This endpoint does not require contents-write
+permission. The independent `PORTFOLIO_VAULT_READ_KEY` remains read-only and is
+used only to retrieve the private portfolio source. Keep
+`PORTFOLIO_DISPATCH_ENABLED` unset or false until this architecture is on
+`main` and the existing token's permission is verified. Do not create, rotate,
+or revoke credentials as part of this change. The dispatch step fails visibly
+with GitHub's API error when a request is rejected.
 
 ### Local commands
 
